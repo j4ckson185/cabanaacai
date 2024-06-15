@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho de Compras</title>
+    <style>
+        /* Estilos para a página do carrinho */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+        }
+        nav {
+            background-color: #333;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        #lista-produtos {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 60px; /* Ajuste para dar espaço ao menu fixo */
+        }
+        .produto {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+        .produto p {
+            margin: 0;
+        }
+        .acompanhamentos, .extras, .sabores {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+        .acompanhamentos li, .extras li, .sabores li {
+            display: flex;
+            align-items: center;
+        }
+        .acompanhamentos li button, .extras li button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 10px;
+        }
+        .botoes {
+            margin-top: 20px;
+        }
+        .botoes button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+        }
+        .btn-adicionar {
+            background-color: #4caf50;
+        }
+        .btn-esvaziar {
+            background-color: #f44336;
+        }
+        .btn-finalizar {
+            background-color: #2196F3;
+        }
+        .btn-adicionar:hover, .btn-esvaziar:hover, .btn-finalizar:hover {
+            opacity: 0.8;
+        }
+        .btn-adicionar:last-child {
+            margin-right: 0;
+        }
+        .total {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="promos.html">Promos</a>
+        <a href="carrinho.html">Carrinho</a>
+    </nav>
+
+    <h1>Carrinho de Compras</h1>
+    <ul id="lista-produtos">
+        <!-- Os itens do carrinho serão adicionados aqui dinamicamente com JavaScript -->
+    </ul>
+
+    <div class="total" id="total-pedido">Total: R$0,00</div>
+
+    <!-- Botões -->
+    <div class="botoes">
+        <button class="btn-adicionar" onclick="location.href='index.html'">Adicionar mais itens</button>
+        <button class="btn-esvaziar" onclick="esvaziarCarrinho()">Esvaziar Carrinho</button>
+        <button class="btn-finalizar" onclick="location.href='pagina_de_pagamento.html'">Finalizar Pedido</button>
+    </div>
+
+    <script>
+        // Função para formatar o valor como moeda
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        // Função para exibir os itens do carrinho
+        function exibirCarrinho() {
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+            if (carrinho && carrinho.length > 0) {
+                const listaProdutos = document.getElementById('lista-produtos');
+                listaProdutos.innerHTML = '';
+                let total = 0;
+                carrinho.forEach((item, index) => {
+                    const produto = document.createElement('li');
+                    produto.classList.add('produto');
+
+                    // Calcula o valor total do item incluindo os extras
+                    let valorProduto = parseFloat(item.preco);
+                    item.extras.forEach(extra => {
+                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                    });
+                    total += valorProduto;
+
+                    const sabores = item.sabores.map(sabor => 
+                        `<li>${sabor}</li>`
+                    ).join('');
+                    const acompanhamentos = item.acompanhamentos.map(acompanhamento => 
+                        `<li>${acompanhamento}<button onclick="removerAcompanhamento(${index}, '${acompanhamento}')">🗑️</button></li>`
+                    ).join('');
+                    const extras = item.extras.map(extra => 
+                        `<li>${extra}<button onclick="removerExtra(${index}, '${extra}')">🗑️</button><button onclick="adicionarMaisExtra(${index}, '${extra}')">➕</button></li>`
+                    ).join('');
+
+                    produto.innerHTML = `
+                        <p><strong>${item.nome} - ${formatarMoeda(valorProduto)}<button onclick="removerProduto(${index})">🗑️</button></strong></p>
+                        <p>Sabores:</p>
+                        <ul class="sabores">${sabores}</ul>
+                        <p>Acompanhamentos:</p>
+                        <ul class="acompanhamentos">${acompanhamentos}</ul>
+                        <p>Itens Extras:</p>
+                        <ul class="extras">${extras}</ul>
+                    `;
+                    listaProdutos.appendChild(produto);
+                });
+
+                // Atualiza o valor total do pedido
+                document.getElementById('total-pedido').innerText = `Total: ${formatarMoeda(total)}`;
+            } else {
+                const listaProdutos = document.getElementById('lista-produtos');
+                listaProdutos.innerHTML = '<li>O carrinho está vazio.</li>';
+                document.getElementById('total-pedido').innerText = 'Total: R$0,00';
+            }
+        }
+
+        // Função para remover um produto do carrinho
+        function removerProduto(index) {
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+            carrinho.splice(index, 1);
+            sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
+            exibirCarrinho();
+        }
+
+        // Função para remover um acompanhamento de um produto
+        function removerAcompanhamento(produtoIndex, acompanhamento) {
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+            carrinho[produtoIndex].acompanhamentos = carrinho[produtoIndex].acompanhamentos.filter(item => item !== acompanhamento);
+            sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
+            exibirCarrinho();
+        }
+
+        // Função para remover um extra de um produto
+        function removerExtra(produtoIndex, extra) {
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+            const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+            carrinho[produtoIndex].extras = carrinho[produtoIndex].extras.filter(item => item !== extra);
+            carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) - precoExtra).toFixed(2);
+            sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
+            exibirCarrinho();
+        }
+
+        // Função para adicionar mais um item extra ao carrinho
+        function adicionarMaisExtra(produtoIndex, extra) {
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+            const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+            if (produtoIndex !== -1) {
+                carrinho[produtoIndex].extras.push(extra);
+                carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) + precoExtra).toFixed(2);
+                sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
+                exibirCarrinho();
+            }
+        }
+
+        // Função para esvaziar o carrinho
+        function esvaziarCarrinho() {
+            sessionStorage.removeItem('carrinho');
+            exibirCarrinho();
+        }
+
+        // Chama a função para exibir os itens do carrinho quando a página carregar
+        window.onload = exibirCarrinho;
+    </script>
+</body>
+</html>
