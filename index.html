@@ -6,6 +6,47 @@
     <title>Cabana Açaí</title>
     <link rel="stylesheet" href="styles2.css">
     <style>
+        .header-content {
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .header-content img.logo {
+            max-width: 100px;
+            height: auto;
+        }
+        .header-content h1 {
+            font-size: 2em;
+            margin: 10px 0;
+        }
+        .header-image img {
+            width: 100%;
+            height: auto;
+        }
+        .welcome-message {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .quick-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .quick-links a {
+            text-decoration: none;
+            font-size: 1em;
+            color: #663399;
+            padding: 10px 20px;
+            border: 1px solid #663399;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .quick-links a:hover {
+            background-color: #663399;
+            color: #fff;
+        }
         .closed-message {
             text-align: center;
             color: red;
@@ -35,18 +76,27 @@
 </head>
 <body>
     <header>
+        <div class="header-content">
+            <img src="https://i.ibb.co/tHm2PK1/logo-cabana.jpg" alt="Cabana Açaí" class="logo">
+            <h1>Cabana Açaí</h1>
+        </div>
         <div class="header-image">
-            <img src="https://i.ibb.co/vD58sdy/DALL-E-2024-06-14-17-17-01-A-horizontal-banner-style-cover-image-for-a-digital-menu-of-a-restaurant.webp" alt="Cabana Açaí - Açaí na Marmita com Nutella" class="banner">
-            <h1></h1>
+            <img src="https://i.ibb.co/wsSwfdt/resized-image-1080x400.png" alt="Açaí na Marmita com Nutella" class="banner">
         </div>
-    </header>
-    <main>
-        <div id="closed-message" class="closed-message" style="display: none;">
-            A loja está fechada no momento. Por favor, volte durante o horário de funcionamento.
-        </div>
+        <p class="welcome-message">Bem-vindo à Cabana Açaí - Sabor e frescor em cada colherada!</p>
+        <nav class="quick-links">
+            <a href="#inicio">Início</a>
+            <a href="#promos">Promos</a>
+            <a href="#carrinho">Carrinho</a>
+        </nav>
         <div class="search-bar">
             <input type="text" id="search-input" placeholder="Pesquisar produtos...">
         </div>
+        <div id="closed-message" class="closed-message" style="display: none;">
+            A loja está fechada no momento. Por favor, volte durante o horário de funcionamento.
+        </div>
+    </header>
+    <main>
         <section id="os-mais-pedidos">
             <h2>Os Mais Pedidos</h2>
             <div class="products"></div>
@@ -90,7 +140,14 @@
             displayProducts(products.filter(p => p.category === 'monte-do-seu-jeito'), monteDoSeuJeitoDiv);
 
             // Verificação de horários de funcionamento
-            const horarios = JSON.parse(localStorage.getItem('horarios')) || {};
+            const horarios = {
+                'wednesday': { open: '12:30', close: '22:30' },
+                'thursday': { open: '12:30', close: '22:30' },
+                'friday': { open: '12:30', close: '22:30' },
+                'saturday': { open: '12:30', close: '22:30' },
+                'sunday': { open: '12:30', close: '22:30' }
+            };
+
             const now = moment().tz("America/Sao_Paulo");
             const day = now.format('dddd').toLowerCase();
             const currentTime = now.hours() * 60 + now.minutes();
