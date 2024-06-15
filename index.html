@@ -93,3 +93,28 @@
             const horarios = JSON.parse(localStorage.getItem('horarios')) || {};
             const now = moment().tz("America/Sao_Paulo");
             const day = now.format('dddd').toLowerCase();
+            const currentTime = now.hours() * 60 + now.minutes();
+            const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
+            const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
+
+            if (openTime !== null && closeTime !== null) {
+                if (currentTime < openTime || currentTime > closeTime) {
+                    document.getElementById('closed-message').style.display = 'block';
+                }
+            } else {
+                document.getElementById('closed-message').style.display = 'block';
+                document.getElementById('closed-message').innerText = 'A loja está fechada hoje.';
+            }
+
+            // Função de pesquisa
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredProducts = products.filter(product => product.name.toLowerCase().includes(searchTerm) || product.description.toLowerCase().includes(searchTerm));
+                displayProducts(filteredProducts.filter(p => p.category === 'mais-pedidos'), maisPedidosDiv);
+                displayProducts(filteredProducts.filter(p => p.category === 'monte-do-seu-jeito'), monteDoSeuJeitoDiv);
+            });
+        });
+    </script>
+</body>
+</html>
