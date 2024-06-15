@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Pedidos</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Estilos para a página de pedidos */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #ffffff;
+        }
+        .pedido {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+        .pedido p {
+            margin: 5px 0;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
+            authDomain: "cabana-8d55e.firebaseapp.com",
+            databaseURL: "https://cabana-8d55e-default-rtdb.firebaseio.com",
+            projectId: "cabana-8d55e",
+            storageBucket: "cabana-8d55e.appspot.com",
+            messagingSenderId: "706144237954",
+            appId: "1:706144237954:web:345c10370972486afc779b",
+            measurementId: "G-96Y337GYT8"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function buscarPedidos() {
+            const telefone = document.getElementById('telefone').value;
+            if (telefone) {
+                db.collection("orders")
+                    .where("telefone", "==", telefone)
+                    .orderBy("timestamp", "desc")
+                    .onSnapshot((querySnapshot) => {
+                        const pedidosDiv = document.getElementById('pedidos');
+                        pedidosDiv.innerHTML = "";
+                        if (querySnapshot.empty) {
+                            pedidosDiv.innerHTML = "<p>Nenhum pedido encontrado para este número de telefone. Digite o número com DDD, ex: 84988205566 ou da mesma forma que você digitou na página de pagamento.</p>";
+                        } else {
+                            querySnapshot.forEach((doc) => {
+                                const pedido = doc.data();
+                                const pedidoDiv = document.createElement('div');
+                                pedidoDiv.classList.add('pedido');
+                                pedidoDiv.innerHTML = `
+                                    <strong>Pedido ${doc.id}</strong>
+                                    <p>Cliente: ${pedido.nomeSobrenome}</p>
+                                    <p>Endereço: ${pedido.endereco}</p>
+                                    <p>Telefone: ${pedido.telefone}</p>
+                                    <p>Email: ${pedido.email}</p>
+                                    <p>Método de Pagamento: ${pedido.metodoPagamento}</p>
+                                    <p>Total: ${pedido.total}</p>
+                                    <p>Status: ${pedido.status}</p>
+                                    <p>Data e Hora: ${pedido.timestamp ? pedido.timestamp.toDate().toLocaleString() : 'N/A'}</p>
+                                `;
+                                pedidosDiv.appendChild(pedidoDiv);
+                            });
+                        }
+                    });
+            } else {
+                alert("Por favor, insira o número de telefone.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Meus Pedidos</h1>
+    </header>
+    <main>
+        <form onsubmit="event.preventDefault(); buscarPedidos();">
+            <label for="telefone">Digite seu telefone com DDD:</label>
+            <input type="tel" id="telefone" required>
+            <button type="submit">Verificar pedidos</button>
+        </form>
+        <div id="pedidos"></div>
+    </main>
+</body>
+</html>
+
+
+
+
+

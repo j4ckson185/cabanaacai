@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horário da Loja - Cabana Açaí</title>
+    <link rel="stylesheet" href="styles2.css">
+    <style>
+        .days {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .day-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ccc;
+            cursor: pointer;
+        }
+        .day-circle.selected {
+            background-color: #800080;
+            color: white;
+        }
+        .day-config {
+            display: none;
+            margin-bottom: 20px;
+        }
+        .day-config.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Horário da Loja - Cabana Açaí</h1>
+        <nav>
+            <ul>
+                <li><a href="admin.html">Voltar ao Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="days">
+            <div class="day-circle" data-day="monday">S</div>
+            <div class="day-circle" data-day="tuesday">T</div>
+            <div class="day-circle" data-day="wednesday">Q</div>
+            <div class="day-circle" data-day="thursday">Q</div>
+            <div class="day-circle" data-day="friday">S</div>
+            <div class="day-circle" data-day="saturday">S</div>
+            <div class="day-circle" data-day="sunday">D</div>
+        </div>
+        <form id="horario-form">
+            <div id="monday" class="day-config">
+                <label for="monday-open">Segunda-feira:</label>
+                <input type="time" id="monday-open" name="monday-open">
+                <input type="time" id="monday-close" name="monday-close">
+            </div>
+            <div id="tuesday" class="day-config">
+                <label for="tuesday-open">Terça-feira:</label>
+                <input type="time" id="tuesday-open" name="tuesday-open">
+                <input type="time" id="tuesday-close" name="tuesday-close">
+            </div>
+            <div id="wednesday" class="day-config">
+                <label for="wednesday-open">Quarta-feira:</label>
+                <input type="time" id="wednesday-open" name="wednesday-open">
+                <input type="time" id="wednesday-close" name="wednesday-close">
+            </div>
+            <div id="thursday" class="day-config">
+                <label for="thursday-open">Quinta-feira:</label>
+                <input type="time" id="thursday-open" name="thursday-open">
+                <input type="time" id="thursday-close" name="thursday-close">
+            </div>
+            <div id="friday" class="day-config">
+                <label for="friday-open">Sexta-feira:</label>
+                <input type="time" id="friday-open" name="friday-open">
+                <input type="time" id="friday-close" name="friday-close">
+            </div>
+            <div id="saturday" class="day-config">
+                <label for="saturday-open">Sábado:</label>
+                <input type="time" id="saturday-open" name="saturday-open">
+                <input type="time" id="saturday-close" name="saturday-close">
+            </div>
+            <div id="sunday" class="day-config">
+                <label for="sunday-open">Domingo:</label>
+                <input type="time" id="sunday-open" name="sunday-open">
+                <input type="time" id="sunday-close" name="sunday-close">
+            </div>
+            <button type="submit">Salvar Horários</button>
+        </form>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dayCircles = document.querySelectorAll('.day-circle');
+            const dayConfigs = document.querySelectorAll('.day-config');
+
+            // Carregar horários salvos do localStorage
+            const horariosSalvos = JSON.parse(localStorage.getItem('horarios')) || {};
+
+            // Restaurar a seleção de dias e horários salvos
+            Object.keys(horariosSalvos).forEach(day => {
+                const circle = document.querySelector(`.day-circle[data-day="${day}"]`);
+                if (circle) {
+                    circle.classList.add('selected');
+                    const config = document.getElementById(day);
+                    if (config) {
+                        config.classList.add('active');
+                        document.getElementById(`${day}-open`).value = horariosSalvos[day].open;
+                        document.getElementById(`${day}-close`).value = horariosSalvos[day].close;
+                    }
+                }
+            });
+
+            dayCircles.forEach(circle => {
+                circle.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    const day = this.getAttribute('data-day');
+                    document.getElementById(day).classList.toggle('active');
+                });
+            });
+
+            document.getElementById('horario-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const horarios = {};
+
+                dayCircles.forEach(circle => {
+                    if (circle.classList.contains('selected')) {
+                        const day = circle.getAttribute('data-day');
+                        horarios[day] = {
+                            open: document.getElementById(`${day}-open`).value,
+                            close: document.getElementById(`${day}-close`).value
+                        };
+                    }
+                });
+
+                localStorage.setItem('horarios', JSON.stringify(horarios));
+                alert('Horários salvos com sucesso!');
+            });
+        });
+    </script>
+</body>
+</html>

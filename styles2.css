@@ -1,0 +1,146 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.header-image {
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.header-image img {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: cover;
+}
+
+.header-image h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+main {
+    padding: 1rem;
+}
+
+section {
+    margin: 2rem 0;
+}
+
+.mais-pedidos, .products {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.mais-pedido-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 1rem;
+    margin: 0.5rem;
+    background-color: #fff;
+    box-sizing: border-box;
+    width: 150px;
+    height: 150px;
+}
+
+.mais-pedido-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.mais-pedido-item h3 {
+    text-align: center;
+    font-size: 1rem;
+}
+
+.product {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 1rem;
+    margin: 0.5rem;
+    background-color: #fff;
+    box-sizing: border-box;
+    width: calc(50% - 1rem);
+}
+
+.product img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 5px;
+}
+
+.product-details {
+    flex-grow: 1;
+    padding-left: 1rem;
+}
+
+.product-details h3 {
+    margin-top: 0;
+}
+
+@media (max-width: 600px) {
+    .product, .mais-pedido-item {
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .product img, .mais-pedido-item img {
+        max-width: 100%;
+    }
+
+    .product-details {
+        padding-left: 0;
+        padding-top: 1rem;
+    }
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-top: 1rem;
+}
+
+form input, form textarea, form select {
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+form button {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #6a0dad;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #4b0082;
+}
+
+footer {
+    text-align: center;
+    margin-top: 2rem;
+}
