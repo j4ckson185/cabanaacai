@@ -62,6 +62,26 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Inicializa os produtos no localStorage se não estiverem presentes
+            if (!localStorage.getItem('products')) {
+                localStorage.setItem('products', JSON.stringify([
+                    {
+                        name: "Produto 1",
+                        description: "Descrição do Produto 1",
+                        price: 10.00,
+                        image: "https://via.placeholder.com/150",
+                        url: "#"
+                    },
+                    {
+                        name: "Produto 2",
+                        description: "Descrição do Produto 2",
+                        price: 20.00,
+                        image: "https://via.placeholder.com/150",
+                        url: "#"
+                    }
+                ]));
+            }
+
             const products = JSON.parse(localStorage.getItem('products')) || [];
 
             const maisPedidosDiv = document.querySelector('#os-mais-pedidos .products');
@@ -79,7 +99,7 @@
                         <div class="product-details">
                             <h3>${product.name}</h3>
                             <p>${product.description}</p>
-                            <p><strong>Preço:</strong> R$ ${product.price}</p>
+                            <p><strong>Preço:</strong> R$ ${product.price.toFixed(2)}</p>
                         </div>
                     `;
                     container.appendChild(productDiv);
