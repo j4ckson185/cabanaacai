@@ -1,140 +1,28 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cabana Açaí</title>
-    <link rel="stylesheet" href="styles2.css">
-    <style>
-        .closed-message {
-            text-align: center;
-            color: red;
-            font-weight: bold;
-            margin-top: 20px;
-            padding: 20px;
-            border: 2px solid red;
-            border-radius: 10px;
-            background-color: #ffe6e6;
-            width: 80%;
-            margin: 20px auto;
-        }
-        .search-bar {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .search-bar input {
-            width: 80%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
-</head>
-<body>
-    <header>
-        <div class="header-image">
-            <img src="https://i.ibb.co/vD58sdy/DALL-E-2024-06-14-17-17-01-A-horizontal-banner-style-cover-image-for-a-digital-menu-of-a-restaurant.webp" alt="Cabana Açaí - Açaí na Marmita com Nutella" class="banner">
-            <h1></h1>
-        </div>
-    </header>
-    <main>
-        <div id="closed-message" class="closed-message" style="display: none;">
-            A loja está fechada no momento. Por favor, volte durante o horário de funcionamento.
-        </div>
-        <div class="search-bar">
-            <input type="text" id="search-input" placeholder="Pesquisar produtos...">
-        </div>
-        <section id="os-mais-pedidos">
-            <h2>Os Mais Pedidos</h2>
-            <div class="products"></div>
-        </section>
-        <section id="monte-do-seu-jeito">
-            <h2>Monte do Seu Jeito</h2>
-            <div class="products"></div>
-        </section>
-    </main>
-    <footer>
-        <!-- Removido o link de Adicionar/Editar Produtos -->
-    </footer>
+document.addEventListener("DOMContentLoaded", function() {
+    const products = JSON.parse(localStorage.getItem('products')) || [];
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Inicializa os produtos no localStorage se não estiverem presentes
-            if (!localStorage.getItem('products')) {
-                localStorage.setItem('products', JSON.stringify([
-                    {
-                        name: "Açaí no Pote 200ml",
-                        description: "Açaí no pote 200ml",
-                        price: 9.99,
-                        image: "https://i.ibb.co/1ZFwq7N/acai1litro.jpg",
-                        url: "https://cabanaacai.netlify.app/acai_1litro"
-                    },
-                    {
-                        name: "Açaí no pote 300ml",
-                        description: "Delicioso e revigorante, perfeito para qualquer momento do dia.",
-                        price: 10.99,
-                        image: "https://i.ibb.co/YQ0shB2/acai2.jpg",
-                        url: "https://cabanaacai.netlify.app/acai_300ml"
-                    }
-                ]));
-            }
+    const maisPedidosDiv = document.querySelector('#os-mais-pedidos .products');
+    const monteDoSeuJeitoDiv = document.querySelector('#monte-do-seu-jeito .products');
 
-            const products = JSON.parse(localStorage.getItem('products')) || [];
-
-            const maisPedidosDiv = document.querySelector('#os-mais-pedidos .products');
-            const monteDoSeuJeitoDiv = document.querySelector('#monte-do-seu-jeito .products');
-
-            function displayProducts(productList, container) {
-                container.innerHTML = '';
-                productList.forEach(product => {
-                    const productDiv = document.createElement('div');
-                    productDiv.classList.add('product');
-                    productDiv.innerHTML = `
-                        <a href="${product.url}" target="_blank">
-                            <img src="${product.image}" alt="${product.name}">
-                        </a>
-                        <div class="product-details">
-                            <h3>${product.name}</h3>
-                            <p>${product.description}</p>
-                            <p><strong>Preço:</strong> R$ ${product.price.toFixed(2)}</p>
-                        </div>
-                    `;
-                    container.appendChild(productDiv);
-                });
-            }
-
-            displayProducts(products, maisPedidosDiv);
-            displayProducts(products.filter(p => p.name !== 'Combo 2 Açais ou Cremes 500ml'), monteDoSeuJeitoDiv);
-
-            // Verificação de horários de funcionamento
-            const horarios = JSON.parse(localStorage.getItem('horarios')) || {};
-            const now = moment().tz("America/Sao_Paulo");
-            const day = now.format('dddd').toLowerCase();
-            const currentTime = now.hours() * 60 + now.minutes();
-            const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
-            const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
-
-            if (openTime !== null && closeTime !== null) {
-                if (currentTime < openTime || currentTime > closeTime) {
-                    document.getElementById('closed-message').style.display = 'block';
-                }
-            } else {
-                document.getElementById('closed-message').style.display = 'block';
-                document.getElementById('closed-message').innerText = 'A loja está fechada hoje.';
-            }
-
-            // Função de pesquisa
-            const searchInput = document.getElementById('search-input');
-            searchInput.addEventListener('input', function() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const filteredProducts = products.filter(product => product.name.toLowerCase().includes(searchTerm) || product.description.toLowerCase().includes(searchTerm));
-                displayProducts(filteredProducts, maisPedidosDiv);
-                displayProducts(filteredProducts.filter(p => p.name !== 'Combo 2 Açais ou Cremes 500ml'), monteDoSeuJeitoDiv);
-            });
+    function displayProducts(productList, container) {
+        container.innerHTML = '';
+        productList.forEach(product => {
+            const productDiv = document.createElement('div');
+            productDiv.classList.add('product');
+            productDiv.innerHTML = `
+                <a href="${product.url}" target="_blank">
+                    <img src="${product.image}" alt="${product.name}">
+                </a>
+                <div class="product-details">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p><strong>Preço:</strong> R$ ${product.price}</p>
+                </div>
+            `;
+            container.appendChild(productDiv);
         });
-    </script>
-</body>
-</html>
+    }
+
+    displayProducts(products.filter(p => p.category === 'mais-pedidos'), maisPedidosDiv);
+    displayProducts(products.filter(p => p.category === 'monte-do-seu-jeito'), monteDoSeuJeitoDiv);
+});
