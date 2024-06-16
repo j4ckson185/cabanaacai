@@ -125,81 +125,85 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const products = JSON.parse(localStorage.getItem('products')) || [];
-            console.log("Products from localStorage:", products);
+            fetch('products.json')
+                .then(response => response.json())
+                .then(products => {
+                    console.log("Products from JSON file:", products);
 
-            const maisPedidosDiv = document.querySelector('#os-mais-pedidos .products');
-            const monteDoSeuJeitoDiv = document.querySelector('#monte-do-seu-jeito .products');
+                    const maisPedidosDiv = document.querySelector('#os-mais-pedidos .products');
+                    const monteDoSeuJeitoDiv = document.querySelector('#monte-do-seu-jeito .products');
 
-            function displayProducts(productList, container) {
-                container.innerHTML = '';
-                if (productList.length === 0) {
-                    container.innerHTML = '<p>Nenhum produto encontrado.</p>';
-                    return;
-                }
-                productList.forEach(product => {
-                    const productDiv = document.createElement('div');
-                    productDiv.classList.add('product');
-                    productDiv.innerHTML = `
-                        <a href="${product.url}" target="_blank">
-                            <img src="${product.image}" alt="${product.name}">
-                        </a>
-                        <div class="product-details">
-                            <h3>${product.name}</h3>
-                            <p>${product.description}</p>
-                            <p><strong>Preço:</strong> R$ ${product.price}</p>
-                        </div>
-                    `;
-                    container.appendChild(productDiv);
-                });
-            }
+                    function displayProducts(productList, container) {
+                        container.innerHTML = '';
+                        if (productList.length === 0) {
+                            container.innerHTML = '<p>Nenhum produto encontrado.</p>';
+                            return;
+                        }
+                        productList.forEach(product => {
+                            const productDiv = document.createElement('div');
+                            productDiv.classList.add('product');
+                            productDiv.innerHTML = `
+                                <a href="${product.url}" target="_blank">
+                                    <img src="${product.image}" alt="${product.name}">
+                                </a>
+                                <div class="product-details">
+                                    <h3>${product.name}</h3>
+                                    <p>${product.description}</p>
+                                    <p><strong>Preço:</strong> R$ ${product.price}</p>
+                                </div>
+                            `;
+                            container.appendChild(productDiv);
+                        });
+                    }
 
-            const maisPedidos = products.filter(p => p.category === 'mais-pedidos');
-            const monteDoSeuJeito = products.filter(p => p.category === 'monte-do-seu-jeito');
+                    const maisPedidos = products.filter(p => p.category === 'mais-pedidos');
+                    const monteDoSeuJeito = products.filter(p => p.category === 'monte-do-seu-jeito');
 
-            console.log("Os Mais Pedidos:", maisPedidos);
-            console.log("Monte do Seu Jeito:", monteDoSeuJeito);
+                    console.log("Os Mais Pedidos:", maisPedidos);
+                    console.log("Monte do Seu Jeito:", monteDoSeuJeito);
 
-            displayProducts(maisPedidos, maisPedidosDiv);
-            displayProducts(monteDoSeuJeito, monteDoSeuJeitoDiv);
+                    displayProducts(maisPedidos, maisPedidosDiv);
+                    displayProducts(monteDoSeuJeito, monteDoSeuJeitoDiv);
 
-            // Verificação de horários de funcionamento
-            const horarios = {
-                'wednesday': { open: '12:30', close: '22:30' },
-                'thursday': { open: '12:30', close: '22:30' },
-                'friday': { open: '12:30', close: '22:30' },
-                'saturday': { open: '12:30', close: '22:30' },
-                'sunday': { open: '12:30', close: '22:30' }
-            };
+                    // Verificação de horários de funcionamento
+                    const horarios = {
+                        'wednesday': { open: '12:30', close: '22:30' },
+                        'thursday': { open: '12:30', close: '22:30' },
+                        'friday': { open: '12:30', close: '22:30' },
+                        'saturday': { open: '12:30', close: '22:30' },
+                        'sunday': { open: '12:30', close: '22:30' }
+                    };
 
-            const now = moment().tz("America/Sao_Paulo");
-            const day = now.format('dddd').toLowerCase();
-            const currentTime = now.hours() * 60 + now.minutes();
-            const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
-            const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
+                    const now = moment().tz("America/Sao_Paulo");
+                    const day = now.format('dddd').toLowerCase();
+                    const currentTime = now.hours() * 60 + now.minutes();
+                    const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
+                    const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
 
-            console.log("Day:", day);
-            console.log("Current Time:", currentTime);
-            console.log("Open Time:", openTime);
-            console.log("Close Time:", closeTime);
+                    console.log("Day:", day);
+                    console.log("Current Time:", currentTime);
+                    console.log("Open Time:", openTime);
+                    console.log("Close Time:", closeTime);
 
-            if (openTime !== null && closeTime !== null) {
-                if (currentTime < openTime || currentTime > closeTime) {
-                    document.getElementById('closed-message').style.display = 'block';
-                }
-            } else {
-                document.getElementById('closed-message').style.display = 'block';
-                document.getElementById('closed-message').innerText = 'A loja está fechada hoje.';
-            }
+                    if (openTime !== null && closeTime !== null) {
+                        if (currentTime < openTime || currentTime > closeTime) {
+                            document.getElementById('closed-message').style.display = 'block';
+                        }
+                    } else {
+                        document.getElementById('closed-message').style.display = 'block';
+                        document.getElementById('closed-message').innerText = 'A loja está fechada hoje.';
+                    }
 
-            // Função de pesquisa
-            const searchInput = document.getElementById('search-input');
-            searchInput.addEventListener('input', function() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const filteredProducts = products.filter(product => product.name.toLowerCase().includes(searchTerm) || product.description.toLowerCase().includes(searchTerm));
-                displayProducts(filteredProducts.filter(p => p.category === 'mais-pedidos'), maisPedidosDiv);
-                displayProducts(filteredProducts.filter(p => p.category === 'monte-do-seu-jeito'), monteDoSeuJeitoDiv);
-            });
+                    // Função de pesquisa
+                    const searchInput = document.getElementById('search-input');
+                    searchInput.addEventListener('input', function() {
+                        const searchTerm = searchInput.value.toLowerCase();
+                        const filteredProducts = products.filter(product => product.name.toLowerCase().includes(searchTerm) || product.description.toLowerCase().includes(searchTerm));
+                        displayProducts(filteredProducts.filter(p => p.category === 'mais-pedidos'), maisPedidosDiv);
+                        displayProducts(filteredProducts.filter(p => p.category === 'monte-do-seu-jeito'), monteDoSeuJeitoDiv);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar produtos:', error));
         });
     </script>
 </body>
