@@ -125,8 +125,8 @@
 
         // Função para exibir os itens do carrinho
         function exibirCarrinho() {
-            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
-            if (carrinho && carrinho.length > 0) {
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+            if (carrinho.length > 0) {
                 const listaProdutos = document.getElementById('lista-produtos');
                 listaProdutos.innerHTML = '';
                 let total = 0;
@@ -174,7 +174,7 @@
 
         // Função para remover um produto do carrinho
         function removerProduto(index) {
-            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
             carrinho.splice(index, 1);
             sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
             exibirCarrinho();
@@ -182,7 +182,7 @@
 
         // Função para remover um acompanhamento de um produto
         function removerAcompanhamento(produtoIndex, acompanhamento) {
-            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
             carrinho[produtoIndex].acompanhamentos = carrinho[produtoIndex].acompanhamentos.filter(item => item !== acompanhamento);
             sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
             exibirCarrinho();
@@ -190,7 +190,7 @@
 
         // Função para remover um extra de um produto
         function removerExtra(produtoIndex, extra) {
-            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
             const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
             carrinho[produtoIndex].extras = carrinho[produtoIndex].extras.filter(item => item !== extra);
             carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) - precoExtra).toFixed(2);
@@ -200,7 +200,7 @@
 
         // Função para adicionar mais um item extra ao carrinho
         function adicionarMaisExtra(produtoIndex, extra) {
-            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
             const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
             if (produtoIndex !== -1) {
                 carrinho[produtoIndex].extras.push(extra);
