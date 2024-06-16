@@ -113,6 +113,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const products = JSON.parse(localStorage.getItem('products')) || [];
+            console.log("Products from localStorage:", products);
 
             const maisPedidosDiv = document.querySelector('#os-mais-pedidos .products');
             const monteDoSeuJeitoDiv = document.querySelector('#monte-do-seu-jeito .products');
@@ -153,6 +154,11 @@
             const currentTime = now.hours() * 60 + now.minutes();
             const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
             const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
+
+            console.log("Day:", day);
+            console.log("Current Time:", currentTime);
+            console.log("Open Time:", openTime);
+            console.log("Close Time:", closeTime);
 
             if (openTime !== null && closeTime !== null) {
                 if (currentTime < openTime || currentTime > closeTime) {
