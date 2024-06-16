@@ -1,3 +1,18 @@
-{
-    "products": []
-}
+[
+    {
+        "name": "Açaí Tradicional",
+        "description": "Açaí puro com granola e mel.",
+        "price": "15.00",
+        "category": "mais-pedidos",
+        "image": "url-da-imagem",
+        "url": "url-do-produto"
+    },
+    {
+        "name": "Açaí com Banana",
+        "description": "Açaí com banana e mel.",
+        "price": "17.00",
+        "category": "monte-do-seu-jeito",
+        "image": "url-da-imagem",
+        "url": "url-do-produto"
+    }
+]
