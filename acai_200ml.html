@@ -180,6 +180,7 @@
             }
 
             const produtoParaCarrinho = {
+                id: new Date().getTime(), // Adiciona um identificador único baseado no timestamp atual
                 nome: produto,
                 acompanhamentos: acompanhamentosSelecionados,
                 extras: extrasSelecionados,
@@ -231,4 +232,3 @@
     </script>
 </body>
 </html>
-
