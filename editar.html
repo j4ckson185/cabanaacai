@@ -44,7 +44,7 @@
 
     <script type="module">
         import { db } from './firebaseConfig.js';
-        import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+        import { collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
         document.addEventListener("DOMContentLoaded", function() {
             const productForm = document.getElementById('product-form');
@@ -96,10 +96,11 @@
                 loadProducts();
             });
 
-            window.editProduct = function(id) {
+            window.editProduct = async function(id) {
                 const productRef = doc(db, "products", id);
-                getDocs(productRef).then((doc) => {
-                    const product = doc.data();
+                const docSnap = await getDoc(productRef);
+                if (docSnap.exists()) {
+                    const product = docSnap.data();
                     productForm.name.value = product.name;
                     productForm.description.value = product.description;
                     productForm.image.value = product.image;
@@ -107,9 +108,9 @@
                     productForm.url.value = product.url;
                     productForm.category.value = product.category;
                     editDocId = id;
-                }).catch((error) => {
-                    console.error('Erro ao carregar produto para edição:', error);
-                });
+                } else {
+                    console.error('Nenhum documento encontrado!');
+                }
             };
 
             window.deleteProduct = async function(id) {
