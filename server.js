@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const fetch = require('node-fetch');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -10,7 +12,59 @@ const FCM_SERVER_KEY = 'AAAAAc4ekf0:APA91bFvHr52ngS3hrfuOkAO2wOMJDZcPiATeLcyW9Kw
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static('public'));
 
+// Rota para obter produtos
+app.get('/api/products', (req, res) => {
+    fs.readFile(path.join(__dirname, 'public/products.json'), 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send('Erro ao ler o arquivo de produtos.');
+        }
+        res.send(JSON.parse(data));
+    });
+});
+
+// Rota para adicionar/editar produtos
+app.post('/api/products', (req, res) => {
+    const newProduct = req.body;
+    fs.readFile(path.join(__dirname, 'public/products.json'), 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send('Erro ao ler o arquivo de produtos.');
+        }
+        const products = JSON.parse(data);
+        if (newProduct.index !== undefined) {
+            products[newProduct.index] = newProduct.product;
+        } else {
+            products.push(newProduct.product);
+        }
+        fs.writeFile(path.join(__dirname, 'public/products.json'), JSON.stringify(products, null, 2), (err) => {
+            if (err) {
+                return res.status(500).send('Erro ao salvar o produto.');
+            }
+            res.send('Produto salvo com sucesso.');
+        });
+    });
+});
+
+// Rota para excluir produtos
+app.delete('/api/products/:index', (req, res) => {
+    const index = parseInt(req.params.index, 10);
+    fs.readFile(path.join(__dirname, 'public/products.json'), 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send('Erro ao ler o arquivo de produtos.');
+        }
+        const products = JSON.parse(data);
+        products.splice(index, 1);
+        fs.writeFile(path.join(__dirname, 'public/products.json'), JSON.stringify(products, null, 2), (err) => {
+            if (err) {
+                return res.status(500).send('Erro ao excluir o produto.');
+            }
+            res.send('Produto excluído com sucesso.');
+        });
+    });
+});
+
+// Rota existente para pedidos
 app.post('/order', async (req, res) => {
     const pedido = req.body;
     const mensagem = {
