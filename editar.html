@@ -42,7 +42,6 @@
         </section>
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const productForm = document.getElementById('product-form');
@@ -50,24 +49,28 @@
             let editIndex = -1;
 
             function loadProducts() {
-                const products = JSON.parse(localStorage.getItem('products')) || [];
-                productList.innerHTML = '';
-                products.forEach((product, index) => {
-                    const productDiv = document.createElement('div');
-                    productDiv.classList.add('product');
-                    productDiv.dataset.index = index;
-                    productDiv.innerHTML = `
-                        <img src="${product.image}" alt="${product.name}">
-                        <h3>${product.name}</h3>
-                        <p>${product.description}</p>
-                        <p><strong>Preço:</strong> R$ ${product.price}</p>
-                        <p><strong>Categoria:</strong> ${product.category === 'mais-pedidos' ? 'Os Mais Pedidos' : 'Monte do Seu Jeito'}</p>
-                        <a href="${product.url}" target="_blank">Ver Produto</a>
-                        <button onclick="editProduct(${index})">Editar</button>
-                        <button onclick="deleteProduct(${index})">Excluir</button>
-                    `;
-                    productList.appendChild(productDiv);
-                });
+                fetch('/api/products')
+                    .then(response => response.json())
+                    .then(products => {
+                        productList.innerHTML = '';
+                        products.forEach((product, index) => {
+                            const productDiv = document.createElement('div');
+                            productDiv.classList.add('product');
+                            productDiv.dataset.index = index;
+                            productDiv.innerHTML = `
+                                <img src="${product.image}" alt="${product.name}">
+                                <h3>${product.name}</h3>
+                                <p>${product.description}</p>
+                                <p><strong>Preço:</strong> R$ ${product.price}</p>
+                                <p><strong>Categoria:</strong> ${product.category === 'mais-pedidos' ? 'Os Mais Pedidos' : 'Monte do Seu Jeito'}</p>
+                                <a href="${product.url}" target="_blank">Ver Produto</a>
+                                <button onclick="editProduct(${index})">Editar</button>
+                                <button onclick="deleteProduct(${index})">Excluir</button>
+                            `;
+                            productList.appendChild(productDiv);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar produtos:', error));
             }
 
             productForm.addEventListener('submit', function(event) {
@@ -81,49 +84,52 @@
                     category: productForm.category.value,
                 };
 
-                const products = JSON.parse(localStorage.getItem('products')) || [];
-                if (editIndex === -1) {
-                    products.push(newProduct);
-                } else {
-                    products[editIndex] = newProduct;
-                    editIndex = -1;
-                }
-                localStorage.setItem('products', JSON.stringify(products));
-                productForm.reset();
-                loadProducts();
+                fetch('/api/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ product: newProduct, index: editIndex })
+                })
+                    .then(response => response.text())
+                    .then(message => {
+                        console.log(message);
+                        productForm.reset();
+                        editIndex = -1;
+                        loadProducts();
+                    })
+                    .catch(error => console.error('Erro ao salvar o produto:', error));
             });
 
             window.editProduct = function(index) {
-                const products = JSON.parse(localStorage.getItem('products')) || [];
-                const product = products[index];
-                productForm.name.value = product.name;
-                productForm.description.value = product.description;
-                productForm.image.value = product.image;
-                productForm.price.value = product.price;
-                productForm.url.value = product.url;
-                productForm.category.value = product.category;
-                editIndex = index;
+                fetch('/api/products')
+                    .then(response => response.json())
+                    .then(products => {
+                        const product = products[index];
+                        productForm.name.value = product.name;
+                        productForm.description.value = product.description;
+                        productForm.image.value = product.image;
+                        productForm.price.value = product.price;
+                        productForm.url.value = product.url;
+                        productForm.category.value = product.category;
+                        editIndex = index;
+                    })
+                    .catch(error => console.error('Erro ao carregar produto para edição:', error));
             };
 
             window.deleteProduct = function(index) {
-                const products = JSON.parse(localStorage.getItem('products')) || [];
-                products.splice(index, 1);
-                localStorage.setItem('products', JSON.stringify(products));
-                loadProducts();
+                fetch(`/api/products/${index}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.text())
+                    .then(message => {
+                        console.log(message);
+                        loadProducts();
+                    })
+                    .catch(error => console.error('Erro ao excluir o produto:', error));
             };
 
             loadProducts();
-
-            const sortable = new Sortable(productList, {
-                animation: 150,
-                onEnd: function(evt) {
-                    const products = JSON.parse(localStorage.getItem('products')) || [];
-                    const [movedProduct] = products.splice(evt.oldIndex, 1);
-                    products.splice(evt.newIndex, 0, movedProduct);
-                    localStorage.setItem('products', JSON.stringify(products));
-                    loadProducts();
-                }
-            });
         });
     </script>
 </body>
