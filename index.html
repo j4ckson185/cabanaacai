@@ -149,10 +149,28 @@
                             <h3>${product.name}</h3>
                             <p>${product.description}</p>
                             <p><strong>Preço:</strong> R$ ${product.price}</p>
+                            <button onclick="adicionarAoCarrinho('${product.name}', ${product.price}, '${product.url}', '${product.image}', '${product.description}')">Adicionar ao Carrinho</button>
                         </div>
                     `;
                     container.appendChild(productDiv);
                 });
+            }
+
+            function adicionarAoCarrinho(nome, preco, url, imagem, descricao) {
+                const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+                const novoProduto = {
+                    nome: nome,
+                    preco: preco,
+                    url: url,
+                    imagem: imagem,
+                    descricao: descricao,
+                    acompanhamentos: [],
+                    extras: [],
+                    sabores: []
+                };
+                carrinho.push(novoProduto);
+                sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
+                alert('Produto adicionado ao carrinho!');
             }
 
             loadProducts();
