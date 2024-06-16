@@ -125,8 +125,8 @@
 
         // Função para exibir os itens do carrinho
         function exibirCarrinho() {
-            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
-            if (carrinho && carrinho.length > 0) {
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+            if (carrinho.length > 0) {
                 const listaProdutos = document.getElementById('lista-produtos');
                 listaProdutos.innerHTML = '';
                 let total = 0;
