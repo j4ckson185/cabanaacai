@@ -1,20 +1,124 @@
-// firebaseConfig.js
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Adicionar/Editar Produtos</title>
+    <link rel="stylesheet" href="styles2.css">
+</head>
+<body>
+    <header>
+        <h1>Admin - Adicionar/Editar Produtos</h1>
+    </header>
+    <main>
+        <form id="product-form">
+            <label for="name">Nome:</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="description">Descrição:</label>
+            <textarea id="description" name="description" required></textarea>
+            
+            <label for="image">URL da Imagem:</label>
+            <input type="text" id="image" name="image" required>
+            
+            <label for="price">Preço:</label>
+            <input type="number" id="price" name="price" step="0.01" required>
+            
+            <label for="url">URL do Produto:</label>
+            <input type="text" id="url" name="url" required>
+            
+            <label for="category">Categoria:</label>
+            <select id="category" name="category" required>
+                <option value="mais-pedidos">Os Mais Pedidos</option>
+                <option value="monte-do-seu-jeito">Monte do Seu Jeito</option>
+            </select>
+            
+            <button type="submit">Adicionar Produto</button>
+        </form>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
-  authDomain: "cabana-8d55e.firebaseapp.com",
-  databaseURL: "https://cabana-8d55e-default-rtdb.firebaseio.com",
-  projectId: "cabana-8d55e",
-  storageBucket: "cabana-8d55e.appspot.com",
-  messagingSenderId: "706144237954",
-  appId: "1:706144237954:web:345c10370972486afc779b",
-  measurementId: "G-96Y337GYT8"
-};
+        <section id="existing-products">
+            <h2>Produtos Existentes</h2>
+            <div id="product-list"></div>
+        </section>
+    </main>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    <script type="module">
+        import { db } from './firebaseConfig.js';
+        import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
-export { db };
+        document.addEventListener("DOMContentLoaded", function() {
+            const productForm = document.getElementById('product-form');
+            const productList = document.getElementById('product-list');
+            let editDocId = null;
 
+            async function loadProducts() {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                productList.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const product = doc.data();
+                    const productDiv = document.createElement('div');
+                    productDiv.classList.add('product');
+                    productDiv.dataset.id = doc.id;
+                    productDiv.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <p><strong>Preço:</strong> R$ ${product.price}</p>
+                        <p><strong>Categoria:</strong> ${product.category === 'mais-pedidos' ? 'Os Mais Pedidos' : 'Monte do Seu Jeito'}</p>
+                        <a href="${product.url}" target="_blank">Ver Produto</a>
+                        <button onclick="editProduct('${doc.id}')">Editar</button>
+                        <button onclick="deleteProduct('${doc.id}')">Excluir</button>
+                    `;
+                    productList.appendChild(productDiv);
+                });
+            }
+
+            productForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const newProduct = {
+                    name: productForm.name.value,
+                    description: productForm.description.value,
+                    image: productForm.image.value,
+                    price: parseFloat(productForm.price.value).toFixed(2),
+                    url: productForm.url.value,
+                    category: productForm.category.value,
+                };
+
+                if (editDocId) {
+                    const productRef = doc(db, "products", editDocId);
+                    await updateDoc(productRef, newProduct);
+                } else {
+                    await addDoc(collection(db, "products"), newProduct);
+                }
+
+                productForm.reset();
+                editDocId = null;
+                loadProducts();
+            });
+
+            window.editProduct = function(id) {
+                const productRef = doc(db, "products", id);
+                getDocs(productRef).then((doc) => {
+                    const product = doc.data();
+                    productForm.name.value = product.name;
+                    productForm.description.value = product.description;
+                    productForm.image.value = product.image;
+                    productForm.price.value = product.price;
+                    productForm.url.value = product.url;
+                    productForm.category.value = product.category;
+                    editDocId = id;
+                }).catch((error) => {
+                    console.error('Erro ao carregar produto para edição:', error);
+                });
+            };
+
+            window.deleteProduct = async function(id) {
+                await deleteDoc(doc(db, "products", id));
+                loadProducts();
+            };
+
+            loadProducts();
+        });
+    </script>
+</body>
+</html>
