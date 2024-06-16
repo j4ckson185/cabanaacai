@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -106,16 +107,13 @@
 <ul id="lista-produtos">
     <!-- Os itens do carrinho serão adicionados aqui dinamicamente com JavaScript -->
 </ul>
-
 <div class="total" id="total-pedido">Total: R$0,00</div>
-
 <!-- Botões -->
 <div class="botoes">
     <button class="btn-adicionar" onclick="location.href='index.html'">Adicionar mais itens</button>
     <button class="btn-esvaziar" onclick="esvaziarCarrinho()">Esvaziar Carrinho</button>
     <button class="btn-finalizar" onclick="location.href='pagina_de_pagamento.html'">Finalizar Pedido</button>
 </div>
-
 <script>
     // Função para formatar o valor como moeda
     function formatarMoeda(valor) {
@@ -124,8 +122,8 @@
 
     // Função para exibir os itens do carrinho
     function exibirCarrinho() {
-        const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
-        if (carrinho.length > 0) {
+        const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
+        if (carrinho && carrinho.length > 0) {
             const listaProdutos = document.getElementById('lista-produtos');
             listaProdutos.innerHTML = '';
             let total = 0;
@@ -135,22 +133,20 @@
 
                 // Calcula o valor total do item incluindo os extras
                 let valorProduto = parseFloat(item.preco);
-                if (item.extras) {
-                    item.extras.forEach(extra => {
-                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                    });
-                }
+                item.extras.forEach(extra => {
+                    valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                });
                 total += valorProduto;
 
-                const sabores = item.sabores ? item.sabores.map(sabor => 
+                const sabores = item.sabores.map(sabor => 
                     `<li>${sabor}</li>`
-                ).join('') : '';
-                const acompanhamentos = item.acompanhamentos ? item.acompanhamentos.map(acompanhamento => 
+                ).join('');
+                const acompanhamentos = item.acompanhamentos.map(acompanhamento => 
                     `<li>${acompanhamento}<button onclick="removerAcompanhamento(${index}, '${acompanhamento}')">🗑️</button></li>`
-                ).join('') : '';
-                const extras = item.extras ? item.extras.map(extra => 
+                ).join('');
+                const extras = item.extras.map(extra => 
                     `<li>${extra}<button onclick="removerExtra(${index}, '${extra}')">🗑️</button><button onclick="adicionarMaisExtra(${index}, '${extra}')">➕</button></li>`
-                ).join('') : '';
+                ).join('');
 
                 produto.innerHTML = `
                     <p><strong>${item.nome} - ${formatarMoeda(valorProduto)}<button onclick="removerProduto(${index})">🗑️</button></strong></p>
@@ -175,7 +171,7 @@
 
     // Função para remover um produto do carrinho
     function removerProduto(index) {
-        const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+        const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
         carrinho.splice(index, 1);
         sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
         exibirCarrinho();
@@ -183,7 +179,7 @@
 
     // Função para remover um acompanhamento de um produto
     function removerAcompanhamento(produtoIndex, acompanhamento) {
-        const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+        const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
         carrinho[produtoIndex].acompanhamentos = carrinho[produtoIndex].acompanhamentos.filter(item => item !== acompanhamento);
         sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
         exibirCarrinho();
@@ -191,7 +187,7 @@
 
     // Função para remover um extra de um produto
     function removerExtra(produtoIndex, extra) {
-        const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+        const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
         const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
         carrinho[produtoIndex].extras = carrinho[produtoIndex].extras.filter(item => item !== extra);
         carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) - precoExtra).toFixed(2);
@@ -201,12 +197,14 @@
 
     // Função para adicionar mais um item extra ao carrinho
     function adicionarMaisExtra(produtoIndex, extra) {
-        const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+        const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
         const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-        carrinho[produtoIndex].extras.push(extra);
-        carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) + precoExtra).toFixed(2);
-        sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
-        exibirCarrinho();
+        if (produtoIndex !== -1) {
+            carrinho[produtoIndex].extras.push(extra);
+            carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) + precoExtra).toFixed(2);
+            sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
+            exibirCarrinho();
+        }
     }
 
     // Função para esvaziar o carrinho
