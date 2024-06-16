@@ -42,38 +42,38 @@
         </section>
     </main>
 
-    <script>
+    <script type="module">
+        import { db } from './firebaseConfig.js';
+        import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+
         document.addEventListener("DOMContentLoaded", function() {
             const productForm = document.getElementById('product-form');
             const productList = document.getElementById('product-list');
-            let editIndex = -1;
+            let editDocId = null;
 
-            function loadProducts() {
-                fetch('/api/products')
-                    .then(response => response.json())
-                    .then(products => {
-                        productList.innerHTML = '';
-                        products.forEach((product, index) => {
-                            const productDiv = document.createElement('div');
-                            productDiv.classList.add('product');
-                            productDiv.dataset.index = index;
-                            productDiv.innerHTML = `
-                                <img src="${product.image}" alt="${product.name}">
-                                <h3>${product.name}</h3>
-                                <p>${product.description}</p>
-                                <p><strong>Preço:</strong> R$ ${product.price}</p>
-                                <p><strong>Categoria:</strong> ${product.category === 'mais-pedidos' ? 'Os Mais Pedidos' : 'Monte do Seu Jeito'}</p>
-                                <a href="${product.url}" target="_blank">Ver Produto</a>
-                                <button onclick="editProduct(${index})">Editar</button>
-                                <button onclick="deleteProduct(${index})">Excluir</button>
-                            `;
-                            productList.appendChild(productDiv);
-                        });
-                    })
-                    .catch(error => console.error('Erro ao carregar produtos:', error));
+            async function loadProducts() {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                productList.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const product = doc.data();
+                    const productDiv = document.createElement('div');
+                    productDiv.classList.add('product');
+                    productDiv.dataset.id = doc.id;
+                    productDiv.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <p><strong>Preço:</strong> R$ ${product.price}</p>
+                        <p><strong>Categoria:</strong> ${product.category === 'mais-pedidos' ? 'Os Mais Pedidos' : 'Monte do Seu Jeito'}</p>
+                        <a href="${product.url}" target="_blank">Ver Produto</a>
+                        <button onclick="editProduct('${doc.id}')">Editar</button>
+                        <button onclick="deleteProduct('${doc.id}')">Excluir</button>
+                    `;
+                    productList.appendChild(productDiv);
+                });
             }
 
-            productForm.addEventListener('submit', function(event) {
+            productForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
                 const newProduct = {
                     name: productForm.name.value,
@@ -84,49 +84,37 @@
                     category: productForm.category.value,
                 };
 
-                fetch('/api/products', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ product: newProduct, index: editIndex })
-                })
-                    .then(response => response.text())
-                    .then(message => {
-                        console.log(message);
-                        productForm.reset();
-                        editIndex = -1;
-                        loadProducts();
-                    })
-                    .catch(error => console.error('Erro ao salvar o produto:', error));
+                if (editDocId) {
+                    const productRef = doc(db, "products", editDocId);
+                    await updateDoc(productRef, newProduct);
+                } else {
+                    await addDoc(collection(db, "products"), newProduct);
+                }
+
+                productForm.reset();
+                editDocId = null;
+                loadProducts();
             });
 
-            window.editProduct = function(index) {
-                fetch('/api/products')
-                    .then(response => response.json())
-                    .then(products => {
-                        const product = products[index];
-                        productForm.name.value = product.name;
-                        productForm.description.value = product.description;
-                        productForm.image.value = product.image;
-                        productForm.price.value = product.price;
-                        productForm.url.value = product.url;
-                        productForm.category.value = product.category;
-                        editIndex = index;
-                    })
-                    .catch(error => console.error('Erro ao carregar produto para edição:', error));
+            window.editProduct = function(id) {
+                const productRef = doc(db, "products", id);
+                getDocs(productRef).then((doc) => {
+                    const product = doc.data();
+                    productForm.name.value = product.name;
+                    productForm.description.value = product.description;
+                    productForm.image.value = product.image;
+                    productForm.price.value = product.price;
+                    productForm.url.value = product.url;
+                    productForm.category.value = product.category;
+                    editDocId = id;
+                }).catch((error) => {
+                    console.error('Erro ao carregar produto para edição:', error);
+                });
             };
 
-            window.deleteProduct = function(index) {
-                fetch(`/api/products/${index}`, {
-                    method: 'DELETE'
-                })
-                    .then(response => response.text())
-                    .then(message => {
-                        console.log(message);
-                        loadProducts();
-                    })
-                    .catch(error => console.error('Erro ao excluir o produto:', error));
+            window.deleteProduct = async function(id) {
+                await deleteDoc(doc(db, "products", id));
+                loadProducts();
             };
 
             loadProducts();
