@@ -42,8 +42,7 @@
             border-bottom: 1px solid #ccc;
             padding: 10px 0;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
         }
         .produto img {
             max-width: 50px;
@@ -138,16 +137,19 @@
                     });
                     total += valorProduto;
 
-                    const sabores = item.sabores.map(sabor => `<span>${sabor}</span>`).join(', ');
-                    const acompanhamentos = item.acompanhamentos.map(acompanhamento => `<span>${acompanhamento}</span>`).join(', ');
-                    const extras = item.extras.map(extra => `<span>${extra}</span>`).join(', ');
+                    const sabores = item.sabores.map(sabor => `<li>${sabor}</li>`).join('');
+                    const acompanhamentos = item.acompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
+                    const extras = item.extras.map(extra => `<li>${extra}</li>`).join('');
 
                     produto.innerHTML = `
                         <div class="detalhes">
                             <p><strong>${item.nome}</strong> - ${formatarMoeda(valorProduto)} <button onclick="removerProduto(${index})">🗑️</button></p>
-                            <p><strong>Sabores:</strong> ${sabores}</p>
-                            <p><strong>Acompanhamentos:</strong> ${acompanhamentos}</p>
-                            <p><strong>Itens Extras:</strong> ${extras}</p>
+                            <p><strong>Sabores:</strong></p>
+                            <ul>${sabores}</ul>
+                            <p><strong>Acompanhamentos:</strong></p>
+                            <ul>${acompanhamentos}</ul>
+                            <p><strong>Itens Extras:</strong></p>
+                            <ul>${extras}</ul>
                         </div>
                     `;
                     listaProdutos.appendChild(produto);
