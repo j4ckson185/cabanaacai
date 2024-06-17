@@ -1,54 +1,77 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrinho de Compras</title>
-    <style>
-        /* ... estilos omitidos para brevidade ... */
-    </style>
-</head>
-<body>
-    <nav>
-        <a href="index.html">Início</a>
-        <a href="promos.html">Promos</a>
-        <a href="carrinho.html">Carrinho</a>
-    </nav>
+<button class="btn-finalizar" onclick="finalizarPedido()">Finalizar Pedido</button>
 
-    <h1>Carrinho de Compras</h1>
-    <ul id="lista-produtos">
-        <!-- Os itens do carrinho serão adicionados aqui dinamicamente com JavaScript -->
-    </ul>
+<script>
+    // Função para formatar o valor como moeda
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
 
-    <div class="total" id="total-pedido">Total: R$0,00</div>
+    // Função para exibir os itens do carrinho
+    function exibirCarrinho() {
+        const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+        const listaProdutos = document.getElementById('lista-produtos');
+        listaProdutos.innerHTML = '';
+        let total = 0;
 
-    <!-- Botões -->
-    <div class="botoes">
-        <button class="btn-adicionar" onclick="location.href='index.html'">Adicionar mais itens</button>
-        <button class="btn-esvaziar" onclick="esvaziarCarrinho()">Esvaziar Carrinho</button>
-        <button class="btn-finalizar" onclick="location.href='pagina_de_pagamento.html'">Finalizar Pedido</button>
-    </div>
+        if (carrinho.length > 0) {
+            carrinho.forEach((item, index) => {
+                const produto = document.createElement('li');
+                produto.classList.add('produto');
 
-    <script>
-        function formatarMoeda(valor) {
-            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                // Calcula o valor total do item incluindo os extras
+                let valorProduto = parseFloat(item.preco);
+                item.extras.forEach(extra => {
+                    valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                });
+                total += valorProduto;
+
+                const sabores = item.sabores.map(sabor => `<li>${sabor}</li>`).join('');
+                const acompanhamentos = item.acompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
+                const extras = item.extras.map(extra => `<li>${extra}</li>`).join('');
+
+                produto.innerHTML = `
+                    <div class="detalhes">
+                        <p><strong>${item.nome}</strong> - ${formatarMoeda(valorProduto)} <button onclick="removerProduto(${index})">🗑️</button></p>
+                        <p><strong>Sabores:</strong></p>
+                        <ul>${sabores}</ul>
+                        <p><strong>Acompanhamentos:</strong></p>
+                        <ul>${acompanhamentos}</ul>
+                        <p><strong>Itens Extras:</strong></p>
+                        <ul>${extras}</ul>
+                    </div>
+                `;
+                listaProdutos.appendChild(produto);
+            });
+
+            // Atualiza o valor total do pedido
+            document.getElementById('total-pedido').innerText = `Total: ${formatarMoeda(total)}`;
+        } else {
+            listaProdutos.innerHTML = '<li class="mensagem-vazio">O carrinho está vazio.</li>';
+            document.getElementById('total-pedido').innerText = 'Total: R$0,00';
         }
+    }
 
-        function exibirCarrinho() {
-            const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-            const listaProdutos = document.getElementById('lista-produtos');
-            listaProdutos.innerHTML = '';
-            let total = 0;
+    // Função para remover um produto do carrinho
+    function removerProduto(index) {
+        const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+        carrinho.splice(index, 1);
+        localStorage.setItem('carrinho', JSON.stringify(carrinho));
+        exibirCarrinho();
+    }
 
-            if (carrinho.length > 0) {
-                carrinho.forEach((item, index) => {
-                    const produto = document.createElement('li');
-                    produto.classList.add('produto');
+    // Função para esvaziar o carrinho
+    function esvaziarCarrinho() {
+        localStorage.removeItem('carrinho');
+        exibirCarrinho();
+    }
 
-                    let valorProduto = parseFloat(item.preco);
-                    item.extras.forEach(extra => {
-                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                    });
-                    total += valorProduto;
+    // Função para finalizar o pedido e armazenar os dados no sessionStorage
+    function finalizarPedido() {
+        const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+        sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
+        window.location.href = 'pagina_de_pagamento.html';
+    }
 
-                    const sabores = item.sabores.map
+    // Chama a função para exibir os itens do carrinho quando a página carregar
+    window.onload = exibirCarrinho;
+</script>
