@@ -33,6 +33,75 @@
             display: block;
         }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
+            authDomain: "cabana-8d55e.firebaseapp.com",
+            projectId: "cabana-8d55e",
+            storageBucket: "cabana-8d55e.appspot.com",
+            messagingSenderId: "706144237954",
+            appId: "1:706144237954:web:345c10370972486afc779b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const dayCircles = document.querySelectorAll('.day-circle');
+            const dayConfigs = document.querySelectorAll('.day-config');
+
+            // Carregar horários salvos do Firestore
+            const horarioRef = doc(db, "settings", "horarios");
+            const horarioSnap = await getDoc(horarioRef);
+            const horariosSalvos = horarioSnap.exists() ? horarioSnap.data() : {};
+
+            // Restaurar a seleção de dias e horários salvos
+            Object.keys(horariosSalvos).forEach(day => {
+                const circle = document.querySelector(`.day-circle[data-day="${day}"]`);
+                if (circle) {
+                    circle.classList.add('selected');
+                    const config = document.getElementById(day);
+                    if (config) {
+                        config.classList.add('active');
+                        document.getElementById(`${day}-open`).value = horariosSalvos[day].open;
+                        document.getElementById(`${day}-close`).value = horariosSalvos[day].close;
+                    }
+                }
+            });
+
+            dayCircles.forEach(circle => {
+                circle.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    const day = this.getAttribute('data-day');
+                    document.getElementById(day).classList.toggle('active');
+                });
+            });
+
+            document.getElementById('horario-form').addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const horarios = {};
+
+                dayCircles.forEach(circle => {
+                    if (circle.classList.contains('selected')) {
+                        const day = circle.getAttribute('data-day');
+                        horarios[day] = {
+                            open: document.getElementById(`${day}-open`).value,
+                            close: document.getElementById(`${day}-close`).value
+                        };
+                    }
+                });
+
+                await setDoc(horarioRef, horarios);
+                alert('Horários salvos com sucesso!');
+            });
+        });
+    </script>
 </head>
 <body>
     <header>
@@ -92,55 +161,5 @@
             <button type="submit">Salvar Horários</button>
         </form>
     </main>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dayCircles = document.querySelectorAll('.day-circle');
-            const dayConfigs = document.querySelectorAll('.day-config');
-
-            // Carregar horários salvos do localStorage
-            const horariosSalvos = JSON.parse(localStorage.getItem('horarios')) || {};
-
-            // Restaurar a seleção de dias e horários salvos
-            Object.keys(horariosSalvos).forEach(day => {
-                const circle = document.querySelector(`.day-circle[data-day="${day}"]`);
-                if (circle) {
-                    circle.classList.add('selected');
-                    const config = document.getElementById(day);
-                    if (config) {
-                        config.classList.add('active');
-                        document.getElementById(`${day}-open`).value = horariosSalvos[day].open;
-                        document.getElementById(`${day}-close`).value = horariosSalvos[day].close;
-                    }
-                }
-            });
-
-            dayCircles.forEach(circle => {
-                circle.addEventListener('click', function() {
-                    this.classList.toggle('selected');
-                    const day = this.getAttribute('data-day');
-                    document.getElementById(day).classList.toggle('active');
-                });
-            });
-
-            document.getElementById('horario-form').addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                const horarios = {};
-
-                dayCircles.forEach(circle => {
-                    if (circle.classList.contains('selected')) {
-                        const day = circle.getAttribute('data-day');
-                        horarios[day] = {
-                            open: document.getElementById(`${day}-open`).value,
-                            close: document.getElementById(`${day}-close`).value
-                        };
-                    }
-                });
-
-                localStorage.setItem('horarios', JSON.stringify(horarios));
-                alert('Horários salvos com sucesso!');
-            });
-        });
-    </script>
 </body>
 </html>
