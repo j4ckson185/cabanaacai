@@ -73,6 +73,8 @@
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
 </head>
 <body>
     <header>
@@ -110,8 +112,21 @@
         <!-- Removido o link de Adicionar/Editar Produtos -->
     </footer>
 <script type="module">
-    import { db } from './firebaseConfig.js';
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+    import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
     import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
+        authDomain: "cabana-8d55e.firebaseapp.com",
+        projectId: "cabana-8d55e",
+        storageBucket: "cabana-8d55e.appspot.com",
+        messagingSenderId: "706144237954",
+        appId: "1:706144237954:web:345c10370972486afc779b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
     document.addEventListener("DOMContentLoaded", function() {
         const maisPedidosDiv = document.querySelector('#os-mais-pedidos .products');
@@ -121,7 +136,7 @@
             const querySnapshot = await getDocs(collection(db, "products"));
             const maisPedidosProducts = [];
             const monteDoSeuJeitoProducts = [];
-            
+
             querySnapshot.forEach((doc) => {
                 const product = doc.data();
                 if (product.category === 'mais-pedidos') {
@@ -156,28 +171,33 @@
 
         loadProducts();
 
-        // Verificação de horários de funcionamento
-        const horarios = JSON.parse(localStorage.getItem('horarios')) || {};
-        const now = moment().tz("America/Sao_Paulo");
-        const day = now.format('dddd').toLowerCase();
-        const currentTime = now.hours() * 60 + now.minutes();
-        const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
-        const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
+        async function checkStoreStatus() {
+            const horarioRef = doc(db, "settings", "horarios");
+            const horarioSnap = await getDoc(horarioRef);
+            const horarios = horarioSnap.exists() ? horarioSnap.data() : {};
+            const now = moment().tz("America/Sao_Paulo");
+            const day = now.format('dddd').toLowerCase();
+            const currentTime = now.hours() * 60 + now.minutes();
+            const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
+            const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
 
-        console.log('Horário de funcionamento:', horarios);
-        console.log('Dia atual:', day);
-        console.log('Horário atual em minutos:', currentTime);
-        console.log('Horário de abertura em minutos:', openTime);
-        console.log('Horário de fechamento em minutos:', closeTime);
+            console.log('Horário de funcionamento:', horarios);
+            console.log('Dia atual:', day);
+            console.log('Horário atual em minutos:', currentTime);
+            console.log('Horário de abertura em minutos:', openTime);
+            console.log('Horário de fechamento em minutos:', closeTime);
 
-        if (openTime !== null && closeTime !== null) {
-            if (currentTime < openTime || currentTime > closeTime) {
+            if (openTime !== null && closeTime !== null) {
+                if (currentTime < openTime || currentTime > closeTime) {
+                    document.getElementById('closed-message').style.display = 'block';
+                }
+            } else {
                 document.getElementById('closed-message').style.display = 'block';
+                document.getElementById('closed-message').innerText = 'A loja está fechada hoje.';
             }
-        } else {
-            document.getElementById('closed-message').style.display = 'block';
-            document.getElementById('closed-message').innerText = 'A loja está fechada hoje.';
         }
+
+        checkStoreStatus();
 
         // Função de pesquisa
         const searchInput = document.getElementById('search-input');
