@@ -1,77 +1,191 @@
-<button class="btn-finalizar" onclick="finalizarPedido()">Finalizar Pedido</button>
-
-<script>
-    // Função para formatar o valor como moeda
-    function formatarMoeda(valor) {
-        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
-
-    // Função para exibir os itens do carrinho
-    function exibirCarrinho() {
-        const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-        const listaProdutos = document.getElementById('lista-produtos');
-        listaProdutos.innerHTML = '';
-        let total = 0;
-
-        if (carrinho.length > 0) {
-            carrinho.forEach((item, index) => {
-                const produto = document.createElement('li');
-                produto.classList.add('produto');
-
-                // Calcula o valor total do item incluindo os extras
-                let valorProduto = parseFloat(item.preco);
-                item.extras.forEach(extra => {
-                    valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                });
-                total += valorProduto;
-
-                const sabores = item.sabores.map(sabor => `<li>${sabor}</li>`).join('');
-                const acompanhamentos = item.acompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
-                const extras = item.extras.map(extra => `<li>${extra}</li>`).join('');
-
-                produto.innerHTML = `
-                    <div class="detalhes">
-                        <p><strong>${item.nome}</strong> - ${formatarMoeda(valorProduto)} <button onclick="removerProduto(${index})">🗑️</button></p>
-                        <p><strong>Sabores:</strong></p>
-                        <ul>${sabores}</ul>
-                        <p><strong>Acompanhamentos:</strong></p>
-                        <ul>${acompanhamentos}</ul>
-                        <p><strong>Itens Extras:</strong></p>
-                        <ul>${extras}</ul>
-                    </div>
-                `;
-                listaProdutos.appendChild(produto);
-            });
-
-            // Atualiza o valor total do pedido
-            document.getElementById('total-pedido').innerText = `Total: ${formatarMoeda(total)}`;
-        } else {
-            listaProdutos.innerHTML = '<li class="mensagem-vazio">O carrinho está vazio.</li>';
-            document.getElementById('total-pedido').innerText = 'Total: R$0,00';
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho de Compras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
         }
-    }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        nav {
+            background-color: #663399;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        #lista-produtos {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 60px; /* Ajuste para dar espaço ao menu fixo */
+        }
+        .produto {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .produto img {
+            max-width: 50px;
+            margin-right: 10px;
+        }
+        .produto p {
+            margin: 0;
+        }
+        .produto .detalhes {
+            flex-grow: 1;
+        }
+        .botoes {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .botoes button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+        }
+        .btn-adicionar {
+            background-color: #4caf50;
+        }
+        .btn-esvaziar {
+            background-color: #f44336;
+        }
+        .btn-finalizar {
+            background-color: #2196F3;
+        }
+        .btn-adicionar:hover, .btn-esvaziar:hover, .btn-finalizar:hover {
+            opacity: 0.8;
+        }
+        .total {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: right;
+        }
+        .mensagem-vazio {
+            text-align: center;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="promos.html">Promos</a>
+        <a href="carrinho.html">Carrinho</a>
+    </nav>
 
-    // Função para remover um produto do carrinho
-    function removerProduto(index) {
-        const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-        carrinho.splice(index, 1);
-        localStorage.setItem('carrinho', JSON.stringify(carrinho));
-        exibirCarrinho();
-    }
+    <h1>Carrinho de Compras</h1>
+    <ul id="lista-produtos">
+        <!-- Os itens do carrinho serão adicionados aqui dinamicamente com JavaScript -->
+    </ul>
 
-    // Função para esvaziar o carrinho
-    function esvaziarCarrinho() {
-        localStorage.removeItem('carrinho');
-        exibirCarrinho();
-    }
+    <div class="total" id="total-pedido">Total: R$0,00</div>
 
-    // Função para finalizar o pedido e armazenar os dados no sessionStorage
-    function finalizarPedido() {
-        const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-        sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
-        window.location.href = 'pagina_de_pagamento.html';
-    }
+    <!-- Botões -->
+    <div class="botoes">
+        <button class="btn-adicionar" onclick="location.href='index.html'">Adicionar mais itens</button>
+        <button class="btn-esvaziar" onclick="esvaziarCarrinho()">Esvaziar Carrinho</button>
+        <button class="btn-finalizar" onclick="finalizarPedido()">Finalizar Pedido</button>
+    </div>
 
-    // Chama a função para exibir os itens do carrinho quando a página carregar
-    window.onload = exibirCarrinho;
-</script>
+    <script>
+        // Função para formatar o valor como moeda
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        // Função para exibir os itens do carrinho
+        function exibirCarrinho() {
+            const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            const listaProdutos = document.getElementById('lista-produtos');
+            listaProdutos.innerHTML = '';
+            let total = 0;
+
+            if (carrinho.length > 0) {
+                carrinho.forEach((item, index) => {
+                    const produto = document.createElement('li');
+                    produto.classList.add('produto');
+
+                    // Calcula o valor total do item incluindo os extras
+                    let valorProduto = parseFloat(item.preco);
+                    item.extras.forEach(extra => {
+                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                    });
+                    total += valorProduto;
+
+                    const sabores = item.sabores.map(sabor => `<li>${sabor}</li>`).join('');
+                    const acompanhamentos = item.acompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
+                    const extras = item.extras.map(extra => `<li>${extra}</li>`).join('');
+
+                    produto.innerHTML = `
+                        <div class="detalhes">
+                            <p><strong>${item.nome}</strong> - ${formatarMoeda(valorProduto)} <button onclick="removerProduto(${index})">🗑️</button></p>
+                            <p><strong>Sabores:</strong></p>
+                            <ul>${sabores}</ul>
+                            <p><strong>Acompanhamentos:</strong></p>
+                            <ul>${acompanhamentos}</ul>
+                            <p><strong>Itens Extras:</strong></p>
+                            <ul>${extras}</ul>
+                        </div>
+                    `;
+                    listaProdutos.appendChild(produto);
+                });
+
+                // Atualiza o valor total do pedido
+                document.getElementById('total-pedido').innerText = `Total: ${formatarMoeda(total)}`;
+            } else {
+                listaProdutos.innerHTML = '<li class="mensagem-vazio">O carrinho está vazio.</li>';
+                document.getElementById('total-pedido').innerText = 'Total: R$0,00';
+            }
+        }
+
+        // Função para remover um produto do carrinho
+        function removerProduto(index) {
+            const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            carrinho.splice(index, 1);
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            exibirCarrinho();
+        }
+
+        // Função para esvaziar o carrinho
+        function esvaziarCarrinho() {
+            localStorage.removeItem('carrinho');
+            exibirCarrinho();
+        }
+
+        // Função para finalizar o pedido e armazenar os dados no sessionStorage
+        function finalizarPedido() {
+            const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
+            window.location.href = 'pagina_de_pagamento.html';
+        }
+
+        // Chama a função para exibir os itens do carrinho quando a página carregar
+        window.onload = exibirCarrinho;
+    </script>
+</body>
+</html>
