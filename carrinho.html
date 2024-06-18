@@ -132,24 +132,36 @@
 
                     // Calcula o valor total do item incluindo os extras
                     let valorProduto = parseFloat(item.preco);
-                    item.extras.forEach(extra => {
+                    item.extras1.forEach(extra => {
+                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                    });
+                    item.extras2.forEach(extra => {
                         valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
                     });
                     total += valorProduto;
 
-                    const sabores = item.sabores.map(sabor => `<li>${sabor}</li>`).join('');
-                    const acompanhamentos = item.acompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
-                    const extras = item.extras.map(extra => `<li>${extra}</li>`).join('');
+                    const sabores1 = item.sabores1.map(sabor => `<li>${sabor}</li>`).join('');
+                    const sabores2 = item.sabores2.map(sabor => `<li>${sabor}</li>`).join('');
+                    const acompanhamentos1 = item.acompanhamentos1.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
+                    const acompanhamentos2 = item.acompanhamentos2.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
+                    const extras1 = item.extras1.map(extra => `<li>${extra}</li>`).join('');
+                    const extras2 = item.extras2.map(extra => `<li>${extra}</li>`).join('');
 
                     produto.innerHTML = `
                         <div class="detalhes">
                             <p><strong>${item.nome}</strong> - ${formatarMoeda(valorProduto)} <button onclick="removerProduto(${index})">🗑️</button></p>
-                            <p><strong>Sabores:</strong></p>
-                            <ul>${sabores}</ul>
-                            <p><strong>Acompanhamentos:</strong></p>
-                            <ul>${acompanhamentos}</ul>
-                            <p><strong>Itens Extras:</strong></p>
-                            <ul>${extras}</ul>
+                            <p><strong>Sabores (Açaí 1):</strong></p>
+                            <ul>${sabores1}</ul>
+                            <p><strong>Sabores (Açaí 2):</strong></p>
+                            <ul>${sabores2}</ul>
+                            <p><strong>Acompanhamentos (Açaí 1):</strong></p>
+                            <ul>${acompanhamentos1}</ul>
+                            <p><strong>Acompanhamentos (Açaí 2):</strong></p>
+                            <ul>${acompanhamentos2}</ul>
+                            <p><strong>Itens Extras (Açaí 1):</strong></p>
+                            <ul>${extras1}</ul>
+                            <p><strong>Itens Extras (Açaí 2):</strong></p>
+                            <ul>${extras2}</ul>
                         </div>
                     `;
                     listaProdutos.appendChild(produto);
