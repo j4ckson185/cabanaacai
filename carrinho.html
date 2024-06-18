@@ -149,9 +149,9 @@
                     const acompanhamentos2 = item.acompanhamentos2 || [];
                     const allAcompanhamentos = acompanhamentos1.concat(acompanhamentos2);
 
-                    const sabores = allSabores.map(sabor => `<li>${sabor}</li>`).join('');
-                    const acompanhamentos = allAcompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
-                    const extras = allExtras.map(extra => `<li>${extra}</li>`).join('');
+                    const sabores = (item.sabores ? item.sabores : allSabores).map(sabor => `<li>${sabor}</li>`).join('');
+                    const acompanhamentos = (item.acompanhamentos ? item.acompanhamentos : allAcompanhamentos).map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
+                    const extras = (item.extras ? item.extras : allExtras).map(extra => `<li>${extra}</li>`).join('');
 
                     produto.innerHTML = `
                         <div class="detalhes">
