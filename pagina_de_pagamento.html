@@ -155,10 +155,10 @@
 
             <div class="summary">
                 <h3>Resumo do Pedido</h3>
-                <p>Subtotal: <span id="subtotal">R$0,00</span></p>
+                <p>Subtotal: <span id="subtotal"></span></p>
                 <p>Taxa de Entrega: R$ 3,00</p>
                 <p>Desconto: <span id="desconto">R$ 0,00</span></p>
-                <p>Total: <span id="total">R$0,00</span></p>
+                <p>Total: <span id="total"></span></p>
             </div>
 
             <div class="form-row">
@@ -213,27 +213,13 @@
             const deliveryFee = 3.00;
             const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
             let subtotal = 0;
-
             carrinho.forEach(item => {
-                let valorProduto = parseFloat(item.preco);
-                item.extras.forEach(extra => {
-                    valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                });
-                subtotal += valorProduto;
+                subtotal += parseFloat(item.preco);
             });
-
             const total = subtotal + deliveryFee;
 
-            // Verificação se os elementos existem antes de definir o texto
-            const subtotalElement = document.getElementById('subtotal');
-            const totalElement = document.getElementById('total');
-
-            if (subtotalElement && totalElement) {
-                subtotalElement.textContent = formatarMoeda(subtotal);
-                totalElement.textContent = formatarMoeda(total);
-            } else {
-                console.error('Elementos de subtotal ou total não encontrados no DOM.');
-            }
+            document.getElementById('subtotal').textContent = formatarMoeda(subtotal);
+            document.getElementById('total').textContent = formatarMoeda(total);
 
             // Verificação de horários de funcionamento
             const horarios = JSON.parse(localStorage.getItem('horarios')) || {};
@@ -242,12 +228,6 @@
             const currentTime = now.hours() * 60 + now.minutes();
             const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
             const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
-
-            console.log('Horário de funcionamento:', horarios);
-            console.log('Dia atual:', day);
-            console.log('Horário atual em minutos:', currentTime);
-            console.log('Horário de abertura em minutos:', openTime);
-            console.log('Horário de fechamento em minutos:', closeTime);
 
             if (openTime !== null && closeTime !== null) {
                 if (currentTime < openTime || currentTime > closeTime) {
@@ -290,26 +270,69 @@
             let subtotal = 0;
             carrinho.forEach(item => {
                 let valorProduto = parseFloat(item.preco);
-                item.extras.forEach(extra => {
-                    valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                });
                 subtotal += valorProduto;
 
                 mensagemCarrinho += `\n*${item.nome} - ${formatarMoeda(valorProduto)}*\n`;
                 mensagemCarrinho += "Sabores:\n";
-                item.sabores.forEach(sabor => {
-                    mensagemCarrinho += `- ${sabor}\n`;
-                });
-                mensagemCarrinho += "Acompanhamentos:\n";
-                item.acompanhamentos.forEach(acompanhamento => {
-                    mensagemCarrinho += `- ${acompanhamento}\n`;
-                });
-                mensagemCarrinho += "Itens Extras:\n";
-                item.extras.forEach(extra => {
-                    mensagemCarrinho += `- ${extra}\n`;
-                });
-            });
+                if (item.sabores) {
+                    item.sabores.forEach(sabor => {
+                        mensagemCarrinho += `- ${sabor}\n`;
+                    });
+                } else {
+                    if (item.sabores1) {
+                        mensagemCarrinho += "Açaí 1:\n";
+                        item.sabores1.forEach(sabor => {
+                            mensagemCarrinho += `- ${sabor}\n`;
+                        });
+                    }
+                    if (item.sabores2) {
+                        mensagemCarrinho += "Açaí 2:\n";
+                        item.sabores2.forEach(sabor => {
+                            mensagemCarrinho += `- ${sabor}\n`;
+                        });
+                    }
+                }
 
+                mensagemCarrinho += "Acompanhamentos:\n";
+                if (item.acompanhamentos) {
+                    item.acompanhamentos.forEach(acompanhamento => {
+                        mensagemCarrinho += `- ${acompanhamento}\n`;
+                    });
+                } else {
+                    if (item.acompanhamentos1) {
+                        mensagemCarrinho += "Açaí 1:\n";
+                        item.acompanhamentos1.forEach(acompanhamento => {
+                            mensagemCarrinho += `- ${acompanhamento}\n`;
+                        });
+                    }
+                    if (item.acompanhamentos2) {
+                        mensagemCarrinho += "Açaí 2:\n";
+                        item.acompanhamentos2.forEach(acompanhamento => {
+                            mensagemCarrinho += `- ${acompanhamento}\n`;
+                        });
+                    }
+                }
+
+                mensagemCarrinho += "Itens Extras:\n";
+                if (item.extras) {
+                    item.extras.forEach(extra => {
+                        mensagemCarrinho += `- ${extra}\n`;
+                    });
+                } else {
+                    if (item.extras1) {
+                        mensagemCarrinho += "Açaí 1:\n";
+                        item.extras1.forEach(extra => {
+                            mensagemCarrinho += `- ${extra}\n`;
+                        });
+                    }
+                    if (item.extras2) {
+                        mensagemCarrinho += "Açaí 2:\n";
+                        item.extras2.forEach(extra => {
+                            mensagemCarrinho += `- ${extra}\n`;
+                        });
+                    }
+                }
+            });
             const desconto = parseFloat(document.getElementById('desconto').textContent.replace("R$", "").replace(",", ".")) || 0;
             const total = subtotal + deliveryOption - desconto;
 
@@ -319,7 +342,7 @@
                 mensagem += `\n*Troco para:* ${troco}`;
             }
 
-            const whatsappUrl = `https://wa.me/5584988731028?text=${encodeURIComponent(mensagem)}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
             window.open(whatsappUrl, '_blank');
 
             const editarPedidoBtn = document.getElementById('botao-editar-pedido');
