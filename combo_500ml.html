@@ -103,19 +103,19 @@
     <div class="container">
         <h1>Açai no pote 500ml</h1>
         <div class="opcoes">
-            <h2>Escolha o Sabor (selecione 1 ou 2)</h2>
+            <h2>Escolha o Sabor (Açaí 1) (selecione 1 ou 2)</h2>
             <ul class="sabores">
                 <li>
-                    <input type="checkbox" id="acai-tradicional" name="sabor" value="Açaí tradicional">
+                    <input type="checkbox" id="acai-tradicional" name="sabor1" value="Açaí tradicional">
                     <label for="acai-tradicional">Açaí tradicional</label>
                     <p class="descricao">Se desejar metade açai e metade creme, será necessário que marque esta opção e o creme que deseja.</p>
                 </li>
-                <li><input type="checkbox" id="creme-ninho-trufado" name="sabor" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado">Creme de Ninho Trufado</label></li>
-                <li><input type="checkbox" id="creme-cupuacu" name="sabor" value="Creme de Cupuaçu"><label for="creme-cupuacu">Creme de Cupuaçu</label></li>
-                <li><input type="checkbox" id="creme-morango-especial" name="sabor" value="Creme de Morango Especial"><label for="creme-morango-especial">Creme de Morango Especial</label></li>
-                <li><input type="checkbox" id="creme-amendoim-premium" name="sabor" value="Creme de Amendoim Premium"><label for="creme-amendoim-premium">Creme de Amendoim Premium"></label></li>
-                <li><input type="checkbox" id="creme-ovomaltine" name="sabor" value="Creme de Ovomaltine"><label for="creme-ovomaltine">Creme de Ovomaltine"></label></li>
-                <li><input type="checkbox" id="creme-maracuja" name="sabor" value="Creme de Maracujá"><label for="creme-maracuja">Creme de Maracujá"></label></li>
+                <li><input type="checkbox" id="creme-ninho-trufado" name="sabor1" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado">Creme de Ninho Trufado</label></li>
+                <li><input type="checkbox" id="creme-cupuacu" name="sabor1" value="Creme de Cupuaçu"><label for="creme-cupuacu">Creme de Cupuaçu</label></li>
+                <li><input type="checkbox" id="creme-morango-especial" name="sabor1" value="Creme de Morango Especial"><label for="creme-morango-especial">Creme de Morango Especial</label></li>
+                <li><input type="checkbox" id="creme-amendoim-premium" name="sabor1" value="Creme de Amendoim Premium"><label for="creme-amendoim-premium">Creme de Amendoim Premium"></label></li>
+                <li><input type="checkbox" id="creme-ovomaltine" name="sabor1" value="Creme de Ovomaltine"><label for="creme-ovomaltine">Creme de Ovomaltine"></label></li>
+                <li><input type="checkbox" id="creme-maracuja" name="sabor1" value="Creme de Maracujá"><label for="creme-maracuja">Creme de Maracujá"></label></li>
             </ul>
             <h2>Escolha os Acompanhamentos (Açaí 1) (selecione até 4)</h2>
             <ul class="acompanhamentos">
@@ -143,6 +143,16 @@
                 <li><input type="checkbox" id="chocoball-extra" name="extra1" value="Chocoball Extra (+R$2,49)"><label for="chocoball-extra">Chocoball (+R$2,49)</label></li>
                 <li><input type="checkbox" id="m-m-extra" name="extra1" value="M&M Extra (+R$2,49)"><label for="m-m-extra">M&M (+R$2,49)</label></li>
                 <li><input type="checkbox" id="leite-em-po-extra" name="extra1" value="Leite em pó Extra (+R$2,49)"><label for="leite-em-po-extra">Leite em pó (+R$2,49)</label></li>
+            </ul>
+            <h2>Escolha o Sabor (Açaí 2) (selecione 1 ou 2)</h2>
+            <ul class="sabores">
+                <li><input type="checkbox" id="acai-tradicional2" name="sabor2" value="Açaí tradicional"><label for="acai-tradicional2">Açaí tradicional</label></li>
+                <li><input type="checkbox" id="creme-ninho-trufado2" name="sabor2" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado2">Creme de Ninho Trufado</label></li>
+                <li><input type="checkbox" id="creme-cupuacu2" name="sabor2" value="Creme de Cupuaçu"><label for="creme-cupuacu2">Creme de Cupuaçu</label></li>
+                <li><input type="checkbox" id="creme-morango-especial2" name="sabor2" value="Creme de Morango Especial"><label for="creme-morango-especial2">Creme de Morango Especial</label></li>
+                <li><input type="checkbox" id="creme-amendoim-premium2" name="sabor2" value="Creme de Amendoim Premium"><label for="creme-amendoim-premium2">Creme de Amendoim Premium"></label></li>
+                <li><input type="checkbox" id="creme-ovomaltine2" name="sabor2" value="Creme de Ovomaltine"><label for="creme-ovomaltine2">Creme de Ovomaltine"></label></li>
+                <li><input type="checkbox" id="creme-maracuja2" name="sabor2" value="Creme de Maracujá"><label for="creme-maracuja2">Creme de Maracujá"></label></li>
             </ul>
             <h2>Escolha os Acompanhamentos (Açaí 2) (selecione até 4)</h2>
             <ul class="acompanhamentos">
@@ -187,7 +197,8 @@
             const acompanhamentosSelecionados2 = [];
             const extrasSelecionados1 = [];
             const extrasSelecionados2 = [];
-            const saboresSelecionados = [];
+            const saboresSelecionados1 = [];
+            const saboresSelecionados2 = [];
             let precoTotal = precoBase;
 
             document.querySelectorAll('input[name="acompanhamento1"]:checked').forEach(function(item) {
@@ -208,12 +219,16 @@
                 precoTotal += parseFloat(item.value.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
             });
 
-            document.querySelectorAll('input[name="sabor"]:checked').forEach(function(item) {
-                saboresSelecionados.push(item.value);
+            document.querySelectorAll('input[name="sabor1"]:checked').forEach(function(item) {
+                saboresSelecionados1.push(item.value);
             });
 
-            if (saboresSelecionados.length < minSabores) {
-                alert(`Você deve selecionar pelo menos ${minSabores} sabor.`);
+            document.querySelectorAll('input[name="sabor2"]:checked').forEach(function(item) {
+                saboresSelecionados2.push(item.value);
+            });
+
+            if (saboresSelecionados1.length < minSabores || saboresSelecionados2.length < minSabores) {
+                alert(`Você deve selecionar pelo menos ${minSabores} sabor para cada Açaí.`);
                 return;
             }
 
@@ -224,7 +239,8 @@
                 acompanhamentos2: acompanhamentosSelecionados2,
                 extras1: extrasSelecionados1,
                 extras2: extrasSelecionados2,
-                sabores: saboresSelecionados,
+                sabores1: saboresSelecionados1,
+                sabores2: saboresSelecionados2,
                 preco: precoTotal.toFixed(2)
             };
 
@@ -259,9 +275,19 @@
             });
         });
 
-        document.querySelectorAll('input[name="sabor"]').forEach(function(item) {
+        document.querySelectorAll('input[name="sabor1"]').forEach(function(item) {
             item.addEventListener('change', function() {
-                const selecionados = document.querySelectorAll('input[name="sabor"]:checked').length;
+                const selecionados = document.querySelectorAll('input[name="sabor1"]:checked').length;
+                if (selecionados > maxSabores) {
+                    this.checked = false;
+                    alert(`Você só pode selecionar até ${maxSabores} sabores.`);
+                }
+            });
+        });
+
+        document.querySelectorAll('input[name="sabor2"]').forEach(function(item) {
+            item.addEventListener('change', function() {
+                const selecionados = document.querySelectorAll('input[name="sabor2"]:checked').length;
                 if (selecionados > maxSabores) {
                     this.checked = false;
                     alert(`Você só pode selecionar até ${maxSabores} sabores.`);
