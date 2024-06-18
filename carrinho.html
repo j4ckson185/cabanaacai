@@ -131,21 +131,26 @@
                     produto.classList.add('produto');
 
                     // Calcula o valor total do item incluindo os extras
-                    let valorProduto = parseFloat(item.preco);
-                    item.extras1.forEach(extra => {
-                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                    });
-                    item.extras2.forEach(extra => {
-                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                    });
+                    let valorProduto = parseFloat(item.preco) || 0;
+
+                    if (item.extras1) {
+                        item.extras1.forEach(extra => {
+                            valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                        });
+                    }
+                    if (item.extras2) {
+                        item.extras2.forEach(extra => {
+                            valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                        });
+                    }
                     total += valorProduto;
 
-                    const sabores1 = item.sabores1.map(sabor => `<li>${sabor}</li>`).join('');
-                    const sabores2 = item.sabores2.map(sabor => `<li>${sabor}</li>`).join('');
-                    const acompanhamentos1 = item.acompanhamentos1.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
-                    const acompanhamentos2 = item.acompanhamentos2.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
-                    const extras1 = item.extras1.map(extra => `<li>${extra}</li>`).join('');
-                    const extras2 = item.extras2.map(extra => `<li>${extra}</li>`).join('');
+                    const sabores1 = item.sabores1 ? item.sabores1.map(sabor => `<li>${sabor}</li>`).join('') : '';
+                    const sabores2 = item.sabores2 ? item.sabores2.map(sabor => `<li>${sabor}</li>`).join('') : '';
+                    const acompanhamentos1 = item.acompanhamentos1 ? item.acompanhamentos1.map(acompanhamento => `<li>${acompanhamento}</li>`).join('') : '';
+                    const acompanhamentos2 = item.acompanhamentos2 ? item.acompanhamentos2.map(acompanhamento => `<li>${acompanhamento}</li>`).join('') : '';
+                    const extras1 = item.extras1 ? item.extras1.map(extra => `<li>${extra}</li>`).join('') : '';
+                    const extras2 = item.extras2 ? item.extras2.map(extra => `<li>${extra}</li>`).join('') : '';
 
                     produto.innerHTML = `
                         <div class="detalhes">
