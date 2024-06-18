@@ -174,11 +174,11 @@
                                 <ul>${extras2Html}</ul>
                             ` : `
                                 <p><strong>Sabores:</strong></p>
-                                <ul>${sabores1Html}</ul>
+                                <ul>${item.sabores ? item.sabores.map(sabor => `<li>${sabor}</li>`).join('') : sabores1Html}</ul>
                                 <p><strong>Acompanhamentos:</strong></p>
-                                <ul>${acompanhamentos1Html}</ul>
+                                <ul>${item.acompanhamentos ? item.acompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('') : acompanhamentos1Html}</ul>
                                 <p><strong>Itens Extras:</strong></p>
-                                <ul>${extras1Html}</ul>
+                                <ul>${item.extras ? item.extras.map(extra => `<li>${extra}</li>`).join('') : extras1Html}</ul>
                             `}
                         </div>
                     `;
