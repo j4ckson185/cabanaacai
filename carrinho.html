@@ -133,40 +133,35 @@
                     // Calcula o valor total do item incluindo os extras
                     let valorProduto = parseFloat(item.preco) || 0;
 
-                    if (item.extras1) {
-                        item.extras1.forEach(extra => {
-                            valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                        });
-                    }
-                    if (item.extras2) {
-                        item.extras2.forEach(extra => {
-                            valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                        });
-                    }
+                    const extras1 = item.extras1 || [];
+                    const extras2 = item.extras2 || [];
+                    const allExtras = extras1.concat(extras2);
+                    allExtras.forEach(extra => {
+                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                    });
                     total += valorProduto;
 
-                    const sabores1 = item.sabores1 ? item.sabores1.map(sabor => `<li>${sabor}</li>`).join('') : '';
-                    const sabores2 = item.sabores2 ? item.sabores2.map(sabor => `<li>${sabor}</li>`).join('') : '';
-                    const acompanhamentos1 = item.acompanhamentos1 ? item.acompanhamentos1.map(acompanhamento => `<li>${acompanhamento}</li>`).join('') : '';
-                    const acompanhamentos2 = item.acompanhamentos2 ? item.acompanhamentos2.map(acompanhamento => `<li>${acompanhamento}</li>`).join('') : '';
-                    const extras1 = item.extras1 ? item.extras1.map(extra => `<li>${extra}</li>`).join('') : '';
-                    const extras2 = item.extras2 ? item.extras2.map(extra => `<li>${extra}</li>`).join('') : '';
+                    const sabores1 = item.sabores1 || [];
+                    const sabores2 = item.sabores2 || [];
+                    const allSabores = sabores1.concat(sabores2);
+
+                    const acompanhamentos1 = item.acompanhamentos1 || [];
+                    const acompanhamentos2 = item.acompanhamentos2 || [];
+                    const allAcompanhamentos = acompanhamentos1.concat(acompanhamentos2);
+
+                    const sabores = allSabores.map(sabor => `<li>${sabor}</li>`).join('');
+                    const acompanhamentos = allAcompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
+                    const extras = allExtras.map(extra => `<li>${extra}</li>`).join('');
 
                     produto.innerHTML = `
                         <div class="detalhes">
                             <p><strong>${item.nome}</strong> - ${formatarMoeda(valorProduto)} <button onclick="removerProduto(${index})">🗑️</button></p>
-                            <p><strong>Sabores (Açaí 1):</strong></p>
-                            <ul>${sabores1}</ul>
-                            <p><strong>Sabores (Açaí 2):</strong></p>
-                            <ul>${sabores2}</ul>
-                            <p><strong>Acompanhamentos (Açaí 1):</strong></p>
-                            <ul>${acompanhamentos1}</ul>
-                            <p><strong>Acompanhamentos (Açaí 2):</strong></p>
-                            <ul>${acompanhamentos2}</ul>
-                            <p><strong>Itens Extras (Açaí 1):</strong></p>
-                            <ul>${extras1}</ul>
-                            <p><strong>Itens Extras (Açaí 2):</strong></p>
-                            <ul>${extras2}</ul>
+                            <p><strong>Sabores:</strong></p>
+                            <ul>${sabores}</ul>
+                            <p><strong>Acompanhamentos:</strong></p>
+                            <ul>${acompanhamentos}</ul>
+                            <p><strong>Itens Extras:</strong></p>
+                            <ul>${extras}</ul>
                         </div>
                     `;
                     listaProdutos.appendChild(produto);
