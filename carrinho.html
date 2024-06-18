@@ -149,19 +149,37 @@
                     const acompanhamentos2 = item.acompanhamentos2 || [];
                     const allAcompanhamentos = acompanhamentos1.concat(acompanhamentos2);
 
-                    const sabores = (item.sabores ? item.sabores : allSabores).map(sabor => `<li>${sabor}</li>`).join('');
-                    const acompanhamentos = (item.acompanhamentos ? item.acompanhamentos : allAcompanhamentos).map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
-                    const extras = (item.extras ? item.extras : allExtras).map(extra => `<li>${extra}</li>`).join('');
+                    const sabores1Html = sabores1.map(sabor => `<li>${sabor}</li>`).join('');
+                    const sabores2Html = sabores2.map(sabor => `<li>${sabor}</li>`).join('');
+                    const acompanhamentos1Html = acompanhamentos1.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
+                    const acompanhamentos2Html = acompanhamentos2.map(acompanhamento => `<li>${acompanhamento}</li>`).join('');
+                    const extras1Html = extras1.map(extra => `<li>${extra}</li>`).join('');
+                    const extras2Html = extras2.map(extra => `<li>${extra}</li>`).join('');
 
                     produto.innerHTML = `
                         <div class="detalhes">
                             <p><strong>${item.nome}</strong> - ${formatarMoeda(valorProduto)} <button onclick="removerProduto(${index})">🗑️</button></p>
-                            <p><strong>Sabores:</strong></p>
-                            <ul>${sabores}</ul>
-                            <p><strong>Acompanhamentos:</strong></p>
-                            <ul>${acompanhamentos}</ul>
-                            <p><strong>Itens Extras:</strong></p>
-                            <ul>${extras}</ul>
+                            ${item.sabores1 && item.sabores2 ? `
+                                <p><strong>Sabores (Açaí 1):</strong></p>
+                                <ul>${sabores1Html}</ul>
+                                <p><strong>Sabores (Açaí 2):</strong></p>
+                                <ul>${sabores2Html}</ul>
+                                <p><strong>Acompanhamentos (Açaí 1):</strong></p>
+                                <ul>${acompanhamentos1Html}</ul>
+                                <p><strong>Acompanhamentos (Açaí 2):</strong></p>
+                                <ul>${acompanhamentos2Html}</ul>
+                                <p><strong>Itens Extras (Açaí 1):</strong></p>
+                                <ul>${extras1Html}</ul>
+                                <p><strong>Itens Extras (Açaí 2):</strong></p>
+                                <ul>${extras2Html}</ul>
+                            ` : `
+                                <p><strong>Sabores:</strong></p>
+                                <ul>${sabores1Html}</ul>
+                                <p><strong>Acompanhamentos:</strong></p>
+                                <ul>${acompanhamentos1Html}</ul>
+                                <p><strong>Itens Extras:</strong></p>
+                                <ul>${extras1Html}</ul>
+                            `}
                         </div>
                     `;
                     listaProdutos.appendChild(produto);
