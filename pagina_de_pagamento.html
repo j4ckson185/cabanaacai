@@ -111,12 +111,21 @@
             document.getElementById('total').textContent = formatarMoeda(total);
 
             // Verificação de horários de funcionamento
-            const horarios = JSON.parse(localStorage.getItem('horarios')) || {};
-            const now = moment().tz("America/Sao_Paulo");
-            const day = now.format('dddd').toLowerCase();
-            const currentTime = now.hours() * 60 + now.minutes();
-            const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
-            const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
+            const horarios = {
+                domingo: { open: "09:00", close: "18:00" },
+                segunda: { open: "09:00", close: "18:00" },
+                terca: { open: "09:00", close: "18:00" },
+                quarta: { open: "09:00", close: "18:00" },
+                quinta: { open: "09:00", close: "18:00" },
+                sexta: { open: "09:00", close: "18:00" },
+                sabado: { open: "09:00", close: "18:00" }
+            };
+
+            const now = new Date();
+            const dayOfWeek = now.toLocaleDateString('pt-BR', { weekday: 'long' }).toLowerCase();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            const openTime = horarios[dayOfWeek].open ? parseInt(horarios[dayOfWeek].open.split(':')[0]) * 60 + parseInt(horarios[dayOfWeek].open.split(':')[1]) : null;
+            const closeTime = horarios[dayOfWeek].close ? parseInt(horarios[dayOfWeek].close.split(':')[0]) * 60 + parseInt(horarios[dayOfWeek].close.split(':')[1]) : null;
 
             if (openTime !== null && closeTime !== null) {
                 if (currentTime < openTime || currentTime > closeTime) {
@@ -201,7 +210,6 @@
                         });
                     }
                 }
-
             });
 
             const desconto = 0;
