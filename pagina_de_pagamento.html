@@ -228,31 +228,24 @@
             }
         }
 
-        // Função para enviar o pedido pelo WhatsApp
+        // Função para enviar o pedido pelo WhatsApp com os detalhes do pedido
         function enviarPedidoWhatsApp() {
-            const nome = document.getElementById('nome-sobrenome').value;
+            const nomeSobrenome = document.getElementById('nome-sobrenome').value;
             const endereco = document.getElementById('endereco').value;
             const numero = document.getElementById('numero').value;
             const complemento = document.getElementById('complemento').value;
             const telefone = document.getElementById('telefone').value;
             const email = document.getElementById('email').value;
-            const pagamento = document.querySelector('input[name="payment-method"]:checked').value;
+            const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
             const troco = document.getElementById('troco').value;
+            const dataHoraPedido = moment().tz("America/Sao_Paulo").format('DD/MM/YYYY HH:mm:ss');
+            const deliveryOption = 3.00; // Taxa de entrega fixa
+            const subtotal = 50.00; // Subtotal do pedido (substitua com a lógica correta)
+            const mensagemCarrinho = ''; // Mensagem com os itens do carrinho (substitua com a lógica correta)
 
-            let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
-            message += `Nome: ${nome}\n`;
-            message += `Endereço: ${endereco}, ${numero}\n`;
-            if (complemento) {
-                message += `Complemento: ${complemento}\n`;
-            }
-            message += `Telefone: ${telefone}\n`;
-            message += `Email: ${email}\n\n`;
-            message += `Método de Pagamento: ${pagamento}\n`;
-            if (pagamento === 'dinheiro' && troco) {
-                message += `Troco para: ${troco}\n`;
-            }
+            const mensagem = `Pedido realizado em ${dataHoraPedido}\n\n*Detalhes do Pedido:*\n\n*Cliente:* ${nomeSobrenome}\n*Endereço:* ${endereco}, ${numero} - ${complemento}\n*CEP:* ${cep}\n*Telefone:* ${telefone}\n*Email:* ${email}\n*Forma de Pagamento:* ${metodoPagamento}\n*Entrega:* R$ ${deliveryOption.toFixed(2)}\n\n${mensagemCarrinho}\n*Total do Pedido:* R$ ${((subtotal + deliveryOption).toFixed(2))}\n\n*Troco para:* ${troco || "N/A"}`;
 
-            const whatsappLink = `https://wa.me/558496468750?text=${encodeURIComponent(message)}`;
+            const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(mensagem)}`;
             window.open(whatsappLink, '_blank');
         }
 
