@@ -6,13 +6,21 @@
     <title>Página de Pagamento</title>
     <link rel="stylesheet" href="pagina_de_pagamento.css">
     <style>
-        /* Estilos CSS existentes */
+        .button {
+            padding: 5px 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-decoration: none;
+            color: #fff;
+            background-color: #007bff;
+        }
     </style>
-    <!-- Incluindo Moment.js e Firebase -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
 </head>
 <body>
     <!-- Estrutura HTML existente -->
@@ -32,6 +40,7 @@
             <input type="text" id="troco" placeholder="Troco para">
         </div>
         <button type="submit">Finalizar Pedido</button>
+        <a href="javascript:void(0)" id="whatsapp-link" class="button">Enviar Pedido pelo WhatsApp</a>
     </form>
 
     <script>
@@ -52,163 +61,63 @@
             return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        document.addEventListener('DOMContentLoaded', async function() {
-            const deliveryFee = 3.00;
+        // Função para obter os detalhes completos do pedido
+        function obterDetalhesPedido() {
             const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+            let mensagem = "Pedido:\n\n";
             let subtotal = 0;
+
             carrinho.forEach(item => {
+                mensagem += `Produto: ${item.nome}\n`;
+                mensagem += `Preço: ${formatarMoeda(item.preco)}\n`;
+
+                // Adicionar acompanhamentos
+                if (item.acompanhamentos && item.acompanhamentos.length > 0) {
+                    mensagem += "Acompanhamentos:\n";
+                    item.acompanhamentos.forEach(acompanhamento => {
+                        mensagem += `- ${acompanhamento}\n`;
+                    });
+                }
+
+                // Adicionar itens extras
+                if (item.itensExtras && item.itensExtras.length > 0) {
+                    mensagem += "Itens Extras:\n";
+                    item.itensExtras.forEach(extra => {
+                        mensagem += `- ${extra}\n`;
+                    });
+                }
+
+                mensagem += "\n";
                 subtotal += parseFloat(item.preco);
             });
+
+            const deliveryFee = 3.00;
             const total = subtotal + deliveryFee;
 
-            // Atualizar elementos de subtotal e total
-            const subtotalElement = document.getElementById('subtotal');
-            const totalElement = document.getElementById('total');
-            if (subtotalElement) {
-                subtotalElement.textContent = formatarMoeda(subtotal);
-            }
-            if (totalElement) {
-                totalElement.textContent = formatarMoeda(total);
-            }
+            mensagem += `Subtotal: ${formatarMoeda(subtotal)}\n`;
+            mensagem += `Taxa de Entrega: ${formatarMoeda(deliveryFee)}\n`;
+            mensagem += `Total: ${formatarMoeda(total)}\n\n`;
 
-            // Verificação de horários de funcionamento
-            const now = moment().tz("America/Sao_Paulo");
-            const day = now.format('dddd').toLowerCase();
-            const currentTime = now.hours() * 60 + now.minutes();
+            return mensagem;
+        }
 
-            try {
-                const horariosDoc = await db.collection("horarios").doc("loja").get();
-                const horarios = horariosDoc.data();
-                
-                if (horarios) {
-                    const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
-                    const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Configuração dos elementos e eventos
+            const whatsappLink = document.getElementById('whatsapp-link');
 
-                    if (openTime !== null && closeTime !== null) {
-                        if (currentTime < openTime || currentTime > closeTime) {
-                            const closedMessage = document.getElementById('closed-message');
-                            if (closedMessage) {
-                                closedMessage.classList.remove('hidden');
-                            }
-                        } else {
-                            const formPagamento = document.getElementById('formulario-pagamento');
-                            if (formPagamento) {
-                                formPagamento.classList.remove('hidden');
-                            }
-                        }
-                    } else {
-                        const closedMessage = document.getElementById('closed-message');
-                        if (closedMessage) {
-                            closedMessage.classList.remove('hidden');
-                        }
-                    }
-                } else {
-                    const closedMessage = document.getElementById('closed-message');
-                    if (closedMessage) {
-                        closedMessage.classList.remove('hidden');
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao obter horários de funcionamento:", error);
-                const closedMessage = document.getElementById('closed-message');
-                if (closedMessage) {
-                    closedMessage.classList.remove('hidden');
-                }
-            }
+            whatsappLink.addEventListener('click', function() {
+                const detalhesPedido = obterDetalhesPedido();
+                const mensagemWhatsapp = encodeURIComponent(detalhesPedido);
 
-            // Exibir seção de troco ao selecionar pagamento em dinheiro
-            document.querySelectorAll('input[name="payment-method"]').forEach(input => {
-                input.addEventListener('change', function() {
-                    const trocoSection = document.getElementById('troco-section');
-                    if (this.value === 'dinheiro' && trocoSection) {
-                        trocoSection.style.display = 'block';
-                    } else if (trocoSection) {
-                        trocoSection.style.display = 'none';
-                    }
-                });
+                // Substitua o número de telefone abaixo pelo seu número de WhatsApp
+                const numeroWhatsapp = "SEU-NUMERO-DE-TELEFONE";
+
+                const whatsappURL = `https://wa.me/${numeroWhatsapp}?text=${mensagemWhatsapp}`;
+                window.open(whatsappURL, '_blank');
             });
 
-            // Manipulador de envio do formulário de pagamento
-            const formPagamento = document.getElementById('formulario-pagamento');
-            if (formPagamento) {
-                formPagamento.addEventListener('submit', function(e) {
-                    e.preventDefault();
+            // ... Restante do seu código aqui ...
 
-                    const nomeSobrenome = document.getElementById('nome-sobrenome').value;
-                    const cep = document.getElementById('cep').value;
-                    const endereco = document.getElementById('endereco').value;
-                    const numero = document.getElementById('numero').value;
-                    const complemento = document.getElementById('complemento').value || "N/A";
-                    const telefone = document.getElementById('telefone').value;
-                    const email = document.getElementById('email').value;
-                    const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
-                    const troco = document.getElementById('troco').value;
-                    const deliveryOption = 3.00;
-
-                    const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
-                    let mensagemCarrinho = "*Itens do Pedido:*\n";
-                    let subtotal = 0;
-                    carrinho.forEach(item => {
-                        let valorProduto = parseFloat(item.preco);
-                        subtotal += valorProduto;
-
-                        mensagemCarrinho += `\n*${item.nome} - ${formatarMoeda(valorProduto)}*\n`;
-                        mensagemCarrinho += "Sabores:\n";
-                        if (item.sabores) {
-                            item.sabores.forEach(sabor => {
-                                mensagemCarrinho += `- ${sabor}\n`;
-                            });
-                        } else {
-                            if (item.sabores1) {
-                                mensagemCarrinho += "Açaí 1:\n";
-                                item.sabores1.forEach(sabor => {
-                                    mensagemCarrinho += `- ${sabor}\n`;
-                                });
-                            }
-                            if (item.sabores2) {
-                                mensagemCarrinho += "Açaí 2:\n";
-                                item.sabores2.forEach(sabor => {
-                                    mensagemCarrinho += `- ${sabor}\n`;
-                                });
-                            }
-                        }
-
-                        mensagemCarrinho += "Acompanhamentos:\n";
-                        if (item.acompanhamentos) {
-                            item.acompanhamentos.forEach(acompanhamento => {
-                                mensagemCarrinho += `- ${acompanhamento}\n`;
-                            });
-                        }
-                    });
-
-                    const total = subtotal + deliveryOption;
-
-                    // Salvar pedido no Firestore
-                    db.collection("pedidos").add({
-                        nomeSobrenome: nomeSobrenome,
-                        cep: cep,
-                        endereco: endereco,
-                        numero: numero,
-                        complemento: complemento,
-                        telefone: telefone,
-                        email: email,
-                        metodoPagamento: metodoPagamento,
-                        troco: troco,
-                        itens: carrinho,
-                        taxaEntrega: formatarMoeda(deliveryOption),
-                        subtotal: formatarMoeda(subtotal),
-                        total: formatarMoeda(total),
-                        status: "Pendente",
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    }).then((docRef) => {
-                        console.log("Pedido salvo com ID: ", docRef.id);
-                        sessionStorage.removeItem('carrinho');
-                        window.location.href = "meus_pedidos.html";
-                    }).catch((error) => {
-                        console.error("Erro ao salvar pedido: ", error);
-                    });
-                });
-            }
         });
     </script>
 </body>
