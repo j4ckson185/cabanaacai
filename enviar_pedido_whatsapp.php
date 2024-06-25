@@ -13,7 +13,7 @@ $mensagem .= "WhatsApp: $whatsapp\n";
 // Adicione mais informações do pedido à mensagem...
 
 // Número de telefone do WhatsApp para enviar a mensagem
-$numero_whatsapp = '84988731028';
+$numero_whatsapp = '84986468750';
 
 // Função para enviar a mensagem para o WhatsApp
 function enviarMensagemParaWhatsApp($mensagem, $numero) {
