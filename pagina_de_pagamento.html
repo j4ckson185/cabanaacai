@@ -33,17 +33,36 @@
         nav a:hover {
             text-decoration: underline;
         }
+        .container {
+            max-width: 800px;
+            margin: 80px auto 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
         }
         .form-row {
             display: flex;
-            flex-wrap: wrap;
             gap: 15px;
         }
-        .form-row > div {
+        .form-row > .form-group {
             flex: 1;
         }
         .summary {
@@ -60,7 +79,6 @@
         .button {
             padding: 10px 20px;
             font-size: 16px;
-            margin: 10px;
             cursor: pointer;
             border: none;
             border-radius: 4px;
@@ -86,30 +104,7 @@
             vertical-align: middle;
             margin-right: 10px;
         }
-        .error {
-            color: red;
-            margin-top: 10px;
-        }
-        .closed-message {
-            text-align: center;
-            color: red;
-            font-weight: bold;
-            margin-top: 20px;
-            padding: 20px;
-            border: 2px solid red;
-            border-radius: 10px;
-            background-color: #ffe6e6;
-            width: 80%;
-            margin: 20px auto;
-        }
-        .hidden {
-            display: none;
-        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
 </head>
 <body>
     <nav>
@@ -118,89 +113,91 @@
         <a href="carrinho.html">Carrinho</a>
     </nav>
 
-    <h1>Página de Pagamento</h1>
-    <form id="formulario-pagamento">
-        <div class="form-group">
-            <label for="nome-sobrenome">Nome e Sobrenome:</label>
-            <input type="text" id="nome-sobrenome" name="nome-sobrenome" required>
-        </div>
-        
-        <div class="form-row">
-            <div>
-                <label for="cep">CEP:</label>
-                <input type="text" id="cep" name="cep" pattern="\d{5}-?\d{3}" placeholder="12345-678" required>
-                <button type="button" onclick="consultarCep()">Consultar</button>
-                <p id="resultado-cep"></p>
+    <div class="container">
+        <h1>Página de Pagamento</h1>
+        <form id="formulario-pagamento">
+            <div class="form-group">
+                <label for="nome-sobrenome">Nome e Sobrenome:</label>
+                <input type="text" id="nome-sobrenome" name="nome-sobrenome" required>
             </div>
-            <div>
-                <label for="telefone">Telefone (com DDD):</label>
-                <input type="tel" id="telefone" name="telefone" pattern="\d{11}" placeholder="84988731028" required>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cep">CEP:</label>
+                    <input type="text" id="cep" name="cep" pattern="\d{5}-?\d{3}" placeholder="12345-678" required>
+                    <button type="button" onclick="consultarCep()">Consultar</button>
+                    <p id="resultado-cep"></p>
+                </div>
+                <div class="form-group">
+                    <label for="telefone">Telefone (com DDD):</label>
+                    <input type="tel" id="telefone" name="telefone" pattern="\d{11}" placeholder="84988731028" required>
+                </div>
             </div>
-        </div>
-        
-        <div class="form-row">
-            <div>
-                <label for="endereco">Endereço:</label>
-                <input type="text" id="endereco" name="endereco" required>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="endereco">Endereço:</label>
+                    <input type="text" id="endereco" name="endereco" required>
+                </div>
+                <div class="form-group">
+                    <label for="numero">Número:</label>
+                    <input type="text" id="numero" name="numero" required>
+                </div>
             </div>
-            <div>
-                <label for="numero">Número:</label>
-                <input type="text" id="numero" name="numero" required>
+            
+            <div class="form-group">
+                <label for="complemento">Complemento:</label>
+                <input type="text" id="complemento" name="complemento">
             </div>
-        </div>
-        
-        <div class="form-group">
-            <label for="complemento">Complemento:</label>
-            <input type="text" id="complemento" name="complemento">
-        </div>
 
-        <h2>Opções de Pagamento</h2>
-        <div class="form-group">
-            <label>
-                <input type="radio" name="payment-method" value="dinheiro" required> Dinheiro
-            </label>
-            <label>
-                <input type="radio" name="payment-method" value="cartao" required> Cartão
-            </label>
-            <label>
-                <input type="radio" name="payment-method" value="pix" required> PIX
-            </label>
-        </div>
+            <h2>Opções de Pagamento</h2>
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="payment-method" value="dinheiro" required> Dinheiro
+                </label>
+                <label>
+                    <input type="radio" name="payment-method" value="cartao" required> Cartão
+                </label>
+                <label>
+                    <input type="radio" name="payment-method" value="pix" required> PIX
+                </label>
+            </div>
 
-        <div id="troco-section" style="display:none;">
-            <label for="troco">Precisa de troco para:</label>
-            <input type="text" id="troco" name="troco">
-        </div>
+            <div id="troco-section" class="form-group" style="display:none;">
+                <label for="troco">Precisa de troco para:</label>
+                <input type="text" id="troco" name="troco">
+            </div>
 
-        <h2>Opções de Entrega</h2>
-        <div class="form-group">
-            <label>
-                <input type="checkbox" name="delivery-option" value="motoboy" checked disabled> Motoboy (R$ 3,00)
-            </label>
-        </div>
+            <h2>Opções de Entrega</h2>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="delivery-option" value="motoboy" checked disabled> Motoboy (R$ 3,00)
+                </label>
+            </div>
 
-        <div class="summary">
-            <h3>Resumo do Pedido</h3>
-            <p>Subtotal: <span id="subtotal"></span></p>
-            <p>Taxa de Entrega: R$ 3,00</p>
-            <p>Desconto: <span id="desconto">R$ 0,00</span></p>
-            <p>Total: <span id="total"></span></p>
-        </div>
+            <div class="summary">
+                <h3>Resumo do Pedido</h3>
+                <p>Subtotal: <span id="subtotal"></span></p>
+                <p>Taxa de Entrega: R$ 3,00</p>
+                <p>Desconto: <span id="desconto">R$ 0,00</span></p>
+                <p>Total: <span id="total"></span></p>
+            </div>
 
-        <div class="form-group">
-            <label for="cupom">Código do Cupom:</label>
-            <input type="text" id="cupom" name="cupom" placeholder="Digite um cupom de desconto aqui caso possua.">
-        </div>
+            <div class="form-group">
+                <label for="cupom">Código do Cupom:</label>
+                <input type="text" id="cupom" name="cupom" placeholder="Digite um cupom de desconto aqui caso possua.">
+            </div>
 
-        <div class="buttons">
-            <button class="button button-whatsapp" id="botao-finalizar-pedido" type="button" onclick="enviarPedidoWhatsApp()">
-                <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png" alt="WhatsApp" class="button-icon">
-                Enviar pedido pelo WhatsApp
-            </button>
-            <a href="index.html" class="button button-secondary">Adicionar mais itens</a>
-            <a href="carrinho.html" class="button button-secondary" id="botao-editar-pedido">Editar pedido</a>
-        </div>
-    </form>
+            <div class="buttons">
+                <button class="button button-whatsapp" id="botao-finalizar-pedido" type="button" onclick="enviarPedidoWhatsApp()">
+                    <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png" alt="WhatsApp" class="button-icon">
+                    Enviar pedido pelo WhatsApp
+                </button>
+                <a href="index.html" class="button button-secondary">Adicionar mais itens</a>
+                <a href="carrinho.html" class="button button-secondary" id="botao-editar-pedido">Editar pedido</a>
+            </div>
+        </form>
+    </div>
 
     <script>
         // Função para formatar o valor como moeda
@@ -236,6 +233,9 @@
             const pagamento = document.querySelector('input[name="payment-method"]:checked').value;
             const troco = document.getElementById('troco').value;
 
+            // Recuperar carrinho do sessionStorage
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+
             let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
             message += `Nome: ${nome}\n`;
             message += `Endereço: ${endereco}, ${numero}\n`;
@@ -243,10 +243,22 @@
                 message += `Complemento: ${complemento}\n`;
             }
             message += `Telefone: ${telefone}\n\n`;
+
             message += `Método de Pagamento: ${pagamento}\n`;
             if (pagamento === 'dinheiro' && troco) {
                 message += `Troco para: ${troco}\n`;
             }
+
+            message += `\nItens do Pedido:\n`;
+            carrinho.forEach(item => {
+                message += `- ${item.nome}: ${item.preco}\n`;
+                if (item.complementos) {
+                    message += `  Complementos: ${item.complementos.join(', ')}\n`;
+                }
+                if (item.itensExtras) {
+                    message += `  Itens Extras: ${item.itensExtras.join(', ')}\n`;
+                }
+            });
 
             const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(message)}`;
             window.open(whatsappLink, '_blank');
