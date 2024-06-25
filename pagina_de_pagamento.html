@@ -4,41 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página de Pagamento</title>
-    <link rel="stylesheet" href="pagina_de_pagamento.css">
     <style>
-        .button {
-            padding: 5px 10px;
-            font-size: 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            text-decoration: none;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        nav {
+            background-color: #663399;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 999;
+        }
+        nav a {
             color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
         }
-        .button-whatsapp {
-            background-color: #25d366;
-        }
-        .button-whatsapp:hover {
-            background-color: #1ebe57;
-        }
-        .button-secondary {
-            background-color: #4caf50;
-        }
-        .button-secondary:hover {
-            background-color: #45a049;
-        }
-        .button-icon {
-            margin-right: 10px;
-        }
-        .button-track {
-            background-color: #800080;
-        }
-        .button-track:hover {
-            background-color: #4b0082;
+        nav a:hover {
+            text-decoration: underline;
         }
         .form-group {
             display: flex;
@@ -63,6 +56,35 @@
         }
         .summary p {
             margin: 5px 0;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            text-decoration: none;
+            display: inline-block;
+            background-color: #2196F3;
+            text-align: center;
+        }
+        .button-whatsapp {
+            background-color: #25d366;
+        }
+        .button-whatsapp:hover {
+            background-color: #1ebe57;
+        }
+        .button-secondary {
+            background-color: #4caf50;
+        }
+        .button-secondary:hover {
+            background-color: #45a049;
+        }
+        .button-icon {
+            vertical-align: middle;
+            margin-right: 10px;
         }
         .error {
             color: red;
@@ -90,51 +112,54 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
 </head>
 <body>
-    <header>
-        <img src="https://i.ibb.co/0qYB3GV/logo-cabana.jpg" alt="Cabana Açaí Logo" class="logo">
-        <nav>
-            <ul class="menu-nav">
-                <li><a href="index.html">Início</a></li>
-                <li><a href="promos.html">Promos</a></li>
-                <li><a href="carrinho.html">Carrinho</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <h1>Página de Pagamento</h1>
-        <div id="closed-message" class="closed-message hidden">
-            A loja está fechada no momento. Por favor, volte durante o horário de funcionamento.
-        </div>
-        <form id="formulario-pagamento" class="hidden">
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="promos.html">Promos</a>
+        <a href="carrinho.html">Carrinho</a>
+    </nav>
+
+    <h1>Página de Pagamento</h1>
+    <div id="closed-message" class="closed-message hidden">
+        A loja está fechada no momento. Por favor, volte durante o horário de funcionamento.
+    </div>
+
+    <form id="formulario-pagamento" class="hidden">
+        <div class="form-group">
             <label for="nome-sobrenome">Nome e Sobrenome:</label>
             <input type="text" id="nome-sobrenome" name="nome-sobrenome" required>
-            
-            <label for="cep">CEP:</label>
-            <input type="text" id="cep" name="cep" pattern="\d{5}-?\d{3}" placeholder="12345-678" required>
-            <button type="button" onclick="consultarCep()">Consultar</button>
-            <p id="resultado-cep"></p>
-            
-            <div class="form-row">
-                <div>
-                    <label for="endereco">Endereço:</label>
-                    <input type="text" id="endereco" name="endereco" required>
-                </div>
-                <div>
-                    <label for="numero">Número:</label>
-                    <input type="text" id="numero" name="numero" required>
-                </div>
+        </div>
+        
+        <div class="form-row">
+            <div>
+                <label for="cep">CEP:</label>
+                <input type="text" id="cep" name="cep" pattern="\d{5}-?\d{3}" placeholder="12345-678" required>
+                <button type="button" onclick="consultarCep()">Consultar</button>
+                <p id="resultado-cep"></p>
             </div>
-            
+            <div>
+                <label for="telefone">Telefone (com DDD):</label>
+                <input type="tel" id="telefone" name="telefone" pattern="\d{11}" placeholder="84988731028" required>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div>
+                <label for="endereco">Endereço:</label>
+                <input type="text" id="endereco" name="endereco" required>
+            </div>
+            <div>
+                <label for="numero">Número:</label>
+                <input type="text" id="numero" name="numero" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
             <label for="complemento">Complemento:</label>
             <input type="text" id="complemento" name="complemento">
-            
-            <label for="telefone">Telefone (com DDD):</label>
-            <input type="tel" id="telefone" name="telefone" pattern="\d{11}" placeholder="84988731028" required>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+        </div>
 
-            <h2>Opções de Pagamento</h2>
+        <h2>Opções de Pagamento</h2>
+        <div class="form-group">
             <label>
                 <input type="radio" name="payment-method" value="dinheiro" required> Dinheiro
             </label>
@@ -144,65 +169,73 @@
             <label>
                 <input type="radio" name="payment-method" value="pix" required> PIX
             </label>
+        </div>
 
-            <div id="troco-section" style="display:none;">
-                <label for="troco">Precisa de troco para:</label>
-                <input type="text" id="troco" name="troco">
-            </div>
+        <div id="troco-section" style="display:none;">
+            <label for="troco">Precisa de troco para:</label>
+            <input type="text" id="troco" name="troco">
+        </div>
 
-            <h2>Opções de Entrega</h2>
+        <h2>Opções de Entrega</h2>
+        <div class="form-group">
             <label>
                 <input type="checkbox" name="delivery-option" value="motoboy" checked disabled> Motoboy (R$ 3,00)
             </label>
+        </div>
 
-            <div class="summary">
-                <h3>Resumo do Pedido</h3>
-                <div id="items-summary"></div>
-                <p>Subtotal: <span id="subtotal"></span></p>
-                <p>Taxa de Entrega: R$ 3,00</p>
-                <p>Desconto: <span id="desconto">R$ 0,00</span></p>
-                <p>Total: <span id="total"></span></p>
-            </div>
+        <div class="summary">
+            <h3>Resumo do Pedido</h3>
+            <p>Subtotal: <span id="subtotal"></span></p>
+            <p>Taxa de Entrega: R$ 3,00</p>
+            <p>Desconto: <span id="desconto">R$ 0,00</span></p>
+            <p>Total: <span id="total"></span></p>
+        </div>
 
-            <div class="form-row">
-                <div>
-                    <label for="cupom">Código do Cupom:</label>
-                    <input type="text" id="cupom" name="cupom" placeholder="Digite um cupom de desconto aqui caso possua.">
-                </div>
-            </div>
+        <div class="form-group">
+            <label for="cupom">Código do Cupom:</label>
+            <input type="text" id="cupom" name="cupom" placeholder="Digite um cupom de desconto aqui caso possua.">
+        </div>
 
-            <div class="buttons">
-                <button class="button button-whatsapp" id="botao-finalizar-pedido" type="button" onclick="enviarPedidoWhatsApp()">
-                    <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png" alt="WhatsApp" class="button-icon">
-                    Enviar pedido pelo WhatsApp
-                </button>
-                <a href="index.html" class="button button-secondary">Adicionar mais itens</a>
-                <a href="carrinho.html" class="button button-secondary" id="botao-editar-pedido">Editar pedido</a>
-            </div>
-        </form>
-    </main>
+        <div class="buttons">
+            <button class="button button-whatsapp" id="botao-finalizar-pedido" type="button" onclick="enviarPedidoWhatsApp()">
+                <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png" alt="WhatsApp" class="button-icon">
+                Enviar pedido pelo WhatsApp
+            </button>
+            <a href="index.html" class="button button-secondary">Adicionar mais itens</a>
+            <a href="carrinho.html" class="button button-secondary" id="botao-editar-pedido">Editar pedido</a>
+        </div>
+    </form>
+
     <script>
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
-            authDomain: "cabana-8d55e.firebaseapp.com",
-            projectId: "cabana-8d55e",
-            storageBucket: "cabana-8d55e.appspot.com",
-            messagingSenderId: "706144237954",
-            appId: "1:706144237954:web:345c10370972486afc779b"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // Função para formatar o valor como moeda
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
 
         // Função para verificar o status da loja com base nos horários do Firestore
         async function checkStoreStatus() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
+                authDomain: "cabana-8d55e.firebaseapp.com",
+                projectId: "cabana-8d55e",
+                storageBucket: "cabana-8d55e.appspot.com",
+                messagingSenderId: "706144237954",
+                appId: "1:706144237954:web:345c10370972486afc779b"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+
             const horarioRef = db.collection("settings").doc("horarios");
             const doc = await horarioRef.get();
+
+            if (!doc.exists) {
+                console.log("Documento não encontrado.");
+                return;
+            }
+
             const horarios = doc.data();
-
-            const currentTime = moment().tz("America/Sao_Paulo").format('HH:mm');
-            const day = moment().tz("America/Sao_Paulo").format('dddd').toLowerCase();
-
+            const currentTime = moment().tz('America/Sao_Paulo');
+            const day = currentTime.format('dddd').toLowerCase();
             const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
             const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
 
@@ -220,44 +253,20 @@
 
         // Função para atualizar o resumo do pedido
         function updateOrderSummary() {
-            const itemsSummary = document.getElementById('items-summary');
             const subtotal = document.getElementById('subtotal');
             const total = document.getElementById('total');
 
-            // Simule o carrinho de compras (substitua com sua lógica de carrinho real)
-            const carrinho = [
-                { nome: 'Açaí Tradicional', preco: 20.00, acompanhamentos: ['Granola', 'Morango'] },
-                { nome: 'Açaí Especial', preco: 25.00, acompanhamentos: ['Leite Condensado', 'Paçoca'] }
-            ];
+            // Recuperar carrinho do sessionStorage
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
 
-            // Limpar o conteúdo atual do resumo
-            itemsSummary.innerHTML = '';
-            subtotal.textContent = 'R$ 0,00';
-            total.textContent = 'R$ 0,00';
-
-            // Calcular subtotal e mostrar os itens
+            // Calcular subtotal
             let subtotalValue = 0;
-
             carrinho.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.textContent = `${item.nome} - R$ ${item.preco.toFixed(2)}`;
-                itemsSummary.appendChild(itemElement);
-
-                subtotalValue += item.preco;
-                if (item.acompanhamentos.length > 0) {
-                    const acompanhamentosElement = document.createElement('ul');
-                    acompanhamentosElement.classList.add('acompanhamentos');
-                    item.acompanhamentos.forEach(acompanhamento => {
-                        const acompanhamentoItem = document.createElement('li');
-                        acompanhamentoItem.textContent = acompanhamento;
-                        acompanhamentosElement.appendChild(acompanhamentoItem);
-                    });
-                    itemsSummary.appendChild(acompanhamentosElement);
-                }
+                subtotalValue += parseFloat(item.preco);
             });
 
-            subtotal.textContent = `R$ ${subtotalValue.toFixed(2)}`;
-            total.textContent = `R$ ${(subtotalValue + 3).toFixed(2)}`; // Considerando a taxa de entrega fixa de R$ 3,00
+            subtotal.textContent = formatarMoeda(subtotalValue);
+            total.textContent = formatarMoeda(subtotalValue + 3); // Total considerando taxa de entrega fixa de R$ 3,00
         }
 
         // Função para enviar o pedido pelo WhatsApp
@@ -267,7 +276,6 @@
             const numero = document.getElementById('numero').value;
             const complemento = document.getElementById('complemento').value;
             const telefone = document.getElementById('telefone').value;
-            const email = document.getElementById('email').value;
             const pagamento = document.querySelector('input[name="payment-method"]:checked').value;
             const troco = document.getElementById('troco').value;
 
@@ -277,8 +285,7 @@
             if (complemento) {
                 message += `Complemento: ${complemento}\n`;
             }
-            message += `Telefone: ${telefone}\n`;
-            message += `Email: ${email}\n\n`;
+            message += `Telefone: ${telefone}\n\n`;
             message += `Método de Pagamento: ${pagamento}\n`;
             if (pagamento === 'dinheiro' && troco) {
                 message += `Troco para: ${troco}\n`;
