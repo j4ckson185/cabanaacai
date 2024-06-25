@@ -6,7 +6,83 @@
     <title>Página de Pagamento</title>
     <link rel="stylesheet" href="pagina_de_pagamento.css">
     <style>
-        /* Estilos CSS existentes permanecem iguais */
+        .button {
+            padding: 5px 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-decoration: none;
+            color: #fff;
+        }
+        .button-whatsapp {
+            background-color: #25d366;
+        }
+        .button-whatsapp:hover {
+            background-color: #1ebe57;
+        }
+        .button-secondary {
+            background-color: #4caf50;
+        }
+        .button-secondary:hover {
+            background-color: #45a049;
+        }
+        .button-icon {
+            margin-right: 10px;
+        }
+        .button-track {
+            background-color: #800080;
+        }
+        .button-track:hover {
+            background-color: #4b0082;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .form-row > div {
+            flex: 1;
+        }
+        .summary {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+        .summary h3 {
+            margin: 0 0 10px 0;
+        }
+        .summary p {
+            margin: 5px 0;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .closed-message {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px solid red;
+            border-radius: 10px;
+            background-color: #ffe6e6;
+            width: 80%;
+            margin: 20px auto;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
@@ -14,25 +90,71 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
 </head>
 <body>
-    <!-- Estrutura HTML existente permanece igual -->
-
     <header>
-        <!-- Cabeçalho com logo e menu -->
+        <img src="https://i.ibb.co/0qYB3GV/logo-cabana.jpg" alt="Cabana Açaí Logo" class="logo">
+        <nav>
+            <ul class="menu-nav">
+                <li><a href="index.html">Início</a></li>
+                <li><a href="promos.html">Promos</a></li>
+                <li><a href="carrinho.html">Carrinho</a></li>
+            </ul>
+        </nav>
     </header>
-    
     <main>
         <h1>Página de Pagamento</h1>
-
-        <!-- Mensagem de loja fechada -->
         <div id="closed-message" class="closed-message hidden">
             A loja está fechada no momento. Por favor, volte durante o horário de funcionamento.
         </div>
-
-        <!-- Formulário de pagamento -->
         <form id="formulario-pagamento" class="hidden">
-            <!-- Campos do formulário -->
+            <label for="nome-sobrenome">Nome e Sobrenome:</label>
+            <input type="text" id="nome-sobrenome" name="nome-sobrenome" required>
+            
+            <label for="cep">CEP:</label>
+            <input type="text" id="cep" name="cep" pattern="\d{5}-?\d{3}" placeholder="12345-678" required>
+            <button type="button" onclick="consultarCep()">Consultar</button>
+            <p id="resultado-cep"></p>
+            
+            <div class="form-row">
+                <div>
+                    <label for="endereco">Endereço:</label>
+                    <input type="text" id="endereco" name="endereco" required>
+                </div>
+                <div>
+                    <label for="numero">Número:</label>
+                    <input type="text" id="numero" name="numero" required>
+                </div>
+            </div>
+            
+            <label for="complemento">Complemento:</label>
+            <input type="text" id="complemento" name="complemento">
+            
+            <label for="telefone">Telefone (com DDD):</label>
+            <input type="tel" id="telefone" name="telefone" pattern="\d{11}" placeholder="84988731028" required>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
 
-            <!-- Resumo do pedido -->
+            <h2>Opções de Pagamento</h2>
+            <label>
+                <input type="radio" name="payment-method" value="dinheiro" required> Dinheiro
+            </label>
+            <label>
+                <input type="radio" name="payment-method" value="cartao" required> Cartão
+            </label>
+            <label>
+                <input type="radio" name="payment-method" value="pix" required> PIX
+            </label>
+
+            <div id="troco-section" style="display:none;">
+                <label for="troco">Precisa de troco para:</label>
+                <input type="text" id="troco" name="troco">
+            </div>
+
+            <h2>Opções de Entrega</h2>
+            <label>
+                <input type="checkbox" name="delivery-option" value="motoboy" checked disabled> Motoboy (R$ 3,00)
+            </label>
+
             <div class="summary">
                 <h3>Resumo do Pedido</h3>
                 <p>Subtotal: <span id="subtotal"></span></p>
@@ -41,9 +163,15 @@
                 <p>Total: <span id="total"></span></p>
             </div>
 
-            <!-- Botões para finalizar, adicionar mais itens e editar pedido -->
+            <div class="form-row">
+                <div>
+                    <label for="cupom">Código do Cupom:</label>
+                    <input type="text" id="cupom" name="cupom" placeholder="Digite um cupom de desconto aqui caso possua.">
+                </div>
+            </div>
+
             <div class="buttons">
-                <button class="button button-whatsapp" id="botao-finalizar-pedido" type="submit">
+                <button class="button button-whatsapp" id="botao-finalizar-pedido" type="button" onclick="enviarPedidoWhatsApp()">
                     <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png" alt="WhatsApp" class="button-icon">
                     Enviar pedido pelo WhatsApp
                 </button>
@@ -52,9 +180,8 @@
             </div>
         </form>
     </main>
-
     <script>
-        // Configuração do Firebase (mantido)
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
             authDomain: "cabana-8d55e.firebaseapp.com",
@@ -66,204 +193,118 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const deliveryFee = 3.00;
-            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
-            let subtotal = 0;
-
-            // Calcular subtotal
-            carrinho.forEach(item => {
-                subtotal += parseFloat(item.preco);
-            });
-
-            // Calcular total
-            const total = subtotal + deliveryFee;
-
-            // Exibir subtotal e total na página
-            document.getElementById('subtotal').textContent = formatarMoeda(subtotal);
-            document.getElementById('total').textContent = formatarMoeda(total);
-
-            // Obter horários de funcionamento do local storage
-            const horarios = JSON.parse(localStorage.getItem('horarios')) || {};
+        // Função para verificar o status da loja com base nos horários do Firestore
+        async function checkStoreStatus() {
+            const horarioRef = db.collection("settings").doc("horarios");
+            const horarioSnap = await horarioRef.get();
+            const horarios = horarioSnap.exists ? horarioSnap.data() : {};
             const now = moment().tz("America/Sao_Paulo");
             const day = now.format('dddd').toLowerCase();
             const currentTime = now.hours() * 60 + now.minutes();
             const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
             const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
 
-            // Verificar se a loja está aberta
+            console.log('Horário de funcionamento:', horarios);
+            console.log('Dia atual:', day);
+            console.log('Horário atual em minutos:', currentTime);
+            console.log('Horário de abertura em minutos:', openTime);
+            console.log('Horário de fechamento em minutos:', closeTime);
+
+            const closedMessage = document.getElementById('closed-message');
+            const formularioPagamento = document.getElementById('formulario-pagamento');
+
             if (openTime !== null && closeTime !== null) {
                 if (currentTime < openTime || currentTime > closeTime) {
-                    document.getElementById('closed-message').classList.remove('hidden');
-                    document.getElementById('formulario-pagamento').classList.add('hidden');
+                    closedMessage.classList.remove('hidden');
+                    formularioPagamento.classList.add('hidden');
                 } else {
-                    document.getElementById('closed-message').classList.add('hidden');
-                    document.getElementById('formulario-pagamento').classList.remove('hidden');
+                    closedMessage.classList.add('hidden');
+                    formularioPagamento.classList.remove('hidden');
                 }
             } else {
-                document.getElementById('closed-message').classList.remove('hidden');
-                document.getElementById('formulario-pagamento').classList.add('hidden');
+                closedMessage.classList.remove('hidden');
+                closedMessage.innerText = 'A loja está fechada hoje.';
+                formularioPagamento.classList.add('hidden');
+            }
+        }
+
+        // Função para enviar o pedido pelo WhatsApp
+        function enviarPedidoWhatsApp() {
+            const nome = document.getElementById('nome-sobrenome').value;
+            const endereco = document.getElementById('endereco').value;
+            const numero = document.getElementById('numero').value;
+            const complemento = document.getElementById('complemento').value;
+            const telefone = document.getElementById('telefone').value;
+            const email = document.getElementById('email').value;
+            const pagamento = document.querySelector('input[name="payment-method"]:checked').value;
+            const troco = document.getElementById('troco').value;
+
+            let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
+            message += `Nome: ${nome}\n`;
+            message += `Endereço: ${endereco}, ${numero}\n`;
+            if (complemento) {
+                message += `Complemento: ${complemento}\n`;
+            }
+            message += `Telefone: ${telefone}\n`;
+            message += `Email: ${email}\n\n`;
+            message += `Método de Pagamento: ${pagamento}\n`;
+            if (pagamento === 'dinheiro' && troco) {
+                message += `Troco para: ${troco}\n`;
             }
 
-            // Mostrar seção de troco ao selecionar pagamento em dinheiro
-            document.querySelectorAll('input[name="payment-method"]').forEach(input => {
-                input.addEventListener('change', function() {
-                    if (this.value === 'dinheiro') {
-                        document.getElementById('troco-section').style.display = 'block';
+            const whatsappLink = `https://wa.me/558496468750?text=${encodeURIComponent(message)}`;
+            window.open(whatsappLink, '_blank');
+        }
+
+        // Função para consultar o CEP
+        async function consultarCep() {
+            const cep = document.getElementById('cep').value;
+            const resultadoCep = document.getElementById('resultado-cep');
+            const cepFormatado = cep.replace(/\D/g, '');
+
+            if (cepFormatado.length !== 8) {
+                resultadoCep.innerText = 'CEP inválido. Por favor, digite um CEP válido.';
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cepFormatado}/json/`);
+                const data = await response.json();
+
+                if (data.erro) {
+                    resultadoCep.innerText = 'CEP não encontrado. Por favor, verifique o CEP informado.';
+                } else {
+                    resultadoCep.innerText = `Endereço: ${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`;
+                    document.getElementById('endereco').value = data.logradouro;
+                }
+            } catch (error) {
+                console.error('Erro ao consultar CEP:', error);
+                resultadoCep.innerText = 'Ocorreu um erro ao consultar o CEP. Por favor, tente novamente mais tarde.';
+            }
+        }
+
+        // Evento ao carregar a página
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkStoreStatus();
+
+            // Atualização de resumo do pedido (substitua com lógica apropriada)
+            document.getElementById('subtotal').innerText = 'R$ 50,00';
+            document.getElementById('total').innerText = 'R$ 53,00';
+
+            // Eventos de mudança nos métodos de pagamento
+            const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
+            const trocoSection = document.getElementById('troco-section');
+
+            paymentMethodRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    if (radio.value === 'dinheiro') {
+                        trocoSection.style.display = 'block';
                     } else {
-                        document.getElementById('troco-section').style.display = 'none';
+                        trocoSection.style.display = 'none';
                     }
                 });
             });
         });
-
-        // Evento de envio do formulário de pagamento
-        document.getElementById('formulario-pagamento').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Obtenção dos dados do formulário
-            const nomeSobrenome = document.getElementById('nome-sobrenome').value;
-            const cep = document.getElementById('cep').value;
-            const endereco = document.getElementById('endereco').value;
-            const numero = document.getElementById('numero').value;
-            const complemento = document.getElementById('complemento').value || "N/A";
-            const telefone = document.getElementById('telefone').value;
-            const email = document.getElementById('email').value;
-            const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
-            const troco = document.getElementById('troco').value;
-            const deliveryOption = 3.00;
-
-            // Obtenção do carrinho de compras
-            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
-            let mensagemCarrinho = "*Itens do Pedido:*\n";
-            let subtotal = 0;
-
-            // Construção da mensagem de itens do pedido
-            carrinho.forEach(item => {
-                let valorProduto = parseFloat(item.preco);
-                subtotal += valorProduto;
-
-                mensagemCarrinho += `\n*${item.nome} - ${formatarMoeda(valorProduto)}*\n`;
-                mensagemCarrinho += "Sabores:\n";
-
-                // Verificação e inclusão dos sabores
-                if (item.sabores) {
-                    item.sabores.forEach(sabor => {
-                        mensagemCarrinho += `- ${sabor}\n`;
-                    });
-                } else {
-                    if (item.sabores1) {
-                        mensagemCarrinho += "Açaí 1:\n";
-                        item.sabores1.forEach(sabor => {
-                            mensagemCarrinho += `- ${sabor}\n`;
-                        });
-                    }
-                    if (item.sabores2) {
-                        mensagemCarrinho += "Açaí 2:\n";
-                        item.sabores2.forEach(sabor => {
-                            mensagemCarrinho += `- ${sabor}\n`;
-                        });
-                    }
-                }
-
-                mensagemCarrinho += "Acompanhamentos:\n";
-
-                // Verificação e inclusão dos acompanhamentos
-                if (item.acompanhamentos) {
-                    item.acompanhamentos.forEach(acompanhamento => {
-                        mensagemCarrinho += `- ${acompanhamento}\n`;
-                    });
-                } else {
-                    if (item.acompanhamentos1) {
-                        mensagemCarrinho += "Açaí 1:\n";
-                        item.acompanhamentos1.forEach(acompanhamento => {
-                            mensagemCarrinho += `- ${acompanhamento}\n`;
-                        });
-                    }
-                    if (item.acompanhamentos2) {
-                        mensagemCarrinho += "Açaí 2:\n";
-                        item.acompanhamentos2.forEach(acompanhamento => {
-                            mensagemCarrinho += `- ${acompanhamento}\n`;
-                        });
-                    }
-                }
-
-                mensagemCarrinho += "Itens Extras:\n";
-
-                // Verificação e inclusão dos extras
-                if (item.extras) {
-                    item.extras.forEach(extra => {
-                        mensagemCarrinho += `- ${extra}\n`;
-                    });
-                } else {
-                    if (item.extras1) {
-                        mensagemCarrinho += "Açaí 1:\n";
-                        item.extras1.forEach(extra => {
-                            mensagemCarrinho += `- ${extra}\n`;
-                        });
-                    }
-                    if (item.extras2) {
-                        mensagemCarrinho += "Açaí 2:\n";
-                        item.extras2.forEach(extra => {
-                            mensagemCarrinho += `- ${extra}\n`;
-                        });
-                    }
-                }
-            });
-
-            // Cálculo do total do pedido
-            const desconto = parseFloat(document.getElementById('desconto').textContent.replace("R$", "").replace(",", ".")) || 0;
-            const total = subtotal + deliveryOption - desconto;
-
-            // Construção final da mensagem do pedido
-            let mensagem = `*Pedido Cabana Açaí*\n\n*Nome:* ${nomeSobrenome}\n*CEP:* ${cep}\n*Endereço:* ${endereco}, ${numero}\n*Complemento:* ${complemento}\n*Telefone:* ${telefone}\n*Email:* ${email}\n*Método de Pagamento:* ${metodoPagamento}\n${mensagemCarrinho}\n*Taxa de Entrega:* ${formatarMoeda(deliveryOption)}\n*Desconto:* ${formatarMoeda(desconto)}\n*Total do Pedido:* ${formatarMoeda(total)}`;
-
-            // Adicionar troco se pagamento for em dinheiro
-            if (metodoPagamento === 'dinheiro' && troco) {
-                mensagem += `\n*Troco para:* ${troco}`;
-            }
-
-            // Criar URL do WhatsApp com mensagem codificada
-            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
-            window.open(whatsappUrl, '_blank');
-
-            // Substituir botão de editar pedido por link para acompanhar pedido
-            const editarPedidoBtn = document.getElementById('botao-editar-pedido');
-            const acompanharPedidoBtn = document.createElement('a');
-            acompanharPedidoBtn.href = "meus_pedidos.html";
-            acompanharPedidoBtn.className = "button button-track";
-            acompanharPedidoBtn.textContent = "Acompanhar Pedido";
-            editarPedidoBtn.replaceWith(acompanharPedidoBtn);
-
-            // Salvar pedido no Firestore
-            db.collection("orders").add({
-                nomeSobrenome: nomeSobrenome,
-                cep: cep,
-                endereco: endereco,
-                numero: numero,
-                complemento: complemento,
-                telefone: telefone,
-                email: email,
-                metodoPagamento: metodoPagamento,
-                troco: troco,
-                itens: carrinho,
-                taxaEntrega: formatarMoeda(deliveryOption),
-                subtotal: formatarMoeda(subtotal),
-                desconto: formatarMoeda(desconto),
-                total: formatarMoeda(total),
-                status: "Pendente",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then((docRef) => {
-                console.log("Pedido salvo com ID: ", docRef.id);
-            }).catch((error) => {
-                console.error("Erro ao salvar pedido: ", error);
-            });
-        });
-
-        // Função para formatar moeda (mantida)
-        function formatarMoeda(valor) {
-            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
     </script>
 </body>
 </html>
