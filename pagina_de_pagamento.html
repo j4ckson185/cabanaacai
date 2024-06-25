@@ -206,83 +206,85 @@
             const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
             const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
 
-            console.log('Horário de funcionamento:', horarios);
-            console.log('Dia atual:', day);
-            console.log('Horário atual em minutos:', currentTime);
-            console.log('Horário de abertura em minutos:', openTime);
-            console.log('Horário de fechamento em minutos:', closeTime);
-
             const closedMessage = document.getElementById('closed-message');
             const formularioPagamento = document.getElementById('formulario-pagamento');
 
-            if (openTime !== null && closeTime !== null) {
-                if (currentTime < openTime || currentTime > closeTime) {
-                    closedMessage.classList.remove('hidden');
-                    formularioPagamento.classList.add('hidden');
-                } else {
-                    closedMessage.classList.add('hidden');
-                    formularioPagamento.classList.remove('hidden');
-                }
-            } else {
+            if (currentTime < openTime || currentTime > closeTime) {
                 closedMessage.classList.remove('hidden');
-                closedMessage.innerText = 'A loja está fechada hoje.';
                 formularioPagamento.classList.add('hidden');
+            } else {
+                closedMessage.classList.add('hidden');
+                formularioPagamento.classList.remove('hidden');
             }
+        }
+
+        // Função para atualizar o resumo do pedido
+        function updateOrderSummary() {
+            const itemsSummary = document.getElementById('items-summary');
+            const subtotal = document.getElementById('subtotal');
+            const total = document.getElementById('total');
+
+            // Simule o carrinho de compras (substitua com sua lógica de carrinho real)
+            const carrinho = [
+                { nome: 'Açaí Tradicional', preco: 20.00, acompanhamentos: ['Granola', 'Morango'] },
+                { nome: 'Açaí Especial', preco: 25.00, acompanhamentos: ['Leite Condensado', 'Paçoca'] }
+            ];
+
+            // Limpar o conteúdo atual do resumo
+            itemsSummary.innerHTML = '';
+            subtotal.textContent = 'R$ 0,00';
+            total.textContent = 'R$ 0,00';
+
+            // Calcular subtotal e mostrar os itens
+            let subtotalValue = 0;
+
+            carrinho.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.textContent = `${item.nome} - R$ ${item.preco.toFixed(2)}`;
+                itemsSummary.appendChild(itemElement);
+
+                subtotalValue += item.preco;
+                if (item.acompanhamentos.length > 0) {
+                    const acompanhamentosElement = document.createElement('ul');
+                    acompanhamentosElement.classList.add('acompanhamentos');
+                    item.acompanhamentos.forEach(acompanhamento => {
+                        const acompanhamentoItem = document.createElement('li');
+                        acompanhamentoItem.textContent = acompanhamento;
+                        acompanhamentosElement.appendChild(acompanhamentoItem);
+                    });
+                    itemsSummary.appendChild(acompanhamentosElement);
+                }
+            });
+
+            subtotal.textContent = `R$ ${subtotalValue.toFixed(2)}`;
+            total.textContent = `R$ ${(subtotalValue + 3).toFixed(2)}`; // Considerando a taxa de entrega fixa de R$ 3,00
         }
 
         // Função para enviar o pedido pelo WhatsApp
         function enviarPedidoWhatsApp() {
-            const nomeSobrenome = document.getElementById('nome-sobrenome').value;
+            const nome = document.getElementById('nome-sobrenome').value;
             const endereco = document.getElementById('endereco').value;
             const numero = document.getElementById('numero').value;
             const complemento = document.getElementById('complemento').value;
             const telefone = document.getElementById('telefone').value;
             const email = document.getElementById('email').value;
-            const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
+            const pagamento = document.querySelector('input[name="payment-method"]:checked').value;
             const troco = document.getElementById('troco').value;
-            const deliveryOption = 3.00; // Taxa de entrega fixa
 
-            // Construção da mensagem do pedido
-            const dataHoraPedido = moment().tz("America/Sao_Paulo").format('DD/MM/YYYY HH:mm');
-            let mensagem = `Pedido realizado em ${dataHoraPedido}\n\n`;
-            mensagem += `*Detalhes do Pedido:*\n\n`;
-            mensagem += `*Cliente:* ${nomeSobrenome}\n`;
-            mensagem += `*Endereço:* ${endereco}, ${numero}`;
+            let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
+            message += `Nome: ${nome}\n`;
+            message += `Endereço: ${endereco}, ${numero}\n`;
             if (complemento) {
-                mensagem += ` - ${complemento}\n`;
-            } else {
-                mensagem += `\n`;
+                message += `Complemento: ${complemento}\n`;
             }
-            mensagem += `*CEP:* ${document.getElementById('cep').value}\n`;
-            mensagem += `*Telefone:* ${telefone}\n`;
-            mensagem += `*Email:* ${email}\n`;
-            mensagem += `*Forma de Pagamento:* ${metodoPagamento}\n`;
-            mensagem += `*Entrega:* R$ ${deliveryOption.toFixed(2)}\n\n`;
+            message += `Telefone: ${telefone}\n`;
+            message += `Email: ${email}\n\n`;
+            message += `Método de Pagamento: ${pagamento}\n`;
+            if (pagamento === 'dinheiro' && troco) {
+                message += `Troco para: ${troco}\n`;
+            }
 
-            // Obter itens do carrinho (reais)
-            const itensCarrinho = getItensCarrinho();
-
-            // Montar detalhes dos itens do carrinho
-            let mensagemCarrinho = "";
-            let subtotal = 0;
-            itensCarrinho.forEach((item, index) => {
-                mensagemCarrinho += `*Item ${index + 1}:* ${item.nome} - R$ ${item.preco.toFixed(2)}\n`;
-                mensagemCarrinho += `  Acompanhamentos: ${item.acompanhamentos.join(", ")}\n`;
-                if (item.extras.length > 0) {
-                    mensagemCarrinho += `  Extras: ${item.extras.join(", ")}\n`;
-                }
-                subtotal += item.preco;
-                mensagemCarrinho += `\n`;
-            });
-
-            // Calcular total do pedido
-            const totalPedido = subtotal + deliveryOption;
-
-            mensagem += mensagemCarrinho;
-            mensagem += `*Total do Pedido:* R$ ${totalPedido.toFixed(2)}\n\n`;
-            mensagem += `*Troco para:* ${troco || "N/A"}`;
-
-            const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(mensagem)}`;
+            const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(message)}`;
             window.open(whatsappLink, '_blank');
         }
 
@@ -313,45 +315,10 @@
             }
         }
 
-        // Função para obter os itens reais do carrinho
-        function getItensCarrinho() {
-            // Implemente a lógica para buscar os itens reais do carrinho aqui
-            // Exemplo simulado:
-            const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-            return carrinho;
-        }
-
         // Evento ao carregar a página
         document.addEventListener('DOMContentLoaded', async () => {
             await checkStoreStatus();
-
-            // Obter itens do carrinho e atualizar resumo do pedido
-            const itensCarrinho = getItensCarrinho();
-            let subtotal = 0;
-
-            // Atualizar resumo do pedido com itens reais
-            const itemsSummary = document.getElementById('items-summary');
-            const subtotalElement = document.getElementById('subtotal');
-            const totalElement = document.getElementById('total');
-
-            if (itensCarrinho.length > 0) {
-                itemsSummary.innerHTML = "";
-                itensCarrinho.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.innerHTML = `<p><strong>${item.nome}</strong> - R$ ${item.preco.toFixed(2)}</p>`;
-                    itemElement.innerHTML += `<p>Acompanhamentos: ${item.acompanhamentos.join(", ")}</p>`;
-                    if (item.extras.length > 0) {
-                        itemElement.innerHTML += `<p>Extras: ${item.extras.join(", ")}</p>`;
-                    }
-                    itemsSummary.appendChild(itemElement);
-                    subtotal += item.preco;
-                });
-
-                subtotalElement.textContent = `R$ ${subtotal.toFixed(2)}`;
-                totalElement.textContent = `R$ ${(subtotal + 3).toFixed(2)}`;
-            } else {
-                itemsSummary.innerHTML = '<p>Seu carrinho está vazio. Por favor, adicione itens antes de prosseguir.</p>';
-            }
+            updateOrderSummary();
 
             // Eventos de mudança nos métodos de pagamento
             const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
