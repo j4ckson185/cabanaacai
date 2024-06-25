@@ -104,6 +104,11 @@
             vertical-align: middle;
             margin-right: 10px;
         }
+        .pix-message {
+            font-style: italic;
+            margin-top: 5px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -158,8 +163,9 @@
                     <input type="radio" name="payment-method" value="cartao" required> Cartão
                 </label>
                 <label>
-                    <input type="radio" name="payment-method" value="pix" required> PIX
+                    <input type="radio" name="payment-method" value="pix" required onclick="showPixMessage()"> PIX
                 </label>
+                <p id="pix-info" class="pix-message" style="display:none;">Nosso PIX: 84 9 8873-1028 (Pagseguro). Envie o comprovante para nosso whatsapp após finalizar este pedido.</p>
             </div>
 
             <div id="troco-section" class="form-group" style="display:none;">
@@ -229,35 +235,41 @@
             total.textContent = formatarMoeda(subtotalValue + 3); // Total considerando taxa de entrega fixa de R$ 3,00
         }
 
+        // Função para mostrar mensagem específica do Pix
+        function showPixMessage() {
+            const pixMessage = document.getElementById('pix-info');
+            pixMessage.style.display = 'block';
+        }
+
         // Função para enviar o pedido pelo WhatsApp
         function enviarPedidoWhatsApp() {
-            const nome = document.getElementById('nome-sobrenome').value;
+            const nomeSobrenome = document.getElementById('nome-sobrenome').value;
             const cep = document.getElementById('cep').value;
-            const telefone = document.getElementById('telefone').value;
             const endereco = document.getElementById('endereco').value;
             const numero = document.getElementById('numero').value;
             const complemento = document.getElementById('complemento').value;
-            const pagamento = document.querySelector('input[name="payment-method"]:checked').value;
+            const telefone = document.getElementById('telefone').value;
+            const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
             const troco = document.getElementById('troco').value;
             const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
 
-            let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
-            message += `Nome: ${nome}\n`;
-            message += `CEP: ${cep}\n`;
-            message += `Endereço: ${endereco}, ${numero}\n`;
+            let message = `*Pedido Cabana Açaí*\n\n`;
+            message += `*Nome:* ${nomeSobrenome}\n`;
+            message += `*CEP:* ${cep}\n`;
+            message += `*Endereço:* ${endereco}, ${numero}\n`;
             if (complemento) {
-                message += `Complemento: ${complemento}\n`;
+                message += `*Complemento:* ${complemento}\n`;
             }
-            message += `Telefone: ${telefone}\n\n`;
+            message += `*Telefone:* ${telefone}\n\n`;
 
-            message += `Método de Pagamento: ${pagamento}\n`;
-            if (pagamento === 'dinheiro' && troco) {
-                message += `Troco para: ${troco}\n`;
+            message += `*Método de Pagamento:* ${metodoPagamento}\n`;
+            if (metodoPagamento === 'dinheiro' && troco) {
+                message += `*Troco para:* ${troco}\n`;
             }
 
-            message += `\nItens do Pedido:\n`;
+            message += `\n*Detalhes do Pedido:*\n`;
             carrinho.forEach(item => {
-                let itemDetails = `- ${item.nome}: ${formatarMoeda(item.preco)}\n`;
+                let itemDetails = `-${item.nome}: ${formatarMoeda(item.preco)}\n`;
                 if (item.sabores1 && item.sabores2) {
                     itemDetails += `  Sabores (Açaí 1): ${item.sabores1.join(', ')}\n`;
                     itemDetails += `  Sabores (Açaí 2): ${item.sabores2.join(', ')}\n`;
@@ -272,6 +284,9 @@
                 }
                 message += itemDetails;
             });
+
+            const totalPedido = parseFloat(subtotal.textContent.replace('R$', '').replace(',', '.')) + 3; // Total do pedido considerando taxa de entrega
+            message += `\n*Total do Pedido:* ${formatarMoeda(totalPedido)}`;
 
             const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(message)}`;
             window.open(whatsappLink, '_blank');
@@ -310,13 +325,19 @@
             // Eventos de mudança nos métodos de pagamento
             const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
             const trocoSection = document.getElementById('troco-section');
+            const pixInfo = document.getElementById('pix-info');
 
             paymentMethodRadios.forEach(radio => {
                 radio.addEventListener('change', () => {
                     if (radio.value === 'dinheiro') {
                         trocoSection.style.display = 'block';
+                        pixInfo.style.display = 'none';
+                    } else if (radio.value === 'pix') {
+                        trocoSection.style.display = 'none';
+                        pixInfo.style.display = 'block';
                     } else {
                         trocoSection.style.display = 'none';
+                        pixInfo.style.display = 'none';
                     }
                 });
             });
