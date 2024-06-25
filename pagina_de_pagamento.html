@@ -124,8 +124,7 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="cep">CEP:</label>
-                    <input type="text" id="cep" name="cep" pattern="\d{5}-?\d{3}" placeholder="12345-678" required>
-                    <button type="button" onclick="consultarCep()">Consultar</button>
+                    <input type="text" id="cep" name="cep" pattern="\d{5}-?\d{3}" placeholder="12345-678" required oninput="consultarCep()">
                     <p id="resultado-cep"></p>
                 </div>
                 <div class="form-group">
@@ -216,7 +215,14 @@
             // Calcular subtotal
             let subtotalValue = 0;
             carrinho.forEach(item => {
-                subtotalValue += parseFloat(item.preco);
+                let valorProduto = parseFloat(item.preco) || 0;
+                const extras1 = item.extras1 || [];
+                const extras2 = item.extras2 || [];
+                const allExtras = extras1.concat(extras2);
+                allExtras.forEach(extra => {
+                    valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                });
+                subtotalValue += valorProduto;
             });
 
             subtotal.textContent = formatarMoeda(subtotalValue);
@@ -226,16 +232,18 @@
         // Função para enviar o pedido pelo WhatsApp
         function enviarPedidoWhatsApp() {
             const nome = document.getElementById('nome-sobrenome').value;
+            const cep = document.getElementById('cep').value;
+            const telefone = document.getElementById('telefone').value;
             const endereco = document.getElementById('endereco').value;
             const numero = document.getElementById('numero').value;
             const complemento = document.getElementById('complemento').value;
-            const telefone = document.getElementById('telefone').value;
             const pagamento = document.querySelector('input[name="payment-method"]:checked').value;
             const troco = document.getElementById('troco').value;
             const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
 
             let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
             message += `Nome: ${nome}\n`;
+            message += `CEP: ${cep}\n`;
             message += `Endereço: ${endereco}, ${numero}\n`;
             if (complemento) {
                 message += `Complemento: ${complemento}\n`;
@@ -269,30 +277,29 @@
             window.open(whatsappLink, '_blank');
         }
 
-        // Função para consultar o CEP
+        // Função para consultar o CEP automaticamente ao digitar
         async function consultarCep() {
             const cep = document.getElementById('cep').value;
             const resultadoCep = document.getElementById('resultado-cep');
             const cepFormatado = cep.replace(/\D/g, '');
 
-            if (cepFormatado.length !== 8) {
-                resultadoCep.innerText = 'CEP inválido. Por favor, digite um CEP válido.';
-                return;
-            }
+            if (cepFormatado.length === 8) {
+                try {
+                    const response = await fetch(`https://viacep.com.br/ws/${cepFormatado}/json/`);
+                    const data = await response.json();
 
-            try {
-                const response = await fetch(`https://viacep.com.br/ws/${cepFormatado}/json/`);
-                const data = await response.json();
-
-                if (data.erro) {
-                    resultadoCep.innerText = 'CEP não encontrado. Por favor, verifique o CEP informado.';
-                } else {
-                    resultadoCep.innerText = `Endereço: ${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`;
-                    document.getElementById('endereco').value = data.logradouro;
+                    if (data.erro) {
+                        resultadoCep.innerText = 'CEP não encontrado. Por favor, verifique o CEP informado.';
+                    } else {
+                        resultadoCep.innerText = `Endereço: ${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`;
+                        document.getElementById('endereco').value = data.logradouro;
+                    }
+                } catch (error) {
+                    console.error('Erro ao consultar CEP:', error);
+                    resultadoCep.innerText = 'Ocorreu um erro ao consultar o CEP. Por favor, tente novamente mais tarde.';
                 }
-            } catch (error) {
-                console.error('Erro ao consultar CEP:', error);
-                resultadoCep.innerText = 'Ocorreu um erro ao consultar o CEP. Por favor, tente novamente mais tarde.';
+            } else {
+                resultadoCep.innerText = '';
             }
         }
 
