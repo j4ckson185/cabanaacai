@@ -258,20 +258,7 @@
             mensagem += `*Entrega:* R$ ${deliveryOption.toFixed(2)}\n\n`;
 
             // Obter itens do carrinho (simulação)
-            const itensCarrinho = [
-                {
-                    nome: "Açaí Puro",
-                    preco: 15.00,
-                    acompanhamentos: ["Granola", "Leite Condensado"],
-                    extras: ["Banana"]
-                },
-                {
-                    nome: "Açaí Especial",
-                    preco: 20.00,
-                    acompanhamentos: ["Granola", "Leite Condensado", "Morango"],
-                    extras: []
-                }
-            ];
+            const itensCarrinho = getItensCarrinho(); // Função a ser implementada para obter itens reais do carrinho
 
             // Montar detalhes dos itens do carrinho
             let mensagemCarrinho = "";
@@ -324,13 +311,37 @@
             }
         }
 
+        // Função para obter os itens reais do carrinho
+        function getItensCarrinho() {
+            // Implemente a lógica para buscar os itens reais do carrinho aqui
+            // Exemplo simulado:
+            const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            return carrinho;
+        }
+
         // Evento ao carregar a página
         document.addEventListener('DOMContentLoaded', async () => {
             await checkStoreStatus();
 
-            // Atualização de resumo do pedido (simulação)
-            document.getElementById('subtotal').innerText = 'R$ 35,00'; // Substituir com a lógica apropriada
-            document.getElementById('total').innerText = 'R$ 38,00'; // Substituir com a lógica apropriada
+            // Obter itens do carrinho e atualizar resumo do pedido
+            const itensCarrinho = getItensCarrinho(); // Função a ser implementada para obter itens reais do carrinho
+            let subtotal = 0;
+
+            // Atualizar resumo do pedido com itens reais
+            const summaryElement = document.querySelector('.summary');
+            const subtotalElement = document.getElementById('subtotal');
+            const totalElement = document.getElementById('total');
+
+            if (itensCarrinho.length > 0) {
+                itensCarrinho.forEach(item => {
+                    subtotal += item.preco;
+                });
+
+                subtotalElement.textContent = `R$ ${subtotal.toFixed(2)}`;
+                totalElement.textContent = `R$ ${(subtotal + 3).toFixed(2)}`;
+            } else {
+                summaryElement.innerHTML = '<p>Seu carrinho está vazio. Por favor, adicione itens antes de prosseguir.</p>';
+            }
 
             // Eventos de mudança nos métodos de pagamento
             const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
