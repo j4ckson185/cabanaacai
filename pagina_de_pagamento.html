@@ -232,8 +232,6 @@
             const telefone = document.getElementById('telefone').value;
             const pagamento = document.querySelector('input[name="payment-method"]:checked').value;
             const troco = document.getElementById('troco').value;
-
-            // Recuperar carrinho do sessionStorage
             const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
 
             let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
@@ -251,13 +249,20 @@
 
             message += `\nItens do Pedido:\n`;
             carrinho.forEach(item => {
-                message += `- ${item.nome}: ${item.preco}\n`;
-                if (item.complementos) {
-                    message += `  Complementos: ${item.complementos.join(', ')}\n`;
+                let itemDetails = `- ${item.nome}: ${formatarMoeda(item.preco)}\n`;
+                if (item.sabores1 && item.sabores2) {
+                    itemDetails += `  Sabores (Açaí 1): ${item.sabores1.join(', ')}\n`;
+                    itemDetails += `  Sabores (Açaí 2): ${item.sabores2.join(', ')}\n`;
+                    itemDetails += `  Acompanhamentos (Açaí 1): ${item.acompanhamentos1.join(', ')}\n`;
+                    itemDetails += `  Acompanhamentos (Açaí 2): ${item.acompanhamentos2.join(', ')}\n`;
+                    itemDetails += `  Itens Extras (Açaí 1): ${item.extras1.join(', ')}\n`;
+                    itemDetails += `  Itens Extras (Açaí 2): ${item.extras2.join(', ')}\n`;
+                } else {
+                    itemDetails += `  Sabores: ${item.sabores ? item.sabores.join(', ') : item.sabores1.join(', ')}\n`;
+                    itemDetails += `  Acompanhamentos: ${item.acompanhamentos ? item.acompanhamentos.join(', ') : item.acompanhamentos1.join(', ')}\n`;
+                    itemDetails += `  Itens Extras: ${item.extras ? item.extras.join(', ') : item.extras1.join(', ')}\n`;
                 }
-                if (item.itensExtras) {
-                    message += `  Itens Extras: ${item.itensExtras.join(', ')}\n`;
-                }
+                message += itemDetails;
             });
 
             const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(message)}`;
