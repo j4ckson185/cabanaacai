@@ -119,11 +119,7 @@
     </nav>
 
     <h1>Página de Pagamento</h1>
-    <div id="closed-message" class="closed-message hidden">
-        A loja está fechada no momento. Por favor, volte durante o horário de funcionamento.
-    </div>
-
-    <form id="formulario-pagamento" class="hidden">
+    <form id="formulario-pagamento">
         <div class="form-group">
             <label for="nome-sobrenome">Nome e Sobrenome:</label>
             <input type="text" id="nome-sobrenome" name="nome-sobrenome" required>
@@ -212,45 +208,6 @@
             return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // Função para verificar o status da loja com base nos horários do Firestore
-        async function checkStoreStatus() {
-            const firebaseConfig = {
-                apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
-                authDomain: "cabana-8d55e.firebaseapp.com",
-                projectId: "cabana-8d55e",
-                storageBucket: "cabana-8d55e.appspot.com",
-                messagingSenderId: "706144237954",
-                appId: "1:706144237954:web:345c10370972486afc779b"
-            };
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore();
-
-            const horarioRef = db.collection("settings").doc("horarios");
-            const doc = await horarioRef.get();
-
-            if (!doc.exists) {
-                console.log("Documento não encontrado.");
-                return;
-            }
-
-            const horarios = doc.data();
-            const currentTime = moment().tz('America/Sao_Paulo');
-            const day = currentTime.format('dddd').toLowerCase();
-            const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
-            const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
-
-            const closedMessage = document.getElementById('closed-message');
-            const formularioPagamento = document.getElementById('formulario-pagamento');
-
-            if (currentTime < openTime || currentTime > closeTime) {
-                closedMessage.classList.remove('hidden');
-                formularioPagamento.classList.add('hidden');
-            } else {
-                closedMessage.classList.add('hidden');
-                formularioPagamento.classList.remove('hidden');
-            }
-        }
-
         // Função para atualizar o resumo do pedido
         function updateOrderSummary() {
             const subtotal = document.getElementById('subtotal');
@@ -323,8 +280,7 @@
         }
 
         // Evento ao carregar a página
-        document.addEventListener('DOMContentLoaded', async () => {
-            await checkStoreStatus();
+        document.addEventListener('DOMContentLoaded', () => {
             updateOrderSummary();
 
             // Eventos de mudança nos métodos de pagamento
