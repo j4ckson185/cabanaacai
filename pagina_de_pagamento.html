@@ -230,29 +230,70 @@
 
         // Função para enviar o pedido pelo WhatsApp
         function enviarPedidoWhatsApp() {
-            const nome = document.getElementById('nome-sobrenome').value;
+            const nomeSobrenome = document.getElementById('nome-sobrenome').value;
             const endereco = document.getElementById('endereco').value;
             const numero = document.getElementById('numero').value;
             const complemento = document.getElementById('complemento').value;
             const telefone = document.getElementById('telefone').value;
             const email = document.getElementById('email').value;
-            const pagamento = document.querySelector('input[name="payment-method"]:checked').value;
+            const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
             const troco = document.getElementById('troco').value;
+            const deliveryOption = 3.00; // Taxa de entrega fixa
 
-            let message = `Olá! Gostaria de fazer o seguinte pedido:\n\n`;
-            message += `Nome: ${nome}\n`;
-            message += `Endereço: ${endereco}, ${numero}\n`;
+            // Construção da mensagem do pedido
+            const dataHoraPedido = moment().tz("America/Sao_Paulo").format('DD/MM/YYYY HH:mm');
+            let mensagem = `Pedido realizado em ${dataHoraPedido}\n\n`;
+            mensagem += `*Detalhes do Pedido:*\n\n`;
+            mensagem += `*Cliente:* ${nomeSobrenome}\n`;
+            mensagem += `*Endereço:* ${endereco}, ${numero}`;
             if (complemento) {
-                message += `Complemento: ${complemento}\n`;
+                mensagem += ` - ${complemento}\n`;
+            } else {
+                mensagem += `\n`;
             }
-            message += `Telefone: ${telefone}\n`;
-            message += `Email: ${email}\n\n`;
-            message += `Método de Pagamento: ${pagamento}\n`;
-            if (pagamento === 'dinheiro' && troco) {
-                message += `Troco para: ${troco}\n`;
-            }
+            mensagem += `*CEP:* ${document.getElementById('cep').value}\n`;
+            mensagem += `*Telefone:* ${telefone}\n`;
+            mensagem += `*Email:* ${email}\n`;
+            mensagem += `*Forma de Pagamento:* ${metodoPagamento}\n`;
+            mensagem += `*Entrega:* R$ ${deliveryOption.toFixed(2)}\n\n`;
 
-            const whatsappLink = `https://wa.me/558496468750?text=${encodeURIComponent(message)}`;
+            // Obter itens do carrinho (simulação)
+            const itensCarrinho = [
+                {
+                    nome: "Açaí Puro",
+                    preco: 15.00,
+                    acompanhamentos: ["Granola", "Leite Condensado"],
+                    extras: ["Banana"]
+                },
+                {
+                    nome: "Açaí Especial",
+                    preco: 20.00,
+                    acompanhamentos: ["Granola", "Leite Condensado", "Morango"],
+                    extras: []
+                }
+            ];
+
+            // Montar detalhes dos itens do carrinho
+            let mensagemCarrinho = "";
+            let subtotal = 0;
+            itensCarrinho.forEach((item, index) => {
+                mensagemCarrinho += `*Item ${index + 1}:* ${item.nome} - R$ ${item.preco.toFixed(2)}\n`;
+                mensagemCarrinho += `  Acompanhamentos: ${item.acompanhamentos.join(", ")}\n`;
+                if (item.extras.length > 0) {
+                    mensagemCarrinho += `  Extras: ${item.extras.join(", ")}\n`;
+                }
+                subtotal += item.preco;
+                mensagemCarrinho += `\n`;
+            });
+
+            // Calcular total do pedido
+            const totalPedido = subtotal + deliveryOption;
+
+            mensagem += mensagemCarrinho;
+            mensagem += `*Total do Pedido:* R$ ${totalPedido.toFixed(2)}\n\n`;
+            mensagem += `*Troco para:* ${troco || "N/A"}`;
+
+            const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(mensagem)}`;
             window.open(whatsappLink, '_blank');
         }
 
@@ -287,9 +328,9 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await checkStoreStatus();
 
-            // Atualização de resumo do pedido (substitua com lógica apropriada)
-            document.getElementById('subtotal').innerText = 'R$ 50,00';
-            document.getElementById('total').innerText = 'R$ 53,00';
+            // Atualização de resumo do pedido (simulação)
+            document.getElementById('subtotal').innerText = 'R$ 35,00'; // Substituir com a lógica apropriada
+            document.getElementById('total').innerText = 'R$ 38,00'; // Substituir com a lógica apropriada
 
             // Eventos de mudança nos métodos de pagamento
             const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
