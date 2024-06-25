@@ -157,6 +157,7 @@
 
             <div class="summary">
                 <h3>Resumo do Pedido</h3>
+                <div id="items-summary"></div>
                 <p>Subtotal: <span id="subtotal"></span></p>
                 <p>Taxa de Entrega: R$ 3,00</p>
                 <p>Desconto: <span id="desconto">R$ 0,00</span></p>
@@ -196,11 +197,12 @@
         // Função para verificar o status da loja com base nos horários do Firestore
         async function checkStoreStatus() {
             const horarioRef = db.collection("settings").doc("horarios");
-            const horarioSnap = await horarioRef.get();
-            const horarios = horarioSnap.exists ? horarioSnap.data() : {};
-            const now = moment().tz("America/Sao_Paulo");
-            const day = now.format('dddd').toLowerCase();
-            const currentTime = now.hours() * 60 + now.minutes();
+            const doc = await horarioRef.get();
+            const horarios = doc.data();
+
+            const currentTime = moment().tz("America/Sao_Paulo").format('HH:mm');
+            const day = moment().tz("America/Sao_Paulo").format('dddd').toLowerCase();
+
             const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
             const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
 
@@ -257,8 +259,8 @@
             mensagem += `*Forma de Pagamento:* ${metodoPagamento}\n`;
             mensagem += `*Entrega:* R$ ${deliveryOption.toFixed(2)}\n\n`;
 
-            // Obter itens do carrinho (simulação)
-            const itensCarrinho = getItensCarrinho(); // Função a ser implementada para obter itens reais do carrinho
+            // Obter itens do carrinho (reais)
+            const itensCarrinho = getItensCarrinho();
 
             // Montar detalhes dos itens do carrinho
             let mensagemCarrinho = "";
@@ -324,23 +326,31 @@
             await checkStoreStatus();
 
             // Obter itens do carrinho e atualizar resumo do pedido
-            const itensCarrinho = getItensCarrinho(); // Função a ser implementada para obter itens reais do carrinho
+            const itensCarrinho = getItensCarrinho();
             let subtotal = 0;
 
             // Atualizar resumo do pedido com itens reais
-            const summaryElement = document.querySelector('.summary');
+            const itemsSummary = document.getElementById('items-summary');
             const subtotalElement = document.getElementById('subtotal');
             const totalElement = document.getElementById('total');
 
             if (itensCarrinho.length > 0) {
+                itemsSummary.innerHTML = "";
                 itensCarrinho.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.innerHTML = `<p><strong>${item.nome}</strong> - R$ ${item.preco.toFixed(2)}</p>`;
+                    itemElement.innerHTML += `<p>Acompanhamentos: ${item.acompanhamentos.join(", ")}</p>`;
+                    if (item.extras.length > 0) {
+                        itemElement.innerHTML += `<p>Extras: ${item.extras.join(", ")}</p>`;
+                    }
+                    itemsSummary.appendChild(itemElement);
                     subtotal += item.preco;
                 });
 
                 subtotalElement.textContent = `R$ ${subtotal.toFixed(2)}`;
                 totalElement.textContent = `R$ ${(subtotal + 3).toFixed(2)}`;
             } else {
-                summaryElement.innerHTML = '<p>Seu carrinho está vazio. Por favor, adicione itens antes de prosseguir.</p>';
+                itemsSummary.innerHTML = '<p>Seu carrinho está vazio. Por favor, adicione itens antes de prosseguir.</p>';
             }
 
             // Eventos de mudança nos métodos de pagamento
