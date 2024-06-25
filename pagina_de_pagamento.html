@@ -6,11 +6,7 @@
     <title>Página de Pagamento</title>
     <link rel="stylesheet" href="pagina_de_pagamento.css">
     <style>
-        /* Estilos CSS existentes... */
-        /* Adicione estilos conforme necessário */
-        .hidden {
-            display: none;
-        }
+        /* Estilos CSS existentes permanecem iguais */
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
@@ -18,20 +14,256 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
 </head>
 <body>
+    <!-- Estrutura HTML existente permanece igual -->
+
     <header>
-        <!-- Código do cabeçalho... -->
+        <!-- Cabeçalho com logo e menu -->
     </header>
+    
     <main>
         <h1>Página de Pagamento</h1>
+
+        <!-- Mensagem de loja fechada -->
         <div id="closed-message" class="closed-message hidden">
             A loja está fechada no momento. Por favor, volte durante o horário de funcionamento.
         </div>
-        <form id="formulario-pagamento">
-            <!-- Conteúdo do formulário... -->
+
+        <!-- Formulário de pagamento -->
+        <form id="formulario-pagamento" class="hidden">
+            <!-- Campos do formulário -->
+
+            <!-- Resumo do pedido -->
+            <div class="summary">
+                <h3>Resumo do Pedido</h3>
+                <p>Subtotal: <span id="subtotal"></span></p>
+                <p>Taxa de Entrega: R$ 3,00</p>
+                <p>Desconto: <span id="desconto">R$ 0,00</span></p>
+                <p>Total: <span id="total"></span></p>
+            </div>
+
+            <!-- Botões para finalizar, adicionar mais itens e editar pedido -->
+            <div class="buttons">
+                <button class="button button-whatsapp" id="botao-finalizar-pedido" type="submit">
+                    <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png" alt="WhatsApp" class="button-icon">
+                    Enviar pedido pelo WhatsApp
+                </button>
+                <a href="index.html" class="button button-secondary">Adicionar mais itens</a>
+                <a href="carrinho.html" class="button button-secondary" id="botao-editar-pedido">Editar pedido</a>
+            </div>
         </form>
     </main>
+
     <script>
-        // JavaScript existente...
+        // Configuração do Firebase (mantido)
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
+            authDomain: "cabana-8d55e.firebaseapp.com",
+            projectId: "cabana-8d55e",
+            storageBucket: "cabana-8d55e.appspot.com",
+            messagingSenderId: "706144237954",
+            appId: "1:706144237954:web:345c10370972486afc779b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const deliveryFee = 3.00;
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+            let subtotal = 0;
+
+            // Calcular subtotal
+            carrinho.forEach(item => {
+                subtotal += parseFloat(item.preco);
+            });
+
+            // Calcular total
+            const total = subtotal + deliveryFee;
+
+            // Exibir subtotal e total na página
+            document.getElementById('subtotal').textContent = formatarMoeda(subtotal);
+            document.getElementById('total').textContent = formatarMoeda(total);
+
+            // Obter horários de funcionamento do local storage
+            const horarios = JSON.parse(localStorage.getItem('horarios')) || {};
+            const now = moment().tz("America/Sao_Paulo");
+            const day = now.format('dddd').toLowerCase();
+            const currentTime = now.hours() * 60 + now.minutes();
+            const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
+            const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
+
+            // Verificar se a loja está aberta
+            if (openTime !== null && closeTime !== null) {
+                if (currentTime < openTime || currentTime > closeTime) {
+                    document.getElementById('closed-message').classList.remove('hidden');
+                    document.getElementById('formulario-pagamento').classList.add('hidden');
+                } else {
+                    document.getElementById('closed-message').classList.add('hidden');
+                    document.getElementById('formulario-pagamento').classList.remove('hidden');
+                }
+            } else {
+                document.getElementById('closed-message').classList.remove('hidden');
+                document.getElementById('formulario-pagamento').classList.add('hidden');
+            }
+
+            // Mostrar seção de troco ao selecionar pagamento em dinheiro
+            document.querySelectorAll('input[name="payment-method"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    if (this.value === 'dinheiro') {
+                        document.getElementById('troco-section').style.display = 'block';
+                    } else {
+                        document.getElementById('troco-section').style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Evento de envio do formulário de pagamento
+        document.getElementById('formulario-pagamento').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Obtenção dos dados do formulário
+            const nomeSobrenome = document.getElementById('nome-sobrenome').value;
+            const cep = document.getElementById('cep').value;
+            const endereco = document.getElementById('endereco').value;
+            const numero = document.getElementById('numero').value;
+            const complemento = document.getElementById('complemento').value || "N/A";
+            const telefone = document.getElementById('telefone').value;
+            const email = document.getElementById('email').value;
+            const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
+            const troco = document.getElementById('troco').value;
+            const deliveryOption = 3.00;
+
+            // Obtenção do carrinho de compras
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+            let mensagemCarrinho = "*Itens do Pedido:*\n";
+            let subtotal = 0;
+
+            // Construção da mensagem de itens do pedido
+            carrinho.forEach(item => {
+                let valorProduto = parseFloat(item.preco);
+                subtotal += valorProduto;
+
+                mensagemCarrinho += `\n*${item.nome} - ${formatarMoeda(valorProduto)}*\n`;
+                mensagemCarrinho += "Sabores:\n";
+
+                // Verificação e inclusão dos sabores
+                if (item.sabores) {
+                    item.sabores.forEach(sabor => {
+                        mensagemCarrinho += `- ${sabor}\n`;
+                    });
+                } else {
+                    if (item.sabores1) {
+                        mensagemCarrinho += "Açaí 1:\n";
+                        item.sabores1.forEach(sabor => {
+                            mensagemCarrinho += `- ${sabor}\n`;
+                        });
+                    }
+                    if (item.sabores2) {
+                        mensagemCarrinho += "Açaí 2:\n";
+                        item.sabores2.forEach(sabor => {
+                            mensagemCarrinho += `- ${sabor}\n`;
+                        });
+                    }
+                }
+
+                mensagemCarrinho += "Acompanhamentos:\n";
+
+                // Verificação e inclusão dos acompanhamentos
+                if (item.acompanhamentos) {
+                    item.acompanhamentos.forEach(acompanhamento => {
+                        mensagemCarrinho += `- ${acompanhamento}\n`;
+                    });
+                } else {
+                    if (item.acompanhamentos1) {
+                        mensagemCarrinho += "Açaí 1:\n";
+                        item.acompanhamentos1.forEach(acompanhamento => {
+                            mensagemCarrinho += `- ${acompanhamento}\n`;
+                        });
+                    }
+                    if (item.acompanhamentos2) {
+                        mensagemCarrinho += "Açaí 2:\n";
+                        item.acompanhamentos2.forEach(acompanhamento => {
+                            mensagemCarrinho += `- ${acompanhamento}\n`;
+                        });
+                    }
+                }
+
+                mensagemCarrinho += "Itens Extras:\n";
+
+                // Verificação e inclusão dos extras
+                if (item.extras) {
+                    item.extras.forEach(extra => {
+                        mensagemCarrinho += `- ${extra}\n`;
+                    });
+                } else {
+                    if (item.extras1) {
+                        mensagemCarrinho += "Açaí 1:\n";
+                        item.extras1.forEach(extra => {
+                            mensagemCarrinho += `- ${extra}\n`;
+                        });
+                    }
+                    if (item.extras2) {
+                        mensagemCarrinho += "Açaí 2:\n";
+                        item.extras2.forEach(extra => {
+                            mensagemCarrinho += `- ${extra}\n`;
+                        });
+                    }
+                }
+            });
+
+            // Cálculo do total do pedido
+            const desconto = parseFloat(document.getElementById('desconto').textContent.replace("R$", "").replace(",", ".")) || 0;
+            const total = subtotal + deliveryOption - desconto;
+
+            // Construção final da mensagem do pedido
+            let mensagem = `*Pedido Cabana Açaí*\n\n*Nome:* ${nomeSobrenome}\n*CEP:* ${cep}\n*Endereço:* ${endereco}, ${numero}\n*Complemento:* ${complemento}\n*Telefone:* ${telefone}\n*Email:* ${email}\n*Método de Pagamento:* ${metodoPagamento}\n${mensagemCarrinho}\n*Taxa de Entrega:* ${formatarMoeda(deliveryOption)}\n*Desconto:* ${formatarMoeda(desconto)}\n*Total do Pedido:* ${formatarMoeda(total)}`;
+
+            // Adicionar troco se pagamento for em dinheiro
+            if (metodoPagamento === 'dinheiro' && troco) {
+                mensagem += `\n*Troco para:* ${troco}`;
+            }
+
+            // Criar URL do WhatsApp com mensagem codificada
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+            window.open(whatsappUrl, '_blank');
+
+            // Substituir botão de editar pedido por link para acompanhar pedido
+            const editarPedidoBtn = document.getElementById('botao-editar-pedido');
+            const acompanharPedidoBtn = document.createElement('a');
+            acompanharPedidoBtn.href = "meus_pedidos.html";
+            acompanharPedidoBtn.className = "button button-track";
+            acompanharPedidoBtn.textContent = "Acompanhar Pedido";
+            editarPedidoBtn.replaceWith(acompanharPedidoBtn);
+
+            // Salvar pedido no Firestore
+            db.collection("orders").add({
+                nomeSobrenome: nomeSobrenome,
+                cep: cep,
+                endereco: endereco,
+                numero: numero,
+                complemento: complemento,
+                telefone: telefone,
+                email: email,
+                metodoPagamento: metodoPagamento,
+                troco: troco,
+                itens: carrinho,
+                taxaEntrega: formatarMoeda(deliveryOption),
+                subtotal: formatarMoeda(subtotal),
+                desconto: formatarMoeda(desconto),
+                total: formatarMoeda(total),
+                status: "Pendente",
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then((docRef) => {
+                console.log("Pedido salvo com ID: ", docRef.id);
+            }).catch((error) => {
+                console.error("Erro ao salvar pedido: ", error);
+            });
+        });
+
+        // Função para formatar moeda (mantida)
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
     </script>
 </body>
 </html>
