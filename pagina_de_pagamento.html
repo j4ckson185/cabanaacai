@@ -16,6 +16,24 @@
 </head>
 <body>
     <!-- Estrutura HTML existente -->
+    <div id="closed-message" class="hidden">Desculpe, estamos fechados no momento.</div>
+    <form id="formulario-pagamento" class="hidden">
+        <!-- Formulário de pagamento -->
+        <input type="text" id="nome-sobrenome" placeholder="Nome e Sobrenome" required><br>
+        <input type="text" id="cep" placeholder="CEP" required><br>
+        <input type="text" id="endereco" placeholder="Endereço" required><br>
+        <input type="text" id="numero" placeholder="Número" required><br>
+        <input type="text" id="complemento" placeholder="Complemento"><br>
+        <input type="tel" id="telefone" placeholder="Telefone" required><br>
+        <input type="email" id="email" placeholder="Email" required><br>
+        <label><input type="radio" name="payment-method" value="cartao" checked> Cartão de Crédito</label><br>
+        <label><input type="radio" name="payment-method" value="dinheiro"> Dinheiro</label><br>
+        <div id="troco-section" style="display: none;">
+            <input type="text" id="troco" placeholder="Troco para">
+        </div>
+        <button type="submit">Finalizar Pedido</button>
+    </form>
+
     <script>
         // Configuração do Firebase
         const firebaseConfig = {
@@ -43,8 +61,15 @@
             });
             const total = subtotal + deliveryFee;
 
-            document.getElementById('subtotal').textContent = formatarMoeda(subtotal);
-            document.getElementById('total').textContent = formatarMoeda(total);
+            // Atualizar elementos de subtotal e total
+            const subtotalElement = document.getElementById('subtotal');
+            const totalElement = document.getElementById('total');
+            if (subtotalElement) {
+                subtotalElement.textContent = formatarMoeda(subtotal);
+            }
+            if (totalElement) {
+                totalElement.textContent = formatarMoeda(total);
+            }
 
             // Verificação de horários de funcionamento
             const now = moment().tz("America/Sao_Paulo");
@@ -61,157 +86,129 @@
 
                     if (openTime !== null && closeTime !== null) {
                         if (currentTime < openTime || currentTime > closeTime) {
-                            document.getElementById('closed-message').classList.remove('hidden');
+                            const closedMessage = document.getElementById('closed-message');
+                            if (closedMessage) {
+                                closedMessage.classList.remove('hidden');
+                            }
                         } else {
-                            document.getElementById('formulario-pagamento').classList.remove('hidden');
+                            const formPagamento = document.getElementById('formulario-pagamento');
+                            if (formPagamento) {
+                                formPagamento.classList.remove('hidden');
+                            }
                         }
                     } else {
-                        document.getElementById('closed-message').classList.remove('hidden');
+                        const closedMessage = document.getElementById('closed-message');
+                        if (closedMessage) {
+                            closedMessage.classList.remove('hidden');
+                        }
                     }
                 } else {
-                    document.getElementById('closed-message').classList.remove('hidden');
+                    const closedMessage = document.getElementById('closed-message');
+                    if (closedMessage) {
+                        closedMessage.classList.remove('hidden');
+                    }
                 }
             } catch (error) {
                 console.error("Erro ao obter horários de funcionamento:", error);
-                document.getElementById('closed-message').classList.remove('hidden');
+                const closedMessage = document.getElementById('closed-message');
+                if (closedMessage) {
+                    closedMessage.classList.remove('hidden');
+                }
             }
 
             // Exibir seção de troco ao selecionar pagamento em dinheiro
             document.querySelectorAll('input[name="payment-method"]').forEach(input => {
                 input.addEventListener('change', function() {
-                    if (this.value === 'dinheiro') {
-                        document.getElementById('troco-section').style.display = 'block';
-                    } else {
-                        document.getElementById('troco-section').style.display = 'none';
+                    const trocoSection = document.getElementById('troco-section');
+                    if (this.value === 'dinheiro' && trocoSection) {
+                        trocoSection.style.display = 'block';
+                    } else if (trocoSection) {
+                        trocoSection.style.display = 'none';
                     }
                 });
             });
-        });
 
-        // Manipulador de envio do formulário de pagamento
-        document.getElementById('formulario-pagamento').addEventListener('submit', function(e) {
-            e.preventDefault();
+            // Manipulador de envio do formulário de pagamento
+            const formPagamento = document.getElementById('formulario-pagamento');
+            if (formPagamento) {
+                formPagamento.addEventListener('submit', function(e) {
+                    e.preventDefault();
 
-            const nomeSobrenome = document.getElementById('nome-sobrenome').value;
-            const cep = document.getElementById('cep').value;
-            const endereco = document.getElementById('endereco').value;
-            const numero = document.getElementById('numero').value;
-            const complemento = document.getElementById('complemento').value || "N/A";
-            const telefone = document.getElementById('telefone').value;
-            const email = document.getElementById('email').value;
-            const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
-            const troco = document.getElementById('troco').value;
-            const deliveryOption = 3.00;
+                    const nomeSobrenome = document.getElementById('nome-sobrenome').value;
+                    const cep = document.getElementById('cep').value;
+                    const endereco = document.getElementById('endereco').value;
+                    const numero = document.getElementById('numero').value;
+                    const complemento = document.getElementById('complemento').value || "N/A";
+                    const telefone = document.getElementById('telefone').value;
+                    const email = document.getElementById('email').value;
+                    const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
+                    const troco = document.getElementById('troco').value;
+                    const deliveryOption = 3.00;
 
-            const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
-            let mensagemCarrinho = "*Itens do Pedido:*\n";
-            let subtotal = 0;
-            carrinho.forEach(item => {
-                let valorProduto = parseFloat(item.preco);
-                subtotal += valorProduto;
+                    const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+                    let mensagemCarrinho = "*Itens do Pedido:*\n";
+                    let subtotal = 0;
+                    carrinho.forEach(item => {
+                        let valorProduto = parseFloat(item.preco);
+                        subtotal += valorProduto;
 
-                mensagemCarrinho += `\n*${item.nome} - ${formatarMoeda(valorProduto)}*\n`;
-                mensagemCarrinho += "Sabores:\n";
-                if (item.sabores) {
-                    item.sabores.forEach(sabor => {
-                        mensagemCarrinho += `- ${sabor}\n`;
+                        mensagemCarrinho += `\n*${item.nome} - ${formatarMoeda(valorProduto)}*\n`;
+                        mensagemCarrinho += "Sabores:\n";
+                        if (item.sabores) {
+                            item.sabores.forEach(sabor => {
+                                mensagemCarrinho += `- ${sabor}\n`;
+                            });
+                        } else {
+                            if (item.sabores1) {
+                                mensagemCarrinho += "Açaí 1:\n";
+                                item.sabores1.forEach(sabor => {
+                                    mensagemCarrinho += `- ${sabor}\n`;
+                                });
+                            }
+                            if (item.sabores2) {
+                                mensagemCarrinho += "Açaí 2:\n";
+                                item.sabores2.forEach(sabor => {
+                                    mensagemCarrinho += `- ${sabor}\n`;
+                                });
+                            }
+                        }
+
+                        mensagemCarrinho += "Acompanhamentos:\n";
+                        if (item.acompanhamentos) {
+                            item.acompanhamentos.forEach(acompanhamento => {
+                                mensagemCarrinho += `- ${acompanhamento}\n`;
+                            });
+                        }
                     });
-                } else {
-                    if (item.sabores1) {
-                        mensagemCarrinho += "Açaí 1:\n";
-                        item.sabores1.forEach(sabor => {
-                            mensagemCarrinho += `- ${sabor}\n`;
-                        });
-                    }
-                    if (item.sabores2) {
-                        mensagemCarrinho += "Açaí 2:\n";
-                        item.sabores2.forEach(sabor => {
-                            mensagemCarrinho += `- ${sabor}\n`;
-                        });
-                    }
-                }
 
-                mensagemCarrinho += "Acompanhamentos:\n";
-                if (item.acompanhamentos) {
-                    item.acompanhamentos.forEach(acompanhamento => {
-                        mensagemCarrinho += `- ${acompanhamento}\n`;
+                    const total = subtotal + deliveryOption;
+
+                    // Salvar pedido no Firestore
+                    db.collection("pedidos").add({
+                        nomeSobrenome: nomeSobrenome,
+                        cep: cep,
+                        endereco: endereco,
+                        numero: numero,
+                        complemento: complemento,
+                        telefone: telefone,
+                        email: email,
+                        metodoPagamento: metodoPagamento,
+                        troco: troco,
+                        itens: carrinho,
+                        taxaEntrega: formatarMoeda(deliveryOption),
+                        subtotal: formatarMoeda(subtotal),
+                        total: formatarMoeda(total),
+                        status: "Pendente",
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then((docRef) => {
+                        console.log("Pedido salvo com ID: ", docRef.id);
+                        sessionStorage.removeItem('carrinho');
+                        window.location.href = "meus_pedidos.html";
+                    }).catch((error) => {
+                        console.error("Erro ao salvar pedido: ", error);
                     });
-                } else {
-                    if (item.acompanhamentos1) {
-                        mensagemCarrinho += "Açaí 1:\n";
-                        item.acompanhamentos1.forEach(acompanhamento => {
-                            mensagemCarrinho += `- ${acompanhamento}\n`;
-                        });
-                    }
-                    if (item.acompanhamentos2) {
-                        mensagemCarrinho += "Açaí 2:\n";
-                        item.acompanhamentos2.forEach(acompanhamento => {
-                            mensagemCarrinho += `- ${acompanhamento}\n`;
-                        });
-                    }
-                }
-
-                mensagemCarrinho += "Itens Extras:\n";
-                if (item.extras) {
-                    item.extras.forEach(extra => {
-                        mensagemCarrinho += `- ${extra}\n`;
-                    });
-                } else {
-                    if (item.extras1) {
-                        mensagemCarrinho += "Açaí 1:\n";
-                        item.extras1.forEach(extra => {
-                            mensagemCarrinho += `- ${extra}\n`;
-                        });
-                    }
-                    if (item.extras2) {
-                        mensagemCarrinho += "Açaí 2:\n";
-                        item.extras2.forEach(extra => {
-                            mensagemCarrinho += `- ${extra}\n`;
-                        });
-                    }
-                }
-            });
-            const desconto = parseFloat(document.getElementById('desconto').textContent.replace("R$", "").replace(",", ".")) || 0;
-            const total = subtotal + deliveryOption - desconto;
-
-            let mensagem = `*Pedido Cabana Açaí*\n\n*Nome:* ${nomeSobrenome}\n*CEP:* ${cep}\n*Endereço:* ${endereco}, ${numero}\n*Complemento:* ${complemento}\n*Telefone:* ${telefone}\n*Email:* ${email}\n*Método de Pagamento:* ${metodoPagamento}\n${mensagemCarrinho}\n*Taxa de Entrega:* ${formatarMoeda(deliveryOption)}\n*Desconto:* ${formatarMoeda(desconto)}\n*Total do Pedido: ${formatarMoeda(total)}*`;
-            
-            if (metodoPagamento === 'dinheiro' && troco) {
-                mensagem += `\n*Troco para:* ${troco}`;
+                });
             }
-
-            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
-            window.open(whatsappUrl, '_blank');
-
-            const editarPedidoBtn = document.getElementById('botao-editar-pedido');
-            const acompanharPedidoBtn = document.createElement('a');
-            acompanharPedidoBtn.href = "meus_pedidos.html";
-            acompanharPedidoBtn.className = "button button-track";
-            acompanharPedidoBtn.textContent = "Acompanhar Pedido";
-            editarPedidoBtn.replaceWith(acompanharPedidoBtn);
-
-            db.collection("orders").add({
-                nomeSobrenome: nomeSobrenome,
-                cep: cep,
-                endereco: endereco,
-                numero: numero,
-                complemento: complemento,
-                telefone: telefone,
-                email: email,
-                metodoPagamento: metodoPagamento,
-                troco: troco,
-                itens: carrinho,
-                taxaEntrega: formatarMoeda(deliveryOption),
-                subtotal: formatarMoeda(subtotal),
-                desconto: formatarMoeda(desconto),
-                total: formatarMoeda(total),
-                status: "Pendente",
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then((docRef) => {
-                console.log("Pedido salvo com ID: ", docRef.id);
-            }).catch((error) => {
-                console.error("Erro ao salvar pedido: ", error);
-            });
         });
     </script>
 </body>
