@@ -113,9 +113,9 @@
                 <li><input type="checkbox" id="creme-ninho-trufado" name="sabor" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado">Creme de Ninho Trufado</label></li>
                 <li><input type="checkbox" id="creme-cupuacu" name="sabor" value="Creme de Cupuaçu"><label for="creme-cupuacu">Creme de Cupuaçu</label></li>
                 <li><input type="checkbox" id="creme-morango-especial" name="sabor" value="Creme de Morango Especial"><label for="creme-morango-especial">Creme de Morango Especial</label></li>
-                <li><input type="checkbox" id="creme-amendoim-premium" name="sabor" value="Creme de Amendoim Premium"><label for="creme-amendoim-premium">Creme de Amendoim Premium"></label></li>
-                <li><input type="checkbox" id="creme-ovomaltine" name="sabor" value="Creme de Ovomaltine"><label for="creme-ovomaltine">Creme de Ovomaltine"></label></li>
-                <li><input type="checkbox" id="creme-maracuja" name="sabor" value="Creme de Maracujá"><label for="creme-maracuja">Creme de Maracujá"></label></li>
+                <li><input type="checkbox" id="creme-amendoim-premium" name="sabor" value="Creme de Amendoim Premium"><label for="creme-amendoim-premium">Creme de Amendoim Premium</label></li>
+                <li><input type="checkbox" id="creme-ovomaltine" name="sabor" value="Creme de Ovomaltine"><label for="creme-ovomaltine">Creme de Ovomaltine</label></li>
+                <li><input type="checkbox" id="creme-maracuja" name="sabor" value="Creme de Maracujá"><label for="creme-maracuja">Creme de Maracujá</label></li>
             </ul>
             <h2>Escolha os Acompanhamentos (selecione até 3)</h2>
             <ul class="acompanhamentos">
@@ -180,7 +180,6 @@
             }
 
             const produtoParaCarrinho = {
-                id: new Date().getTime(), // Identificador único baseado no timestamp atual
                 nome: produto,
                 acompanhamentos: acompanhamentosSelecionados,
                 extras: extrasSelecionados,
@@ -188,9 +187,9 @@
                 preco: precoTotal.toFixed(2)
             };
 
-            let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            let carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
             carrinho.push(produtoParaCarrinho);
-            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
 
             document.querySelector('.ver-carrinho').style.display = 'block';
         }
@@ -231,4 +230,3 @@
     </script>
 </body>
 </html>
-
