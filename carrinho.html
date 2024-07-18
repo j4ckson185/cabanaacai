@@ -51,12 +51,15 @@
             list-style-type: none;
         }
         .acompanhamentos li, .extras li, .sabores li {
-            display: flex;
-            align-items: center;
-        }
-        .acompanhamentos li, .extras li {
             display: block;
-            margin-bottom: 5px;
+            align-items: flex-start;
+        }
+        .acompanhamentos li button, .extras li button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 10px;
         }
         .botoes {
             margin-top: 20px;
@@ -133,29 +136,51 @@
 
                     // Calcula o valor total do item incluindo os extras
                     let valorProduto = parseFloat(item.preco);
-                    item.extras.forEach(extra => {
-                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                    });
+                    if (item.extras1) {
+                        item.extras1.forEach(extra => {
+                            valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                        });
+                    }
+                    if (item.extras2) {
+                        item.extras2.forEach(extra => {
+                            valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                        });
+                    }
                     total += valorProduto;
 
-                    const sabores = item.sabores.map(sabor => 
+                    const sabores1 = item.sabores1 ? item.sabores1.map(sabor => 
                         `<li>${sabor}</li>`
-                    ).join('');
-                    const acompanhamentos = item.acompanhamentos.map(acompanhamento => 
-                        `<li>${acompanhamento}</li>`
-                    ).join('');
-                    const extras = item.extras.map(extra => 
-                        `<li>${extra}</li>`
-                    ).join('');
+                    ).join('') : '';
+                    const sabores2 = item.sabores2 ? item.sabores2.map(sabor => 
+                        `<li>${sabor}</li>`
+                    ).join('') : '';
+                    const acompanhamentos1 = item.acompanhamentos1 ? item.acompanhamentos1.map(acompanhamento => 
+                        `<li>${acompanhamento}<button onclick="removerAcompanhamento(${index}, '${acompanhamento}', 1)">🗑️</button></li>`
+                    ).join('') : '';
+                    const acompanhamentos2 = item.acompanhamentos2 ? item.acompanhamentos2.map(acompanhamento => 
+                        `<li>${acompanhamento}<button onclick="removerAcompanhamento(${index}, '${acompanhamento}', 2)">🗑️</button></li>`
+                    ).join('') : '';
+                    const extras1 = item.extras1 ? item.extras1.map(extra => 
+                        `<li>${extra}<button onclick="removerExtra(${index}, '${extra}', 1)">🗑️</button><button onclick="adicionarMaisExtra(${index}, '${extra}', 1)">➕</button></li>`
+                    ).join('') : '';
+                    const extras2 = item.extras2 ? item.extras2.map(extra => 
+                        `<li>${extra}<button onclick="removerExtra(${index}, '${extra}', 2)">🗑️</button><button onclick="adicionarMaisExtra(${index}, '${extra}', 2)">➕</button></li>`
+                    ).join('') : '';
 
                     produto.innerHTML = `
                         <p><strong>${item.nome} - ${formatarMoeda(valorProduto)}<button onclick="removerProduto(${index})">🗑️</button></strong></p>
-                        <p>Sabores:</p>
-                        <ul class="sabores">${sabores}</ul>
-                        <p>Acompanhamentos:</p>
-                        <ul class="acompanhamentos">${acompanhamentos}</ul>
-                        <p>Itens Extras:</p>
-                        <ul class="extras">${extras}</ul>
+                        <p>Sabores Açaí 1:</p>
+                        <ul class="sabores">${sabores1}</ul>
+                        <p>Acompanhamentos Açaí 1:</p>
+                        <ul class="acompanhamentos">${acompanhamentos1}</ul>
+                        <p>Itens Extras Açaí 1:</p>
+                        <ul class="extras">${extras1}</ul>
+                        <p>Sabores Açaí 2:</p>
+                        <ul class="sabores">${sabores2}</ul>
+                        <p>Acompanhamentos Açaí 2:</p>
+                        <ul class="acompanhamentos">${acompanhamentos2}</ul>
+                        <p>Itens Extras Açaí 2:</p>
+                        <ul class="extras">${extras2}</ul>
                     `;
                     listaProdutos.appendChild(produto);
                 });
@@ -173,6 +198,48 @@
         function removerProduto(index) {
             const carrinho = JSON.parse(localStorage.getItem('carrinho'));
             carrinho.splice(index, 1);
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            exibirCarrinho();
+        }
+
+        // Função para remover um acompanhamento de um produto
+        function removerAcompanhamento(produtoIndex, acompanhamento, acaiIndex) {
+            const carrinho = JSON.parse(localStorage.getItem('carrinho'));
+            if (acaiIndex === 1) {
+                carrinho[produtoIndex].acompanhamentos1 = carrinho[produtoIndex].acompanhamentos1.filter(item => item !== acompanhamento);
+            } else {
+                carrinho[produtoIndex].acompanhamentos2 = carrinho[produtoIndex].acompanhamentos2.filter(item => item !== acompanhamento);
+            }
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            exibirCarrinho();
+        }
+
+        // Função para remover um extra de um produto
+        function removerExtra(produtoIndex, extra, acaiIndex) {
+            const carrinho = JSON.parse(localStorage.getItem('carrinho'));
+            const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+            if (acaiIndex === 1) {
+                carrinho[produtoIndex].extras1 = carrinho[produtoIndex].extras1.filter(item => item !== extra);
+                carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) - precoExtra).toFixed(2);
+            } else {
+                carrinho[produtoIndex].extras2 = carrinho[produtoIndex].extras2.filter(item => item !== extra);
+                carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) - precoExtra).toFixed(2);
+            }
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            exibirCarrinho();
+        }
+
+        // Função para adicionar mais um item extra ao carrinho
+        function adicionarMaisExtra(produtoIndex, extra, acaiIndex) {
+            const carrinho = JSON.parse(localStorage.getItem('carrinho'));
+            const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+            if (acaiIndex === 1) {
+                carrinho[produtoIndex].extras1.push(extra);
+                carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) + precoExtra).toFixed(2);
+            } else {
+                carrinho[produtoIndex].extras2.push(extra);
+                carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) + precoExtra).toFixed(2);
+            }
             localStorage.setItem('carrinho', JSON.stringify(carrinho));
             exibirCarrinho();
         }
