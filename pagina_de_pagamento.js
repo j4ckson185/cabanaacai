@@ -66,6 +66,12 @@ function updateOrderSummary() {
     total.textContent = formatarMoeda(subtotalValue + 3); // Total considerando taxa de entrega fixa de R$ 3,00
 }
 
+// Função para mostrar mensagem específica do Pix
+function showPixMessage() {
+    const pixMessage = document.getElementById('pix-info');
+    pixMessage.style.display = 'block';
+}
+
 // Função para enviar o pedido pelo WhatsApp
 function enviarPedidoWhatsApp() {
     const nomeSobrenome = document.getElementById('nome-sobrenome').value;
@@ -110,33 +116,12 @@ function enviarPedidoWhatsApp() {
         message += itemDetails;
     });
 
-    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('R$', '').replace(',', '.'));
-    const totalPedido = subtotal + 3; // Total do pedido considerando taxa de entrega
+    const totalPedido = parseFloat(subtotal.textContent.replace('R$', '').replace(',', '.')) + 3; // Total do pedido considerando taxa de entrega
     message += `\n*Taxa de Entrega:* R$ 3,00\n`;
     message += `*Total do Pedido:* ${formatarMoeda(totalPedido)}`;
 
-    const whatsappLink = `https://wa.me/5584988731028?text=${encodeURIComponent(message)}`;
+    const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(message)}`;
     window.open(whatsappLink, '_blank');
-
-    // Salvar o pedido no Firestore
-    db.collection("orders").add({
-        nomeSobrenome: nomeSobrenome,
-        cep: cep,
-        endereco: endereco,
-        numero: numero,
-        complemento: complemento,
-        telefone: telefone,
-        metodoPagamento: metodoPagamento,
-        troco: troco,
-        itens: carrinho,
-        total: formatarMoeda(totalPedido),
-        status: "Pendente",
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then((docRef) => {
-        console.log("Pedido salvo com ID: ", docRef.id);
-    }).catch((error) => {
-        console.error("Erro ao salvar pedido: ", error);
-    });
 }
 
 // Função para consultar o CEP automaticamente ao digitar
@@ -164,28 +149,3 @@ async function consultarCep() {
         resultadoCep.innerText = '';
     }
 }
-
-// Evento ao carregar a página
-document.addEventListener('DOMContentLoaded', () => {
-    updateOrderSummary();
-
-    // Eventos de mudança nos métodos de pagamento
-    const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
-    const trocoSection = document.getElementById('troco-section');
-    const pixInfo = document.getElementById('pix-info');
-
-    paymentMethodRadios.forEach(radio => {
-        radio.addEventListener('change', () => {
-            if (radio.value === 'dinheiro') {
-                trocoSection.style.display = 'block';
-                pixInfo.style.display = 'none';
-            } else if (radio.value === 'pix') {
-                trocoSection.style.display = 'none';
-                pixInfo.style.display = 'block';
-            } else {
-                trocoSection.style.display = 'none';
-                pixInfo.style.display = 'none';
-            }
-        });
-    });
-});
