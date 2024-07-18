@@ -101,7 +101,7 @@
             height: 100%;
             width: 0;
             position: fixed;
-            z-index: 2;
+            z-index: 3; /* Garantir que a barra lateral esteja acima de outros elementos */
             top: 0;
             left: 0;
             background-color: #663399;
@@ -116,7 +116,7 @@
             color: white;
             display: block;
             transition: 0.3s;
-            z-index: 3; /* Garantir que os links estejam acima de outros elementos */
+            z-index: 4; /* Garantir que os links estejam acima de outros elementos */
         }
         .side-menu a:hover {
             background-color: #4b2373;
@@ -127,7 +127,7 @@
             right: 25px;
             font-size: 36px;
             margin-left: 50px;
-            z-index: 3; /* Garantir que o botão de fechar esteja acima de outros elementos */
+            z-index: 4; /* Garantir que o botão de fechar esteja acima de outros elementos */
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
