@@ -103,59 +103,51 @@
     <div class="container">
         <h1>Combo 2 Açaís ou Cremes 1 Litro</h1>
         <div class="opcoes">
-            <h2>Escolha o Sabor (Açaí 1) (selecione 1 ou 2)</h2>
-            <ul class="sabores">
+            <h2>Escolha os Sabores para Açaí 1 (selecione 1 ou 2)</h2>
+            <ul class="sabores" id="sabores1">
                 <li>
-                    <input type="checkbox" id="acai-tradicional" name="sabor1" value="Açaí tradicional">
-                    <label for="acai-tradicional">Açaí tradicional</label>
+                    <input type="checkbox" id="acai-tradicional1" name="sabor1" value="Açaí tradicional">
+                    <label for="acai-tradicional1">Açaí tradicional</label>
                     <p class="descricao">Se desejar metade açai e metade creme, será necessário que marque esta opção e o creme que deseja.</p>
                 </li>
-                <li><input type="checkbox" id="creme-ninho-trufado" name="sabor1" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado">Creme de Ninho Trufado</label></li>
-                <li><input type="checkbox" id="creme-cupuacu" name="sabor1" value="Creme de Cupuaçu"><label for="creme-cupuacu">Creme de Cupuaçu</label></li>
-                <li><input type="checkbox" id="creme-morango-especial" name="sabor1" value="Creme de Morango Especial"><label for="creme-morango-especial">Creme de Morango Especial</label></li>
-                <li><input type="checkbox" id="creme-amendoim-premium" name="sabor1" value="Creme de Amendoim Premium"><label for="creme-amendoim-premium">Creme de Amendoim Premium"></label></li>
-                <li><input type="checkbox" id="creme-ovomaltine" name="sabor1" value="Creme de Ovomaltine"><label for="creme-ovomaltine">Creme de Ovomaltine"></label></li>
-                <li><input type="checkbox" id="creme-maracuja" name="sabor1" value="Creme de Maracujá"><label for="creme-maracuja">Creme de Maracujá"></label></li>
+                <li><input type="checkbox" id="creme-ninho-trufado1" name="sabor1" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado1">Creme de Ninho Trufado</label></li>
+                <li><input type="checkbox" id="creme-cupuacu1" name="sabor1" value="Creme de Cupuaçu"><label for="creme-cupuacu1">Creme de Cupuaçu</label></li>
+                <li><input type="checkbox" id="creme-morango-especial1" name="sabor1" value="Creme de Morango Especial"><label for="creme-morango-especial1">Creme de Morango Especial</label></li>
+                <li><input type="checkbox" id="creme-amendoim-premium1" name="sabor1" value="Creme de Amendoim Premium"><label for="creme-amendoim-premium1">Creme de Amendoim Premium</label></li>
+                <li><input type="checkbox" id="creme-ovomaltine1" name="sabor1" value="Creme de Ovomaltine"><label for="creme-ovomaltine1">Creme de Ovomaltine</label></li>
+                <li><input type="checkbox" id="creme-maracuja1" name="sabor1" value="Creme de Maracujá"><label for="creme-maracuja1">Creme de Maracujá</label></li>
             </ul>
-            <h2>Escolha os Acompanhamentos (Açaí 1) (selecione até 8)</h2>
-            <ul class="acompanhamentos">
-                <li><input type="checkbox" id="ovomaltine" name="acompanhamento1" value="Ovomaltine"><label for="ovomaltine">Ovomaltine</label></li>
-                <li><input type="checkbox" id="farinha-lactea" name="acompanhamento1" value="Farinha Láctea"><label for="farinha-lactea">Farinha Láctea</label></li>
-                <li><input type="checkbox" id="amendoim" name="acompanhamento1" value="Amendoim"><label for="amendoim">Amendoim</label></li>
-                <li><input type="checkbox" id="chocoball" name="acompanhamento1" value="Chocoball"><label for="chocoball">Chocoball</label></li>
-                <li><input type="checkbox" id="m-m" name="acompanhamento1" value="M&M"><label for="m-m">M&M</label></li>
-                <li><input type="checkbox" id="leite-em-po" name="acompanhamento1" value="Leite em pó"><label for="leite-em-po">Leite em pó</label></li>
-                <li><input type="checkbox" id="granola" name="acompanhamento1" value="Granola"><label for="granola">Granola</label></li>
-                <li><input type="checkbox" id="leite-condensado" name="acompanhamento1" value="Leite Condensado"><label for="leite-condensado">Leite Condensado</label></li>
-                <li><input type="checkbox" id="coco-ralado" name="acompanhamento1" value="Côco Ralado"><label for="coco-ralado">Côco Ralado</label></li>
-                <li><input type="checkbox" id="calda-de-morango" name="acompanhamento1" value="Calda de Morango"><label for="calda-de-morango">Calda de Morango</label></li>
-                <li><input type="checkbox" id="calda-de-chocolate" name="acompanhamento1" value="Calda de Chocolate"><label for="calda-de-chocolate">Calda de Chocolate</label></li>
-                <li><input type="checkbox" id="gotas-de-chocolate" name="acompanhamento1" value="Gotas de Chocolate"><label for="gotas-de-chocolate">Gotas de Chocolate</label></li>
+            <h2>Escolha os Acompanhamentos para Açaí 1 (selecione até 8)</h2>
+            <ul class="acompanhamentos" id="acompanhamentos1">
+                <li><input type="checkbox" id="ovomaltine1" name="acompanhamento1" value="Ovomaltine"><label for="ovomaltine1">Ovomaltine</label></li>
+                <li><input type="checkbox" id="farinha-lactea1" name="acompanhamento1" value="Farinha Láctea"><label for="farinha-lactea1">Farinha Láctea</label></li>
+                <li><input type="checkbox" id="amendoim1" name="acompanhamento1" value="Amendoim"><label for="amendoim1">Amendoim</label></li>
+                <li><input type="checkbox" id="chocoball1" name="acompanhamento1" value="Chocoball"><label for="chocoball1">Chocoball</label></li>
+                <li><input type="checkbox" id="m-m1" name="acompanhamento1" value="M&M"><label for="m-m1">M&M</label></li>
+                <li><input type="checkbox" id="leite-em-po1" name="acompanhamento1" value="Leite em pó"><label for="leite-em-po1">Leite em pó</label></li>
+                <li><input type="checkbox" id="granola1" name="acompanhamento1" value="Granola"><label for="granola1">Granola</label></li>
+                <li><input type="checkbox" id="leite-condensado1" name="acompanhamento1" value="Leite Condensado"><label for="leite-condensado1">Leite Condensado</label></li>
+                <li><input type="checkbox" id="coco-ralado1" name="acompanhamento1" value="Côco Ralado"><label for="coco-ralado1">Côco Ralado</label></li>
+                <li><input type="checkbox" id="calda-de-morango1" name="acompanhamento1" value="Calda de Morango"><label for="calda-de-morango1">Calda de Morango</label></li>
+                <li><input type="checkbox" id="calda-de-chocolate1" name="acompanhamento1" value="Calda de Chocolate"><label for="calda-de-chocolate1">Calda de Chocolate</label></li>
+                <li><input type="checkbox" id="gotas-de-chocolate1" name="acompanhamento1" value="Gotas de Chocolate"><label for="gotas-de-chocolate1">Gotas de Chocolate</label></li>
             </ul>
-            <h2>Adicione Itens Extras (Açaí 1)</h2>
-            <ul class="itens-extras">
-                <li><input type="checkbox" id="granola-extra" name="extra1" value="Granola Extra (+R$2,49)"><label for="granola-extra">Granola (+R$2,49)</label></li>
-                <li><input type="checkbox" id="leite-condensado-extra" name="extra1" value="Leite Condensado Extra (+R$2,49)"><label for="leite-condensado-extra">Leite Condensado (+R$2,49)</label></li>
-                <li><input type="checkbox" id="coco-ralado-extra" name="extra1" value="Côco Ralado Extra (+R$2,49)"><label for="coco-ralado-extra">Côco Ralado (+R$2,49)</label></li>
-                <li><input type="checkbox" id="ovomaltine-extra" name="extra1" value="Ovomaltine Extra (+R$2,49)"><label for="ovomaltine-extra">Ovomaltine (+R$2,49)</label></li>
-                <li><input type="checkbox" id="farinha-lactea-extra" name="extra1" value="Farinha Láctea Extra (+R$2,49)"><label for="farinha-lactea-extra">Farinha Láctea (+R$2,49)</label></li>
-                <li><input type="checkbox" id="amendoim-extra" name="extra1" value="Amendoim Extra (+R$2,49)"><label for="amendoim-extra">Amendoim (+R$2,49)</label></li>
-                <li><input type="checkbox" id="chocoball-extra" name="extra1" value="Chocoball Extra (+R$2,49)"><label for="chocoball-extra">Chocoball (+R$2,49)</label></li>
-                <li><input type="checkbox" id="m-m-extra" name="extra1" value="M&M Extra (+R$2,49)"><label for="m-m-extra">M&M (+R$2,49)</label></li>
-                <li><input type="checkbox" id="leite-em-po-extra" name="extra1" value="Leite em pó Extra (+R$2,49)"><label for="leite-em-po-extra">Leite em pó (+R$2,49)</label></li>
-            </ul>
-            <h2>Escolha o Sabor (Açaí 2) (selecione 1 ou 2)</h2>
-            <ul class="sabores">
-                <li><input type="checkbox" id="acai-tradicional2" name="sabor2" value="Açaí tradicional"><label for="acai-tradicional2">Açaí tradicional</label></li>
+            <h2>Escolha os Sabores para Açaí 2 (selecione 1 ou 2)</h2>
+            <ul class="sabores" id="sabores2">
+                <li>
+                    <input type="checkbox" id="acai-tradicional2" name="sabor2" value="Açaí tradicional">
+                    <label for="acai-tradicional2">Açaí tradicional</label>
+                    <p class="descricao">Se desejar metade açai e metade creme, será necessário que marque esta opção e o creme que deseja.</p>
+                </li>
                 <li><input type="checkbox" id="creme-ninho-trufado2" name="sabor2" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado2">Creme de Ninho Trufado</label></li>
                 <li><input type="checkbox" id="creme-cupuacu2" name="sabor2" value="Creme de Cupuaçu"><label for="creme-cupuacu2">Creme de Cupuaçu</label></li>
                 <li><input type="checkbox" id="creme-morango-especial2" name="sabor2" value="Creme de Morango Especial"><label for="creme-morango-especial2">Creme de Morango Especial</label></li>
-                <li><input type="checkbox" id="creme-amendoim-premium2" name="sabor2" value="Creme de Amendoim Premium"><label for="creme-amendoim-premium2">Creme de Amendoim Premium"></label></li>
-                <li><input type="checkbox" id="creme-ovomaltine2" name="sabor2" value="Creme de Ovomaltine"><label for="creme-ovomaltine2">Creme de Ovomaltine"></label></li>
-                <li><input type="checkbox" id="creme-maracuja2" name="sabor2" value="Creme de Maracujá"><label for="creme-maracuja2">Creme de Maracujá"></label></li>
+                <li><input type="checkbox" id="creme-amendoim-premium2" name="sabor2" value="Creme de Amendoim Premium"><label for="creme-amendoim-premium2">Creme de Amendoim Premium</label></li>
+                <li><input type="checkbox" id="creme-ovomaltine2" name="sabor2" value="Creme de Ovomaltine"><label for="creme-ovomaltine2">Creme de Ovomaltine</label></li>
+                <li><input type="checkbox" id="creme-maracuja2" name="sabor2" value="Creme de Maracujá"><label for="creme-maracuja2">Creme de Maracujá</label></li>
             </ul>
-            <h2>Escolha os Acompanhamentos (Açaí 2) (selecione até 4)</h2>
-            <ul class="acompanhamentos">
+            <h2>Escolha os Acompanhamentos para Açaí 2 (selecione até 8)</h2>
+            <ul class="acompanhamentos" id="acompanhamentos2">
                 <li><input type="checkbox" id="ovomaltine2" name="acompanhamento2" value="Ovomaltine"><label for="ovomaltine2">Ovomaltine</label></li>
                 <li><input type="checkbox" id="farinha-lactea2" name="acompanhamento2" value="Farinha Láctea"><label for="farinha-lactea2">Farinha Láctea</label></li>
                 <li><input type="checkbox" id="amendoim2" name="acompanhamento2" value="Amendoim"><label for="amendoim2">Amendoim</label></li>
@@ -169,19 +161,19 @@
                 <li><input type="checkbox" id="calda-de-chocolate2" name="acompanhamento2" value="Calda de Chocolate"><label for="calda-de-chocolate2">Calda de Chocolate</label></li>
                 <li><input type="checkbox" id="gotas-de-chocolate2" name="acompanhamento2" value="Gotas de Chocolate"><label for="gotas-de-chocolate2">Gotas de Chocolate</label></li>
             </ul>
-            <h2>Adicione Itens Extras (Açaí 2)</h2>
+            <h2>Adicione Itens Extras</h2>
             <ul class="itens-extras">
-                <li><input type="checkbox" id="granola-extra2" name="extra2" value="Granola Extra (+R$2,49)"><label for="granola-extra2">Granola (+R$2,49)</label></li>
-                <li><input type="checkbox" id="leite-condensado-extra2" name="extra2" value="Leite Condensado Extra (+R$2,49)"><label for="leite-condensado-extra2">Leite Condensado (+R$2,49)</label></li>
-                <li><input type="checkbox" id="coco-ralado-extra2" name="extra2" value="Côco Ralado Extra (+R$2,49)"><label for="coco-ralado-extra2">Côco Ralado (+R$2,49)</label></li>
-                <li><input type="checkbox" id="ovomaltine-extra2" name="extra2" value="Ovomaltine Extra (+R$2,49)"><label for="ovomaltine-extra2">Ovomaltine (+R$2,49)</label></li>
-                <li><input type="checkbox" id="farinha-lactea-extra2" name="extra2" value="Farinha Láctea Extra (+R$2,49)"><label for="farinha-lactea-extra2">Farinha Láctea (+R$2,49)</label></li>
-                <li><input type="checkbox" id="amendoim-extra2" name="extra2" value="Amendoim Extra (+R$2,49)"><label for="amendoim-extra2">Amendoim (+R$2,49)</label></li>
-                <li><input type="checkbox" id="chocoball-extra2" name="extra2" value="Chocoball Extra (+R$2,49)"><label for="chocoball-extra2">Chocoball (+R$2,49)</label></li>
-                <li><input type="checkbox" id="m-m-extra2" name="extra2" value="M&M Extra (+R$2,49)"><label for="m-m-extra2">M&M (+R$2,49)</label></li>
-                <li><input type="checkbox" id="leite-em-po-extra2" name="extra2" value="Leite em pó Extra (+R$2,49)"><label for="leite-em-po-extra2">Leite em pó (+R$2,49)</label></li>
+                <li><input type="checkbox" id="granola-extra" name="extra" value="Granola Extra (+R$2,49)"><label for="granola-extra">Granola (+R$2,49)</label></li>
+                <li><input type="checkbox" id="leite-condensado-extra" name="extra" value="Leite Condensado Extra (+R$2,49)"><label for="leite-condensado-extra">Leite Condensado (+R$2,49)</label></li>
+                <li><input type="checkbox" id="coco-ralado-extra" name="extra" value="Côco Ralado Extra (+R$2,49)"><label for="coco-ralado-extra">Côco Ralado (+R$2,49)</label></li>
+                <li><input type="checkbox" id="ovomaltine-extra" name="extra" value="Ovomaltine Extra (+R$2,49)"><label for="ovomaltine-extra">Ovomaltine (+R$2,49)</label></li>
+                <li><input type="checkbox" id="farinha-lactea-extra" name="extra" value="Farinha Láctea Extra (+R$2,49)"><label for="farinha-lactea-extra">Farinha Láctea (+R$2,49)</label></li>
+                <li><input type="checkbox" id="amendoim-extra" name="extra" value="Amendoim Extra (+R$2,49)"><label for="amendoim-extra">Amendoim (+R$2,49)</label></li>
+                <li><input type="checkbox" id="chocoball-extra" name="extra" value="Chocoball Extra (+R$2,49)"><label for="chocoball-extra">Chocoball (+R$2,49)</label></li>
+                <li><input type="checkbox" id="m-m-extra" name="extra" value="M&M Extra (+R$2,49)"><label for="m-m-extra">M&M (+R$2,49)</label></li>
+                <li><input type="checkbox" id="leite-em-po-extra" name="extra" value="Leite em pó Extra (+R$2,49)"><label for="leite-em-po-extra">Leite em pó (+R$2,49)</label></li>
             </ul>
-            <button onclick="adicionarAoCarrinho('Combo 2 Açaís ou Cremes 1 Litro', 25.99)">Adicionar ao Carrinho</button>
+            <button onclick="adicionarAoCarrinho('Combo 2 Açaís ou Cremes 1 Litro', 19.99)">Adicionar ao Carrinho</button>
             <button class="ver-carrinho" style="display:none;" onclick="verCarrinho()">Ver Carrinho</button>
         </div>
     </div>
@@ -195,8 +187,7 @@
         function adicionarAoCarrinho(produto, precoBase) {
             const acompanhamentosSelecionados1 = [];
             const acompanhamentosSelecionados2 = [];
-            const extrasSelecionados1 = [];
-            const extrasSelecionados2 = [];
+            const extrasSelecionados = [];
             const saboresSelecionados1 = [];
             const saboresSelecionados2 = [];
             let precoTotal = precoBase;
@@ -209,13 +200,8 @@
                 acompanhamentosSelecionados2.push(item.value);
             });
 
-            document.querySelectorAll('input[name="extra1"]:checked').forEach(function(item) {
-                extrasSelecionados1.push(item.value);
-                precoTotal += parseFloat(item.value.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-            });
-
-            document.querySelectorAll('input[name="extra2"]:checked').forEach(function(item) {
-                extrasSelecionados2.push(item.value);
+            document.querySelectorAll('input[name="extra"]:checked').forEach(function(item) {
+                extrasSelecionados.push(item.value);
                 precoTotal += parseFloat(item.value.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
             });
 
@@ -228,25 +214,23 @@
             });
 
             if (saboresSelecionados1.length < minSabores || saboresSelecionados2.length < minSabores) {
-                alert(`Você deve selecionar pelo menos ${minSabores} sabor para cada Açaí.`);
+                alert(`Você deve selecionar pelo menos ${minSabores} sabor para cada pote.`);
                 return;
             }
 
             const produtoParaCarrinho = {
-                id: new Date().getTime(), // Identificador único baseado no timestamp atual
                 nome: produto,
                 acompanhamentos1: acompanhamentosSelecionados1,
                 acompanhamentos2: acompanhamentosSelecionados2,
-                extras1: extrasSelecionados1,
-                extras2: extrasSelecionados2,
+                extras: extrasSelecionados,
                 sabores1: saboresSelecionados1,
                 sabores2: saboresSelecionados2,
                 preco: precoTotal.toFixed(2)
             };
 
-            let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            let carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
             carrinho.push(produtoParaCarrinho);
-            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
 
             document.querySelector('.ver-carrinho').style.display = 'block';
         }
@@ -260,7 +244,7 @@
                 const selecionados = document.querySelectorAll('input[name="acompanhamento1"]:checked').length;
                 if (selecionados > maxAcompanhamentos) {
                     this.checked = false;
-                    alert(`Você só pode selecionar até ${maxAcompanhamentos} acompanhamentos.`);
+                    alert(`Você só pode selecionar até ${maxAcompanhamentos} acompanhamentos para o Açaí 1.`);
                 }
             });
         });
@@ -270,7 +254,7 @@
                 const selecionados = document.querySelectorAll('input[name="acompanhamento2"]:checked').length;
                 if (selecionados > maxAcompanhamentos) {
                     this.checked = false;
-                    alert(`Você só pode selecionar até ${maxAcompanhamentos} acompanhamentos.`);
+                    alert(`Você só pode selecionar até ${maxAcompanhamentos} acompanhamentos para o Açaí 2.`);
                 }
             });
         });
@@ -280,7 +264,7 @@
                 const selecionados = document.querySelectorAll('input[name="sabor1"]:checked').length;
                 if (selecionados > maxSabores) {
                     this.checked = false;
-                    alert(`Você só pode selecionar até ${maxSabores} sabores.`);
+                    alert(`Você só pode selecionar até ${maxSabores} sabores para o Açaí 1.`);
                 }
             });
         });
@@ -290,24 +274,14 @@
                 const selecionados = document.querySelectorAll('input[name="sabor2"]:checked').length;
                 if (selecionados > maxSabores) {
                     this.checked = false;
-                    alert(`Você só pode selecionar até ${maxSabores} sabores.`);
+                    alert(`Você só pode selecionar até ${maxSabores} sabores para o Açaí 2.`);
                 }
             });
         });
 
-        document.querySelectorAll('input[name="extra1"]').forEach(function(item) {
+        document.querySelectorAll('input[name="extra"]').forEach(function(item) {
             item.addEventListener('change', function() {
-                const selecionados = document.querySelectorAll('input[name="extra1"]:checked').length;
-                if (selecionados > maxExtras) {
-                    this.checked = false;
-                    alert(`Você só pode selecionar até ${maxExtras} itens extras.`);
-                }
-            });
-        });
-
-        document.querySelectorAll('input[name="extra2"]').forEach(function(item) {
-            item.addEventListener('change', function() {
-                const selecionados = document.querySelectorAll('input[name="extra2"]:checked').length;
+                const selecionados = document.querySelectorAll('input[name="extra"]:checked').length;
                 if (selecionados > maxExtras) {
                     this.checked = false;
                     alert(`Você só pode selecionar até ${maxExtras} itens extras.`);
