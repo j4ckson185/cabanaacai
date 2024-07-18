@@ -137,14 +137,60 @@
             }
         });
 
+        function loadOrders() {
+            console.log('Função loadOrders chamada');
+            const orderList = document.getElementById('order-list');
+            orderList.innerHTML = '';
+
+            db.collection("orders").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+                console.log("Pedidos recebidos do Firestore: ", querySnapshot.size);
+                orderList.innerHTML = ''; // Limpa a lista antes de atualizar
+                querySnapshot.forEach((doc) => {
+                    const order = doc.data();
+                    console.log("Pedido:", order);
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <strong>Pedido ${doc.id}</strong>
+                        <p>Cliente: ${order.nomeSobrenome}</p>
+                        <p>Endereço: ${order.endereco}</p>
+                        <p>Telefone: ${order.telefone}</p>
+                        <p>Email: ${order.email}</p>
+                        <p>Método de Pagamento: ${order.metodoPagamento}</p>
+                        <p>Total: ${order.total}</p>
+                        <p>Status: ${order.status}</p>
+                        <p>Data e Hora: ${order.timestamp ? order.timestamp.toDate().toLocaleString() : 'N/A'}</p>
+                        <button onclick="updateOrderStatus('${doc.id}', '${order.status}')">Atualizar Status</button>
+                    `;
+                    orderList.appendChild(li);
+                });
+            });
+        }
+
+        function updateOrderStatus(orderId, currentStatus) {
+            const newStatus = prompt('Digite o novo status do pedido:', currentStatus);
+            if (newStatus) {
+                db.collection("orders").doc(orderId).update({
+                    status: newStatus
+                }).then(() => {
+                    console.log('Status do pedido atualizado');
+                    loadOrders();
+                }).catch((error) => {
+                    console.error('Erro ao atualizar status do pedido:', error);
+                });
+            }
+        }
+
+        function generateReport(type) {
+            // Função para gerar relatórios
+            alert(`Gerando relatório ${type}`);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            initFCM();
             loadProducts();
-            loadOrders(); // Adicionado aqui para carregar pedidos ao iniciar
         });
     </script>
 </head>
-<body>
+<body onload="initFCM()">
     <header>
         <h1>Administração do Cardápio Digital</h1>
         <nav>
