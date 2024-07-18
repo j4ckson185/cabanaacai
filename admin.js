@@ -1,15 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     // Carregar produtos e categorias ao iniciar
     loadProducts();
     loadCategories();
-    listenForOrders();
 
     // Manipulação de formulários
     document.getElementById('product-form').addEventListener('submit', saveProduct);
     document.getElementById('category-form').addEventListener('submit', saveCategory);
 });
 
-// Função para mostrar seções
 function showSection(sectionId) {
     document.querySelectorAll('.admin-section').forEach(section => {
         section.style.display = 'none';
@@ -18,20 +16,21 @@ function showSection(sectionId) {
 }
 
 function loadProducts() {
-    // Carregar produtos do servidor ou local storage
-    const products = JSON.parse(localStorage.getItem('products')) || [];
-    const productList = document.getElementById('product-list');
-    productList.innerHTML = '';
-    products.forEach((product, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <strong>${product.name}</strong>
-            <p>${product.description}</p>
-            <p>Preço: R$ ${product.price.toFixed(2)}</p>
-            <button onclick="editProduct(${index})">Editar</button>
-            <button onclick="deleteProduct(${index})">Excluir</button>
-        `;
-        productList.appendChild(li);
+    db.collection('products').get().then((querySnapshot) => {
+        const productList = document.getElementById('product-list');
+        productList.innerHTML = '';
+        querySnapshot.forEach((doc) => {
+            const product = doc.data();
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <strong>${product.name}</strong>
+                <p>${product.description}</p>
+                <p>Preço: R$ ${product.price.toFixed(2)}</p>
+                <button onclick="editProduct('${doc.id}')">Editar</button>
+                <button onclick="deleteProduct('${doc.id}')">Excluir</button>
+            `;
+            productList.appendChild(li);
+        });
     });
 }
 
@@ -45,54 +44,59 @@ function saveProduct(event) {
 
     const product = { name, description, price, category };
 
-    let products = JSON.parse(localStorage.getItem('products')) || [];
     if (id) {
-        products[parseInt(id)] = product;
+        db.collection('products').doc(id).update(product).then(() => {
+            loadProducts();
+            document.getElementById('product-form').reset();
+        });
     } else {
-        products.push(product);
+        db.collection('products').add(product).then(() => {
+            loadProducts();
+            document.getElementById('product-form').reset();
+        });
     }
-    localStorage.setItem('products', JSON.stringify(products));
-
-    loadProducts();
-    document.getElementById('product-form').reset();
 }
 
-function editProduct(index) {
-    const products = JSON.parse(localStorage.getItem('products'));
-    const product = products[index];
-    document.getElementById('product-id').value = index;
-    document.getElementById('product-name').value = product.name;
-    document.getElementById('product-description').value = product.description;
-    document.getElementById('product-price').value = product.price;
-    document.getElementById('product-category').value = product.category;
-    showSection('manage-products');
+function editProduct(id) {
+    db.collection('products').doc(id).get().then((doc) => {
+        if (doc.exists) {
+            const product = doc.data();
+            document.getElementById('product-id').value = id;
+            document.getElementById('product-name').value = product.name;
+            document.getElementById('product-description').value = product.description;
+            document.getElementById('product-price').value = product.price;
+            document.getElementById('product-category').value = product.category;
+            showSection('manage-products');
+        }
+    });
 }
 
-function deleteProduct(index) {
-    let products = JSON.parse(localStorage.getItem('products'));
-    products.splice(index, 1);
-    localStorage.setItem('products', JSON.stringify(products));
-    loadProducts();
+function deleteProduct(id) {
+    db.collection('products').doc(id).delete().then(() => {
+        loadProducts();
+    });
 }
 
 function loadCategories() {
-    const categories = JSON.parse(localStorage.getItem('categories')) || [];
-    const categoryList = document.getElementById('category-list');
-    const categorySelect = document.getElementById('product-category');
-    categoryList.innerHTML = '';
-    categorySelect.innerHTML = '';
-    categories.forEach((category, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <strong>${category.name}</strong>
-            <button onclick="editCategory(${index})">Editar</button>
-            <button onclick="deleteCategory(${index})">Excluir</button>
-        `;
-        categoryList.appendChild(li);
-        const option = document.createElement('option');
-        option.value = category.name;
-        option.text = category.name;
-        categorySelect.add(option);
+    db.collection('categories').get().then((querySnapshot) => {
+        const categoryList = document.getElementById('category-list');
+        const categorySelect = document.getElementById('product-category');
+        categoryList.innerHTML = '';
+        categorySelect.innerHTML = '';
+        querySnapshot.forEach((doc) => {
+            const category = doc.data();
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <strong>${category.name}</strong>
+                <button onclick="editCategory('${doc.id}')">Editar</button>
+                <button onclick="deleteCategory('${doc.id}')">Excluir</button>
+            `;
+            categoryList.appendChild(li);
+            const option = document.createElement('option');
+            option.value = category.name;
+            option.text = category.name;
+            categorySelect.add(option);
+        });
     });
 }
 
@@ -103,39 +107,47 @@ function saveCategory(event) {
     
     const category = { name };
 
-    let categories = JSON.parse(localStorage.getItem('categories')) || [];
     if (id) {
-        categories[parseInt(id)] = category;
+        db.collection('categories').doc(id).update(category).then(() => {
+            loadCategories();
+            document.getElementById('category-form').reset();
+        });
     } else {
-        categories.push(category);
+        db.collection('categories').add(category).then(() => {
+            loadCategories();
+            document.getElementById('category-form').reset();
+        });
     }
-    localStorage.setItem('categories', JSON.stringify(categories));
-
-    loadCategories();
-    document.getElementById('category-form').reset();
 }
 
-function editCategory(index) {
-    const categories = JSON.parse(localStorage.getItem('categories'));
-    const category = categories[index];
-    document.getElementById('category-id').value = index;
-    document.getElementById('category-name').value = category.name;
-    showSection('manage-categories');
+function editCategory(id) {
+    db.collection('categories').doc(id).get().then((doc) => {
+        if (doc.exists) {
+            const category = doc.data();
+            document.getElementById('category-id').value = id;
+            document.getElementById('category-name').value = category.name;
+            showSection('manage-categories');
+        }
+    });
 }
 
-function deleteCategory(index) {
-    let categories = JSON.parse(localStorage.getItem('categories'));
-    categories.splice(index, 1);
-    localStorage.setItem('categories', JSON.stringify(categories));
-    loadCategories();
+function deleteCategory(id) {
+    db.collection('categories').doc(id).delete().then(() => {
+        loadCategories();
+    });
 }
 
-function listenForOrders() {
-    db.collection("orders").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-        const orderList = document.getElementById('order-list');
-        orderList.innerHTML = '';
-        snapshot.forEach((doc) => {
+function loadOrders() {
+    console.log('Função loadOrders chamada');
+    const orderList = document.getElementById('order-list');
+    orderList.innerHTML = '';
+
+    db.collection("orders").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+        console.log("Pedidos recebidos do Firestore: ", querySnapshot.size);
+        orderList.innerHTML = ''; // Limpa a lista antes de atualizar
+        querySnapshot.forEach((doc) => {
             const order = doc.data();
+            console.log("Pedido:", order);
             const li = document.createElement('li');
             li.innerHTML = `
                 <strong>Pedido ${doc.id}</strong>
@@ -161,6 +173,7 @@ function updateOrderStatus(orderId, currentStatus) {
             status: newStatus
         }).then(() => {
             console.log('Status do pedido atualizado');
+            loadOrders();
         }).catch((error) => {
             console.error('Erro ao atualizar status do pedido:', error);
         });
@@ -171,3 +184,9 @@ function generateReport(type) {
     // Função para gerar relatórios
     alert(`Gerando relatório ${type}`);
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadProducts();
+    loadOrders();
+    loadCategories();
+});
