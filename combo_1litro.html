@@ -103,7 +103,7 @@
     <div class="container">
         <h1>Combo 2 Açaís ou Cremes 1 Litro</h1>
         <div class="opcoes">
-            <h2>Açaí 1 - Escolha o Sabor (selecione até 8)</h2>
+            <h2>Açaí 1 - Escolha o Sabor (selecione até 2)</h2>
             <ul class="sabores1">
                 <li><input type="checkbox" id="acai-tradicional-1" name="sabor1" value="Açaí tradicional"><label for="acai-tradicional-1">Açaí tradicional</label></li>
                 <li><input type="checkbox" id="creme-ninho-trufado-1" name="sabor1" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado-1">Creme de Ninho Trufado</label></li>
@@ -113,7 +113,7 @@
                 <li><input type="checkbox" id="creme-ovomaltine-1" name="sabor1" value="Creme de Ovomaltine"><label for="creme-ovomaltine-1">Creme de Ovomaltine</label></li>
                 <li><input type="checkbox" id="creme-maracuja-1" name="sabor1" value="Creme de Maracujá"><label for="creme-maracuja-1">Creme de Maracujá</label></li>
             </ul>
-            <h2>Açaí 2 - Escolha o Sabor (selecione até 8)</h2>
+            <h2>Açaí 2 - Escolha o Sabor (selecione até 2)</h2>
             <ul class="sabores2">
                 <li><input type="checkbox" id="acai-tradicional-2" name="sabor2" value="Açaí tradicional"><label for="acai-tradicional-2">Açaí tradicional</label></li>
                 <li><input type="checkbox" id="creme-ninho-trufado-2" name="sabor2" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado-2">Creme de Ninho Trufado</label></li>
@@ -173,7 +173,8 @@
     <script>
         const maxAcompanhamentos = 8;
         const minSabores = 1;
-
+        const maxSabores = 2;
+        
         function adicionarAoCarrinho(produto, precoBase) {
             const acompanhamentosSelecionados1 = [];
             const extrasSelecionados = [];
