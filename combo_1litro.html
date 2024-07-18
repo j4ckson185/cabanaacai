@@ -103,13 +103,9 @@
     <div class="container">
         <h1>Combo 2 Açaís ou Cremes 1 Litro</h1>
         <div class="opcoes">
-            <h2>Escolha o Sabor do Açaí 1 (selecione até 8)</h2>
+            <h2>Escolha os Sabores do Açaí 1 (selecione 1 ou 2)</h2>
             <ul class="sabores-1">
-                <li>
-                    <input type="checkbox" id="acai-tradicional-1" name="sabor-1" value="Açaí tradicional">
-                    <label for="acai-tradicional-1">Açaí tradicional</label>
-                    <p class="descricao">Se desejar metade açai e metade creme, será necessário que marque esta opção e o creme que deseja.</p>
-                </li>
+                <li><input type="checkbox" id="acai-tradicional-1" name="sabor-1" value="Açaí tradicional"><label for="acai-tradicional-1">Açaí tradicional</label></li>
                 <li><input type="checkbox" id="creme-ninho-trufado-1" name="sabor-1" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado-1">Creme de Ninho Trufado</label></li>
                 <li><input type="checkbox" id="creme-cupuacu-1" name="sabor-1" value="Creme de Cupuaçu"><label for="creme-cupuacu-1">Creme de Cupuaçu</label></li>
                 <li><input type="checkbox" id="creme-morango-especial-1" name="sabor-1" value="Creme de Morango Especial"><label for="creme-morango-especial-1">Creme de Morango Especial</label></li>
@@ -132,13 +128,9 @@
                 <li><input type="checkbox" id="calda-de-chocolate-1" name="acompanhamento-1" value="Calda de Chocolate"><label for="calda-de-chocolate-1">Calda de Chocolate</label></li>
                 <li><input type="checkbox" id="gotas-de-chocolate-1" name="acompanhamento-1" value="Gotas de Chocolate"><label for="gotas-de-chocolate-1">Gotas de Chocolate</label></li>
             </ul>
-            <h2>Escolha o Sabor do Açaí 2 (selecione até 8)</h2>
+            <h2>Escolha os Sabores do Açaí 2 (selecione 1 ou 2)</h2>
             <ul class="sabores-2">
-                <li>
-                    <input type="checkbox" id="acai-tradicional-2" name="sabor-2" value="Açaí tradicional">
-                    <label for="acai-tradicional-2">Açaí tradicional</label>
-                    <p class="descricao">Se desejar metade açai e metade creme, será necessário que marque esta opção e o creme que deseja.</p>
-                </li>
+                <li><input type="checkbox" id="acai-tradicional-2" name="sabor-2" value="Açaí tradicional"><label for="acai-tradicional-2">Açaí tradicional</label></li>
                 <li><input type="checkbox" id="creme-ninho-trufado-2" name="sabor-2" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado-2">Creme de Ninho Trufado</label></li>
                 <li><input type="checkbox" id="creme-cupuacu-2" name="sabor-2" value="Creme de Cupuaçu"><label for="creme-cupuacu-2">Creme de Cupuaçu</label></li>
                 <li><input type="checkbox" id="creme-morango-especial-2" name="sabor-2" value="Creme de Morango Especial"><label for="creme-morango-especial-2">Creme de Morango Especial</label></li>
@@ -173,14 +165,14 @@
                 <li><input type="checkbox" id="m-m-extra" name="extra" value="M&M Extra (+R$2,49)"><label for="m-m-extra">M&M (+R$2,49)</label></li>
                 <li><input type="checkbox" id="leite-em-po-extra" name="extra" value="Leite em pó Extra (+R$2,49)"><label for="leite-em-po-extra">Leite em pó (+R$2,49)</label></li>
             </ul>
-            <button onclick="adicionarAoCarrinho('Combo 2 Açaís ou Cremes 1 Litro', 19.99)">Adicionar ao Carrinho</button>
+            <button onclick="adicionarAoCarrinho('Combo 2 Açaís ou Cremes 1 Litro', 39.99)">Adicionar ao Carrinho</button>
             <button class="ver-carrinho" style="display:none;" onclick="verCarrinho()">Ver Carrinho</button>
         </div>
     </div>
 
     <script>
         const maxAcompanhamentos = 8;
-        const maxSabores = 8;
+        const maxSabores = 2;
         const minSabores = 1;
         const maxExtras = 6;
 
@@ -228,9 +220,9 @@
                 preco: precoTotal.toFixed(2)
             };
 
-            let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            let carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
             carrinho.push(produtoParaCarrinho);
-            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
 
             document.querySelector('.ver-carrinho').style.display = 'block';
         }
