@@ -6,7 +6,6 @@
     <title>Administração do Cardápio Digital</title>
     <link rel="stylesheet" href="admin.css">
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <script>
         const firebaseConfig = {
@@ -21,167 +20,7 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        const messaging = firebase.messaging();
         const db = firebase.firestore();
-
-        messaging.onMessage((payload) => {
-            console.log('Message received. ', payload);
-            const notificationTitle = payload.notification.title;
-            const notificationOptions = {
-                body: payload.notification.body,
-                icon: payload.notification.icon
-            };
-            new Notification(notificationTitle, notificationOptions);
-        });
-
-        function initFCM() {
-            messaging.requestPermission()
-            .then(() => {
-                console.log('Notification permission granted.');
-                return messaging.getToken();
-            })
-            .then((token) => {
-                console.log('FCM Token:', token);
-            })
-            .catch((err) => {
-                console.log('Unable to get permission to notify.', err);
-            });
-        }
-
-        function showSection(sectionId) {
-            const sections = document.querySelectorAll('.admin-section');
-            sections.forEach(section => {
-                section.style.display = section.id === sectionId ? 'block' : 'none';
-            });
-        }
-
-        function loadProducts() {
-            db.collection('products').get().then((querySnapshot) => {
-                const productList = document.getElementById('product-list');
-                productList.innerHTML = '';
-                querySnapshot.forEach((doc) => {
-                    const product = doc.data();
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <span>${product.name}</span>
-                        <button onclick="editProduct('${doc.id}')">Editar</button>
-                        <button onclick="deleteProduct('${doc.id}')">Excluir</button>
-                    `;
-                    productList.appendChild(li);
-                });
-            });
-        }
-
-        function editProduct(productId) {
-            db.collection('products').doc(productId).get().then((doc) => {
-                if (doc.exists) {
-                    const product = doc.data();
-                    document.getElementById('product-id').value = productId;
-                    document.getElementById('product-name').value = product.name;
-                    document.getElementById('product-description').value = product.description;
-                    document.getElementById('product-price').value = product.price;
-                    document.getElementById('product-category').value = product.category;
-                } else {
-                    console.log('No such document!');
-                }
-            }).catch((error) => {
-                console.log('Error getting document:', error);
-            });
-        }
-
-        function deleteProduct(productId) {
-            db.collection('products').doc(productId).delete().then(() => {
-                console.log('Document successfully deleted!');
-                loadProducts();
-            }).catch((error) => {
-                console.error('Error removing document: ', error);
-            });
-        }
-
-        document.getElementById('product-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const productId = document.getElementById('product-id').value;
-            const productName = document.getElementById('product-name').value;
-            const productDescription = document.getElementById('product-description').value;
-            const productPrice = document.getElementById('product-price').value;
-            const productCategory = document.getElementById('product-category').value;
-
-            if (productId) {
-                db.collection('products').doc(productId).update({
-                    name: productName,
-                    description: productDescription,
-                    price: productPrice,
-                    category: productCategory
-                }).then(() => {
-                    console.log('Document successfully updated!');
-                    loadProducts();
-                    document.getElementById('product-form').reset();
-                }).catch((error) => {
-                    console.error('Error updating document: ', error);
-                });
-            } else {
-                db.collection('products').add({
-                    name: productName,
-                    description: productDescription,
-                    price: productPrice,
-                    category: productCategory
-                }).then(() => {
-                    console.log('Document successfully written!');
-                    loadProducts();
-                    document.getElementById('product-form').reset();
-                }).catch((error) => {
-                    console.error('Error writing document: ', error);
-                });
-            }
-        });
-
-        function loadOrders() {
-            console.log('Função loadOrders chamada');
-            const orderList = document.getElementById('order-list');
-            orderList.innerHTML = '';
-
-            db.collection("orders").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
-                console.log("Pedidos recebidos do Firestore: ", querySnapshot.size);
-                querySnapshot.forEach((doc) => {
-                    const order = doc.data();
-                    console.log("Pedido:", order);
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <strong>Pedido ${doc.id}</strong>
-                        <p>Cliente: ${order.nomeSobrenome}</p>
-                        <p>Endereço: ${order.endereco}</p>
-                        <p>Telefone: ${order.telefone}</p>
-                        <p>Email: ${order.email}</p>
-                        <p>Método de Pagamento: ${order.metodoPagamento}</p>
-                        <p>Total: ${order.total}</p>
-                        <p>Status: ${order.status}</p>
-                        <p>Data e Hora: ${order.timestamp ? order.timestamp.toDate().toLocaleString() : 'N/A'}</p>
-                        <button onclick="updateOrderStatus('${doc.id}', '${order.status}')">Atualizar Status</button>
-                    `;
-                    orderList.appendChild(li);
-                });
-            }, (error) => {
-                console.error("Erro ao carregar pedidos do Firestore: ", error);
-            });
-        }
-
-        function updateOrderStatus(orderId, currentStatus) {
-            const newStatus = prompt('Digite o novo status do pedido:', currentStatus);
-            if (newStatus) {
-                db.collection("orders").doc(orderId).update({
-                    status: newStatus
-                }).then(() => {
-                    console.log('Status do pedido atualizado');
-                    loadOrders();
-                }).catch((error) => {
-                    console.error('Erro ao atualizar status do pedido:', error);
-                });
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            loadProducts();
-        });
     </script>
 </head>
 <body onload="initFCM()">
@@ -189,9 +28,9 @@
         <h1>Administração do Cardápio Digital</h1>
         <nav>
             <ul>
-                <li><a href="editar.html">Editar Produtos</a></li>
-                <li><a href="horario.html">Horário da Loja</a></li>
-                <li><a href="#" onclick="showSection('view-orders'); loadOrders();">Visualizar Pedidos</a></li>
+                <li><a href="#" onclick="showSection('manage-products');">Gerenciar Produtos</a></li>
+                <li><a href="#" onclick="showSection('manage-categories');">Gerenciar Categorias</a></li>
+                <li><a href="#" id="view-orders" onclick="showSection('view-orders');">Visualizar Pedidos</a></li>
                 <li><a href="#" onclick="showSection('reports')">Relatórios</a></li>
             </ul>
         </nav>
