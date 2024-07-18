@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página de Pagamento</title>
     <link rel="stylesheet" href="pagina_de_pagamento.css">
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="pagina_de_pagamento.js" defer></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
+            authDomain: "cabana-8d55e.firebaseapp.com",
+            databaseURL: "https://cabana-8d55e-default-rtdb.firebaseio.com",
+            projectId: "cabana-8d55e",
+            storageBucket: "cabana-8d55e.appspot.com",
+            messagingSenderId: "706144237954",
+            appId: "1:706144237954:web:345c10370972486afc779b",
+            measurementId: "G-96Y337GYT8"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
 </head>
 <body>
     <nav>
@@ -60,7 +77,7 @@
                 <label>
                     <input type="radio" name="payment-method" value="pix" required onclick="showPixMessage()"> PIX
                 </label>
-                <p id="pix-info" class="pix-message" style="display:none;">Nosso PIX: 84 9 8873-1028 (Pagseguro). Envie o comprovante para nosso whatsapp após finalizar este pedido.</p>
+                <p id="pix-info" class="pix-message" style="display:none;">Nosso Pix: 84 9 8873-1028 - Envie o comprovante para nosso whatsapp após finalizar o pedido.</p>
             </div>
 
             <div id="troco-section" class="form-group" style="display:none;">
@@ -77,10 +94,9 @@
 
             <div class="summary">
                 <h3>Resumo do Pedido</h3>
-                <p>Subtotal: <span id="subtotal">R$ 0,00</span></p>
+                <p>Subtotal: <span id="subtotal"></span></p>
                 <p>Taxa de Entrega: R$ 3,00</p>
-                <p>Desconto: <span id="desconto">R$ 0,00</span></p>
-                <p>Total: <span id="total">R$ 0,00</span></p>
+                <p>Total: <span id="total"></span></p>
             </div>
 
             <div class="form-group">
@@ -98,6 +114,5 @@
             </div>
         </form>
     </div>
-    <script src="pagina_de_pagamento.js"></script>
 </body>
 </html>
