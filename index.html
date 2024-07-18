@@ -172,7 +172,7 @@
     <footer>
         <!-- Removido o link de Adicionar/Editar Produtos -->
     </footer>
-<script type="module">
+<script>
     function openMenu() {
         document.getElementById("side-menu").style.width = "250px";
     }
@@ -180,7 +180,8 @@
     function closeMenu() {
         document.getElementById("side-menu").style.width = "0";
     }
-
+</script>
+<script type="module">
     import { db } from './firebaseConfig.js';
     import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
