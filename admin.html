@@ -138,11 +138,13 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
+            initFCM();
             loadProducts();
+            loadOrders(); // Adicionado aqui para carregar pedidos ao iniciar
         });
     </script>
 </head>
-<body onload="initFCM()">
+<body>
     <header>
         <h1>Administração do Cardápio Digital</h1>
         <nav>
