@@ -6,6 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Manipulação de formulários
     document.getElementById('product-form').addEventListener('submit', saveProduct);
     document.getElementById('category-form').addEventListener('submit', saveCategory);
+
+    // Carregar pedidos ao iniciar
+    loadOrders();
+
+    // Iniciar FCM
+    initFCM();
 });
 
 // Função para mostrar seções
@@ -134,8 +140,9 @@ function loadOrders() {
     const orderList = document.getElementById('order-list');
     orderList.innerHTML = '';
 
-    db.collection("orders").orderBy("timestamp", "desc").get().then((querySnapshot) => {
+    db.collection("orders").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
         console.log("Pedidos recebidos do Firestore: ", querySnapshot.size);
+        orderList.innerHTML = ''; // Limpa a lista antes de adicionar novos pedidos
         querySnapshot.forEach((doc) => {
             const order = doc.data();
             console.log("Pedido:", order);
@@ -143,9 +150,10 @@ function loadOrders() {
             li.innerHTML = `
                 <strong>Pedido ${doc.id}</strong>
                 <p>Cliente: ${order.nomeSobrenome}</p>
-                <p>Endereço: ${order.endereco}</p>
+                <p>CEP: ${order.cep}</p>
+                <p>Endereço: ${order.endereco}, ${order.numero}</p>
+                <p>Complemento: ${order.complemento}</p>
                 <p>Telefone: ${order.telefone}</p>
-                <p>Email: ${order.email}</p>
                 <p>Método de Pagamento: ${order.metodoPagamento}</p>
                 <p>Total: ${order.total}</p>
                 <p>Status: ${order.status}</p>
@@ -154,7 +162,7 @@ function loadOrders() {
             `;
             orderList.appendChild(li);
         });
-    }).catch((error) => {
+    }, (error) => {
         console.error("Erro ao carregar pedidos do Firestore: ", error);
     });
 }
@@ -176,4 +184,19 @@ function updateOrderStatus(orderId, currentStatus) {
 function generateReport(type) {
     // Função para gerar relatórios
     alert(`Gerando relatório ${type}`);
+}
+
+function initFCM() {
+    messaging.requestPermission()
+    .then(() => {
+        console.log('Notification permission granted.');
+        return messaging.getToken();
+    })
+    .then((token) => {
+        console.log('FCM Token:', token);
+        // Save the token to your server/database if needed
+    })
+    .catch((err) => {
+        console.log('Unable to get permission to notify.', err);
+    });
 }
