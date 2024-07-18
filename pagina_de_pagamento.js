@@ -16,27 +16,24 @@ var db = firebase.firestore();
 
 document.addEventListener('DOMContentLoaded', function() {
     updateOrderSummary();
-    consultarCep();
 
     // Função para exibir ou ocultar a seção de troco
     document.querySelectorAll('input[name="payment-method"]').forEach((radio) => {
         radio.addEventListener('change', function() {
             const trocoSection = document.getElementById('troco-section');
+            const pixInfo = document.getElementById('pix-info');
             if (this.value === 'dinheiro') {
                 trocoSection.style.display = 'block';
-                document.getElementById('pix-info').style.display = 'none';
+                pixInfo.style.display = 'none';
             } else if (this.value === 'pix') {
                 trocoSection.style.display = 'none';
-                document.getElementById('pix-info').style.display = 'block';
+                pixInfo.style.display = 'block';
             } else {
                 trocoSection.style.display = 'none';
-                document.getElementById('pix-info').style.display = 'none';
+                pixInfo.style.display = 'none';
             }
         });
     });
-
-    // Evento para o botão de envio do pedido
-    document.getElementById('botao-finalizar-pedido').addEventListener('click', enviarPedidoWhatsApp);
 });
 
 // Função para formatar o valor como moeda
@@ -55,18 +52,18 @@ function updateOrderSummary() {
     // Calcular subtotal
     let subtotalValue = 0;
     carrinho.forEach(item => {
-        let valorProduto = parseFloat(item.preco);
+        let valorProduto = parseFloat(item.preco) || 0;
+        const extras1 = item.extras1 || [];
+        const extras2 = item.extras2 || [];
+        const allExtras = extras1.concat(extras2);
+        allExtras.forEach(extra => {
+            valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+        });
         subtotalValue += valorProduto;
     });
 
     subtotal.textContent = formatarMoeda(subtotalValue);
     total.textContent = formatarMoeda(subtotalValue + 3); // Total considerando taxa de entrega fixa de R$ 3,00
-}
-
-// Função para mostrar mensagem específica do Pix
-function showPixMessage() {
-    const pixMessage = document.getElementById('pix-info');
-    pixMessage.style.display = 'block';
 }
 
 // Função para enviar o pedido pelo WhatsApp
@@ -113,12 +110,12 @@ function enviarPedidoWhatsApp() {
         message += itemDetails;
     });
 
-    const subtotalValue = parseFloat(document.getElementById('subtotal').textContent.replace('R$', '').replace(',', '.'));
-    const totalPedido = subtotalValue + 3; // Total do pedido considerando taxa de entrega
+    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('R$', '').replace(',', '.'));
+    const totalPedido = subtotal + 3; // Total do pedido considerando taxa de entrega
     message += `\n*Taxa de Entrega:* R$ 3,00\n`;
     message += `*Total do Pedido:* ${formatarMoeda(totalPedido)}`;
 
-    const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(message)}`;
+    const whatsappLink = `https://wa.me/5584988731028?text=${encodeURIComponent(message)}`;
     window.open(whatsappLink, '_blank');
 
     // Salvar o pedido no Firestore
@@ -131,7 +128,7 @@ function enviarPedidoWhatsApp() {
         telefone: telefone,
         metodoPagamento: metodoPagamento,
         troco: troco,
-        carrinho: carrinho,
+        itens: carrinho,
         total: formatarMoeda(totalPedido),
         status: "Pendente",
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -167,3 +164,28 @@ async function consultarCep() {
         resultadoCep.innerText = '';
     }
 }
+
+// Evento ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+    updateOrderSummary();
+
+    // Eventos de mudança nos métodos de pagamento
+    const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
+    const trocoSection = document.getElementById('troco-section');
+    const pixInfo = document.getElementById('pix-info');
+
+    paymentMethodRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.value === 'dinheiro') {
+                trocoSection.style.display = 'block';
+                pixInfo.style.display = 'none';
+            } else if (radio.value === 'pix') {
+                trocoSection.style.display = 'none';
+                pixInfo.style.display = 'block';
+            } else {
+                trocoSection.style.display = 'none';
+                pixInfo.style.display = 'none';
+            }
+        });
+    });
+});
