@@ -140,3 +140,22 @@ h2 {
     margin-right: 10px;
 }
 
+.summary {
+    margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+}
+
+.summary h3 {
+    margin: 0 0 10px 0;
+}
+
+.summary p {
+    margin: 5px 0;
+}
+
+.pix-message {
+    font-style: italic;
+    margin-top: 5px;
+    color: #888;
+}
