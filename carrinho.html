@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrinho de Compras</title>
     <style>
+        /* Estilos para a página do carrinho */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -50,7 +51,8 @@
             list-style-type: none;
         }
         .acompanhamentos li, .extras li, .sabores li {
-            display: block; /* Alinha os itens verticalmente */
+            display: flex;
+            align-items: center;
         }
         .acompanhamentos li button, .extras li button {
             background: none;
@@ -123,7 +125,7 @@
 
         // Função para exibir os itens do carrinho
         function exibirCarrinho() {
-            const carrinho = JSON.parse(localStorage.getItem('carrinho'));
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
             if (carrinho && carrinho.length > 0) {
                 const listaProdutos = document.getElementById('lista-produtos');
                 listaProdutos.innerHTML = '';
@@ -134,26 +136,49 @@
 
                     // Calcula o valor total do item incluindo os extras
                     let valorProduto = parseFloat(item.preco);
-                    item.extras.forEach(extra => {
-                        valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                    });
+                    if (item.extras1) {
+                        item.extras1.forEach(extra => {
+                            valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                        });
+                    }
+                    if (item.extras2) {
+                        item.extras2.forEach(extra => {
+                            valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
+                        });
+                    }
                     total += valorProduto;
 
-                    const sabores1 = item.sabores1 ? item.sabores1.map(sabor => `<li>${sabor}</li>`).join('') : '';
-                    const sabores2 = item.sabores2 ? item.sabores2.map(sabor => `<li>${sabor}</li>`).join('') : '';
-                    const acompanhamentos1 = item.acompanhamentos1 ? item.acompanhamentos1.map(acompanhamento => `<li>${acompanhamento}<button onclick="removerAcompanhamento(${index}, '${acompanhamento}', 1)">🗑️</button></li>`).join('') : '';
-                    const acompanhamentos2 = item.acompanhamentos2 ? item.acompanhamentos2.map(acompanhamento => `<li>${acompanhamento}<button onclick="removerAcompanhamento(${index}, '${acompanhamento}', 2)">🗑️</button></li>`).join('') : '';
-                    const extras = item.extras.map(extra => `<li>${extra}<button onclick="removerExtra(${index}, '${extra}')">🗑️</button><button onclick="adicionarMaisExtra(${index}, '${extra}')">➕</button></li>`).join('');
-
-                    produto.innerHTML = `
+                    let detalhes = `
                         <p><strong>${item.nome} - ${formatarMoeda(valorProduto)}<button onclick="removerProduto(${index})">🗑️</button></strong></p>
-                        ${sabores1 ? `<p>Sabores 1:</p><ul class="sabores">${sabores1}</ul>` : ''}
-                        ${sabores2 ? `<p>Sabores 2:</p><ul class="sabores">${sabores2}</ul>` : ''}
-                        ${acompanhamentos1 ? `<p>Acompanhamentos 1:</p><ul class="acompanhamentos">${acompanhamentos1}</ul>` : ''}
-                        ${acompanhamentos2 ? `<p>Acompanhamentos 2:</p><ul class="acompanhamentos">${acompanhamentos2}</ul>` : ''}
-                        <p>Itens Extras:</p>
-                        <ul class="extras">${extras}</ul>
                     `;
+
+                    if (item.sabores1 && item.sabores2) {
+                        detalhes += `
+                            <p>Sabores (Açaí 1):</p>
+                            <ul class="sabores">${item.sabores1.map(sabor => `<li>${sabor}</li>`).join('')}</ul>
+                            <p>Acompanhamentos (Açaí 1):</p>
+                            <ul class="acompanhamentos">${item.acompanhamentos1.map(acompanhamento => `<li>${acompanhamento}</li>`).join('')}</ul>
+                            <p>Itens Extras (Açaí 1):</p>
+                            <ul class="extras">${item.extras1.map(extra => `<li>${extra}</li>`).join('')}</ul>
+                            <p>Sabores (Açaí 2):</p>
+                            <ul class="sabores">${item.sabores2.map(sabor => `<li>${sabor}</li>`).join('')}</ul>
+                            <p>Acompanhamentos (Açaí 2):</p>
+                            <ul class="acompanhamentos">${item.acompanhamentos2.map(acompanhamento => `<li>${acompanhamento}</li>`).join('')}</ul>
+                            <p>Itens Extras (Açaí 2):</p>
+                            <ul class="extras">${item.extras2.map(extra => `<li>${extra}</li>`).join('')}</ul>
+                        `;
+                    } else {
+                        detalhes += `
+                            <p>Sabores:</p>
+                            <ul class="sabores">${item.sabores.map(sabor => `<li>${sabor}</li>`).join('')}</ul>
+                            <p>Acompanhamentos:</p>
+                            <ul class="acompanhamentos">${item.acompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('')}</ul>
+                            <p>Itens Extras:</p>
+                            <ul class="extras">${item.extras.map(extra => `<li>${extra}</li>`).join('')}</ul>
+                        `;
+                    }
+
+                    produto.innerHTML = detalhes;
                     listaProdutos.appendChild(produto);
                 });
 
@@ -168,49 +193,15 @@
 
         // Função para remover um produto do carrinho
         function removerProduto(index) {
-            const carrinho = JSON.parse(localStorage.getItem('carrinho'));
+            const carrinho = JSON.parse(sessionStorage.getItem('carrinho'));
             carrinho.splice(index, 1);
-            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            sessionStorage.setItem('carrinho', JSON.stringify(carrinho));
             exibirCarrinho();
-        }
-
-        // Função para remover um acompanhamento de um produto
-        function removerAcompanhamento(produtoIndex, acompanhamento, acaiNum) {
-            const carrinho = JSON.parse(localStorage.getItem('carrinho'));
-            if (acaiNum === 1) {
-                carrinho[produtoIndex].acompanhamentos1 = carrinho[produtoIndex].acompanhamentos1.filter(item => item !== acompanhamento);
-            } else {
-                carrinho[produtoIndex].acompanhamentos2 = carrinho[produtoIndex].acompanhamentos2.filter(item => item !== acompanhamento);
-            }
-            localStorage.setItem('carrinho', JSON.stringify(carrinho));
-            exibirCarrinho();
-        }
-
-        // Função para remover um extra de um produto
-        function removerExtra(produtoIndex, extra) {
-            const carrinho = JSON.parse(localStorage.getItem('carrinho'));
-            const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-            carrinho[produtoIndex].extras = carrinho[produtoIndex].extras.filter(item => item !== extra);
-            carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) - precoExtra).toFixed(2);
-            localStorage.setItem('carrinho', JSON.stringify(carrinho));
-            exibirCarrinho();
-        }
-
-        // Função para adicionar mais um item extra ao carrinho
-        function adicionarMaisExtra(produtoIndex, extra) {
-            const carrinho = JSON.parse(localStorage.getItem('carrinho'));
-            const precoExtra = parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-            if (produtoIndex !== -1) {
-                carrinho[produtoIndex].extras.push(extra);
-                carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) + precoExtra).toFixed(2);
-                localStorage.setItem('carrinho', JSON.stringify(carrinho));
-                exibirCarrinho();
-            }
         }
 
         // Função para esvaziar o carrinho
         function esvaziarCarrinho() {
-            localStorage.removeItem('carrinho');
+            sessionStorage.removeItem('carrinho');
             exibirCarrinho();
         }
 
