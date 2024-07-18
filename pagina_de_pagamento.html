@@ -1,103 +1,161 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Pagamento</title>
-    <link rel="stylesheet" href="pagina_de_pagamento.css">
-</head>
-<body>
-    <nav>
-        <a href="index.html">Início</a>
-        <a href="promos.html">Promos</a>
-        <a href="carrinho.html">Carrinho</a>
-    </nav>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    color: #333;
+}
 
-    <div class="container">
-        <h1>Página de Pagamento</h1>
-        <form id="formulario-pagamento">
-            <div class="form-group">
-                <label for="nome-sobrenome">Nome e Sobrenome:</label>
-                <input type="text" id="nome-sobrenome" name="nome-sobrenome" required>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="cep">CEP:</label>
-                    <input type="text" id="cep" name="cep" pattern="\d{5}-?\d{3}" placeholder="12345-678" required oninput="consultarCep()">
-                    <p id="resultado-cep"></p>
-                </div>
-                <div class="form-group">
-                    <label for="telefone">Telefone (com DDD):</label>
-                    <input type="tel" id="telefone" name="telefone" pattern="\d{11}" placeholder="84988731028" required>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="endereco">Endereço:</label>
-                    <input type="text" id="endereco" name="endereco" required>
-                </div>
-                <div class="form-group">
-                    <label for="numero">Número:</label>
-                    <input type="text" id="numero" name="numero" required>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="complemento">Complemento:</label>
-                <input type="text" id="complemento" name="complemento">
-            </div>
+header {
+    background-color: #663399;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
 
-            <h2>Opções de Pagamento</h2>
-            <div class="form-group">
-                <label>
-                    <input type="radio" name="payment-method" value="dinheiro" required> Dinheiro
-                </label>
-                <label>
-                    <input type="radio" name="payment-method" value="cartao" required> Cartão
-                </label>
-                <label>
-                    <input type="radio" name="payment-method" value="pix" required onclick="showPixMessage()"> PIX
-                </label>
-                <p id="pix-info" class="pix-message" style="display:none;">Nosso PIX: 84 9 8873-1028 (Pagseguro). Envie o comprovante para nosso whatsapp após finalizar este pedido.</p>
-            </div>
+.logo {
+    max-width: 150px;
+    height: auto;
+    margin-bottom: 10px;
+}
 
-            <div id="troco-section" class="form-group" style="display:none;">
-                <label for="troco">Precisa de troco para:</label>
-                <input type="text" id="troco" name="troco">
-            </div>
+.menu-nav {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
 
-            <h2>Opções de Entrega</h2>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="delivery-option" value="motoboy" checked disabled> Motoboy (R$ 3,00)
-                </label>
-            </div>
+.menu-nav li {
+    display: inline;
+}
 
-            <div class="summary">
-                <h3>Resumo do Pedido</h3>
-                <p>Subtotal: <span id="subtotal">R$ 0,00</span></p>
-                <p>Taxa de Entrega: R$ 3,00</p>
-                <p>Desconto: <span id="desconto">R$ 0,00</span></p>
-                <p>Total: <span id="total">R$ 0,00</span></p>
-            </div>
+.menu-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 5px 10px;
+    transition: background-color 0.3s;
+}
 
-            <div class="form-group">
-                <label for="cupom">Código do Cupom:</label>
-                <input type="text" id="cupom" name="cupom" placeholder="Digite um cupom de desconto aqui caso possua.">
-            </div>
+.menu-nav a:hover {
+    background-color: #4b2373;
+    border-radius: 5px;
+}
 
-            <div class="buttons">
-                <button class="button button-whatsapp" id="botao-finalizar-pedido" type="button" onclick="enviarPedidoWhatsApp()">
-                    <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png" alt="WhatsApp" class="button-icon">
-                    Enviar pedido pelo WhatsApp
-                </button>
-                <a href="index.html" class="button button-secondary">Adicionar mais itens</a>
-                <a href="carrinho.html" class="button button-secondary" id="botao-editar-pedido">Editar pedido</a>
-            </div>
-        </form>
-    </div>
-    <script src="pagina_de_pagamento.js"></script>
-</body>
-</html>
+main {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #663399;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+input[type="radio"],
+input[type="checkbox"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    width: auto;
+}
+
+h2 {
+    color: #663399;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button {
+    flex: 1;
+    padding: 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.button-whatsapp {
+    background-color: #25d366;
+}
+
+.button-whatsapp:hover {
+    background-color: #1ebe57;
+}
+
+.button-secondary {
+    background-color: #4caf50;
+}
+
+.button-secondary:hover {
+    background-color: #45a049;
+}
+
+.button-icon {
+    margin-right: 10px;
+}
+
+.summary {
+    margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+}
+
+.summary h3 {
+    margin: 0 0 10px 0;
+}
+
+.summary p {
+    margin: 5px 0;
+}
+
+.pix-message {
+    font-style: italic;
+    margin-top: 5px;
+    color: #888;
+}
