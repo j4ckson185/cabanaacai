@@ -169,6 +169,7 @@
 
                     produto.innerHTML = `
                         <p><strong>${item.nome} - ${formatarMoeda(valorProduto)}<button onclick="removerProduto(${index})">🗑️</button></strong></p>
+                        ${item.sabores1 ? `
                         <p>Sabores Açaí 1:</p>
                         <ul class="sabores">${sabores1}</ul>
                         <p>Acompanhamentos Açaí 1:</p>
@@ -181,6 +182,14 @@
                         <ul class="acompanhamentos">${acompanhamentos2}</ul>
                         <p>Itens Extras Açaí 2:</p>
                         <ul class="extras">${extras2}</ul>
+                        ` : `
+                        <p>Sabores:</p>
+                        <ul class="sabores">${item.sabores ? item.sabores.map(sabor => `<li>${sabor}</li>`).join('') : ''}</ul>
+                        <p>Acompanhamentos:</p>
+                        <ul class="acompanhamentos">${item.acompanhamentos ? item.acompanhamentos.map(acompanhamento => `<li>${acompanhamento}<button onclick="removerAcompanhamento(${index}, '${acompanhamento}')">🗑️</button></li>`).join('') : ''}</ul>
+                        <p>Itens Extras:</p>
+                        <ul class="extras">${item.extras ? item.extras.map(extra => `<li>${extra}<button onclick="removerExtra(${index}, '${extra}')">🗑️</button><button onclick="adicionarMaisExtra(${index}, '${extra}')">➕</button></li>`).join('') : ''}</ul>
+                        `}
                     `;
                     listaProdutos.appendChild(produto);
                 });
@@ -207,8 +216,10 @@
             const carrinho = JSON.parse(localStorage.getItem('carrinho'));
             if (acaiIndex === 1) {
                 carrinho[produtoIndex].acompanhamentos1 = carrinho[produtoIndex].acompanhamentos1.filter(item => item !== acompanhamento);
-            } else {
+            } else if (acaiIndex === 2) {
                 carrinho[produtoIndex].acompanhamentos2 = carrinho[produtoIndex].acompanhamentos2.filter(item => item !== acompanhamento);
+            } else {
+                carrinho[produtoIndex].acompanhamentos = carrinho[produtoIndex].acompanhamentos.filter(item => item !== acompanhamento);
             }
             localStorage.setItem('carrinho', JSON.stringify(carrinho));
             exibirCarrinho();
@@ -221,8 +232,11 @@
             if (acaiIndex === 1) {
                 carrinho[produtoIndex].extras1 = carrinho[produtoIndex].extras1.filter(item => item !== extra);
                 carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) - precoExtra).toFixed(2);
-            } else {
+            } else if (acaiIndex === 2) {
                 carrinho[produtoIndex].extras2 = carrinho[produtoIndex].extras2.filter(item => item !== extra);
+                carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) - precoExtra).toFixed(2);
+            } else {
+                carrinho[produtoIndex].extras = carrinho[produtoIndex].extras.filter(item => item !== extra);
                 carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) - precoExtra).toFixed(2);
             }
             localStorage.setItem('carrinho', JSON.stringify(carrinho));
@@ -236,8 +250,11 @@
             if (acaiIndex === 1) {
                 carrinho[produtoIndex].extras1.push(extra);
                 carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) + precoExtra).toFixed(2);
-            } else {
+            } else if (acaiIndex === 2) {
                 carrinho[produtoIndex].extras2.push(extra);
+                carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) + precoExtra).toFixed(2);
+            } else {
+                carrinho[produtoIndex].extras.push(extra);
                 carrinho[produtoIndex].preco = (parseFloat(carrinho[produtoIndex].preco) + precoExtra).toFixed(2);
             }
             localStorage.setItem('carrinho', JSON.stringify(carrinho));
