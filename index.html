@@ -173,6 +173,14 @@
         <!-- Removido o link de Adicionar/Editar Produtos -->
     </footer>
 <script type="module">
+    function openMenu() {
+        document.getElementById("side-menu").style.width = "250px";
+    }
+
+    function closeMenu() {
+        document.getElementById("side-menu").style.width = "0";
+    }
+
     import { db } from './firebaseConfig.js';
     import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
@@ -252,14 +260,6 @@
             displayProducts(filteredProducts.filter(p => p.category === 'monte-do-seu-jeito'), monteDoSeuJeitoDiv);
         });
     });
-
-    function openMenu() {
-        document.getElementById("side-menu").style.width = "250px";
-    }
-
-    function closeMenu() {
-        document.getElementById("side-menu").style.width = "0";
-    }
 </script>
 </body>
 </html>
