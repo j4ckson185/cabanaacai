@@ -1,20 +1,7 @@
-// Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
-    authDomain: "cabana-8d55e.firebaseapp.com",
-    databaseURL: "https://cabana-8d55e-default-rtdb.firebaseio.com",
-    projectId: "cabana-8d55e",
-    storageBucket: "cabana-8d55e.appspot.com",
-    messagingSenderId: "706144237954",
-    appId: "1:706144237954:web:345c10370972486afc779b",
-    measurementId: "G-96Y337GYT8"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-var db = firebase.firestore();
-
 document.addEventListener('DOMContentLoaded', function() {
+    // Carregar resumo do pedido
+    updateOrderSummary();
+
     // Função para exibir ou ocultar a seção de troco
     document.querySelectorAll('input[name="payment-method"]').forEach((radio) => {
         radio.addEventListener('change', function() {
@@ -24,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 trocoSection.style.display = 'block';
                 pixInfo.style.display = 'none';
             } else if (this.value === 'pix') {
-                trocoSection.style.display = 'none';
                 pixInfo.style.display = 'block';
+                trocoSection.style.display = 'none';
             } else {
                 trocoSection.style.display = 'none';
                 pixInfo.style.display = 'none';
@@ -33,37 +20,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Função para formatar o valor como moeda
-    function formatarMoeda(valor) {
-        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
-
     // Função para atualizar o resumo do pedido
     function updateOrderSummary() {
         const subtotalElement = document.getElementById('subtotal');
         const totalElement = document.getElementById('total');
-
-        // Recuperar carrinho do sessionStorage
         const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
 
-        // Calcular subtotal
         let subtotal = 0;
         carrinho.forEach(item => {
-            let valorProduto = parseFloat(item.preco);
-            const extras1 = item.extras1 || [];
-            const extras2 = item.extras2 || [];
-            const allExtras = extras1.concat(extras2);
-            allExtras.forEach(extra => {
-                valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-            });
-            subtotal += valorProduto;
+            subtotal += parseFloat(item.preco);
         });
 
-        const taxaEntrega = 3.00; // Taxa de entrega fixa
-        const total = subtotal + taxaEntrega;
-
         subtotalElement.textContent = formatarMoeda(subtotal);
-        totalElement.textContent = formatarMoeda(total);
+        totalElement.textContent = formatarMoeda(subtotal + 3);
+    }
+
+    // Função para formatar o valor como moeda
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
     // Função para enviar o pedido pelo WhatsApp e salvar no Firestore
@@ -110,12 +84,12 @@ document.addEventListener('DOMContentLoaded', function() {
             message += itemDetails;
         });
 
-        const subtotalElement = document.getElementById('subtotal').textContent.replace('R$', '').replace(',', '.');
-        const totalPedido = parseFloat(subtotalElement) + 3; // Total do pedido considerando taxa de entrega
+        const subtotalValue = carrinho.reduce((total, item) => total + parseFloat(item.preco), 0);
+        const totalPedido = subtotalValue + 3; // Total do pedido considerando taxa de entrega
         message += `\n*Taxa de Entrega:* R$ 3,00\n`;
         message += `*Total do Pedido:* ${formatarMoeda(totalPedido)}`;
 
-        const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(message)}`;
+        const whatsappLink = `https://wa.me/5584988731028?text=${encodeURIComponent(message)}`;
         window.open(whatsappLink, '_blank');
 
         // Salvar o pedido no Firestore
@@ -129,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
             metodoPagamento: metodoPagamento,
             troco: troco,
             itens: carrinho,
-            subtotal: subtotalElement,
+            subtotal: formatarMoeda(subtotalValue),
             total: formatarMoeda(totalPedido),
             status: "Pendente",
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -166,6 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Chama a função para atualizar o resumo do pedido quando a página carregar
+    // Atualizar o resumo do pedido ao carregar a página
     updateOrderSummary();
 });
