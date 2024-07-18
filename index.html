@@ -185,7 +185,7 @@
             const searchInput = document.getElementById('search-input');
             searchInput.addEventListener('input', function() {
                 const searchTerm = searchInput.value.toLowerCase();
-                const filteredProducts = products.filter(product => product.name.toLowerCase().includes(searchTerm) || product.description.toLowerCase().includes(searchTerm));
+                const filteredProducts = productList.filter(product => product.name.toLowerCase().includes(searchTerm) || product.description.toLowerCase().includes(searchTerm));
                 displayProducts(filteredProducts.filter(p => p.category === 'mais-pedidos'), maisPedidosDiv);
                 displayProducts(filteredProducts.filter(p => p.category === 'monte-do-seu-jeito'), monteDoSeuJeitoDiv);
             });
