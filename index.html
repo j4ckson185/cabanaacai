@@ -31,26 +31,19 @@
         .header img.logo {
             max-width: 100px;
             height: auto;
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: relative;
             z-index: 1;
+            margin-top: 20px;
         }
         .header h1 {
             font-size: 2em;
             margin: 10px 0;
-            position: absolute;
-            top: 130px; /* Ajuste conforme necessário */
-            left: 50%;
-            transform: translateX(-50%);
+            position: relative;
             z-index: 1;
         }
         .header .header-banner {
             width: 100%;
             height: auto;
-            position: relative;
-            top: -20px;
         }
         .header-content {
             position: relative;
@@ -132,92 +125,6 @@
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
-    <script>
-        function openMenu() {
-            document.getElementById("side-menu").style.width = "250px";
-        }
-
-        function closeMenu() {
-            document.getElementById("side-menu").style.width = "0";
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const maisPedidosDiv = document.querySelector('#os-mais-pedidos .products');
-            const monteDoSeuJeitoDiv = document.querySelector('#monte-do-seu-jeito .products');
-
-            async function loadProducts() {
-                const querySnapshot = await getDocs(collection(db, "products"));
-                const maisPedidosProducts = [];
-                const monteDoSeuJeitoProducts = [];
-                
-                querySnapshot.forEach((doc) => {
-                    const product = doc.data();
-                    if (product.category === 'mais-pedidos') {
-                        maisPedidosProducts.push(product);
-                    } else if (product.category === 'monte-do-seu-jeito') {
-                        monteDoSeuJeitoProducts.push(product);
-                    }
-                });
-
-                displayProducts(maisPedidosProducts, maisPedidosDiv);
-                displayProducts(monteDoSeuJeitoProducts, monteDoSeuJeitoDiv);
-            }
-
-            function displayProducts(productList, container) {
-                container.innerHTML = '';
-                productList.forEach(product => {
-                    const productDiv = document.createElement('div');
-                    productDiv.classList.add('product');
-                    productDiv.innerHTML = `
-                        <a href="${product.url}" target="_blank">
-                            <img src="${product.image}" alt="${product.name}">
-                        </a>
-                        <div class="product-details">
-                            <h3>${product.name}</h3>
-                            <p>${product.description}</p>
-                            <p><strong>Preço:</strong> R$ ${product.price}</p>
-                        </div>
-                    `;
-                    container.appendChild(productDiv);
-                });
-            }
-
-            loadProducts();
-
-            // Verificação de horários de funcionamento
-            const horarios = {
-                'wednesday': { open: '12:30', close: '22:30' },
-                'thursday': { open: '12:30', close: '22:30' },
-                'friday': { open: '12:30', close: '22:30' },
-                'saturday': { open: '12:30', close: '22:30' },
-                'sunday': { open: '12:30', close: '22:30' }
-            };
-
-            const now = moment().tz("America/Sao_Paulo");
-            const day = now.format('dddd').toLowerCase();
-            const currentTime = now.hours() * 60 + now.minutes();
-            const openTime = horarios[day]?.open ? parseInt(horarios[day].open.split(':')[0]) * 60 + parseInt(horarios[day].open.split(':')[1]) : null;
-            const closeTime = horarios[day]?.close ? parseInt(horarios[day].close.split(':')[0]) * 60 + parseInt(horarios[day].close.split(':')[1]) : null;
-
-            if (openTime !== null && closeTime !== null) {
-                if (currentTime < openTime || currentTime > closeTime) {
-                    document.getElementById('closed-message').style.display = 'block';
-                }
-            } else {
-                document.getElementById('closed-message').style.display = 'block';
-                document.getElementById('closed-message').innerText = 'A loja está fechada hoje.';
-            }
-
-            // Função de pesquisa
-            const searchInput = document.getElementById('search-input');
-            searchInput.addEventListener('input', function() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const filteredProducts = products.filter(product => product.name.toLowerCase().includes(searchTerm) || product.description.toLowerCase().includes(searchTerm));
-                displayProducts(filteredProducts.filter(p => p.category === 'mais-pedidos'), maisPedidosDiv);
-                displayProducts(filteredProducts.filter(p => p.category === 'monte-do-seu-jeito'), monteDoSeuJeitoDiv);
-            });
-        });
-    </script>
 </head>
 <body>
     <div class="top-bar">
@@ -340,6 +247,14 @@
             displayProducts(filteredProducts.filter(p => p.category === 'monte-do-seu-jeito'), monteDoSeuJeitoDiv);
         });
     });
+
+    function openMenu() {
+        document.getElementById("side-menu").style.width = "250px";
+    }
+
+    function closeMenu() {
+        document.getElementById("side-menu").style.width = "0";
+    }
 </script>
 </body>
 </html>
