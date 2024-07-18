@@ -5,26 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página de Pagamento</title>
     <link rel="stylesheet" href="pagina_de_pagamento.css">
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
-            authDomain: "cabana-8d55e.firebaseapp.com",
-            databaseURL: "https://cabana-8d55e-default-rtdb.firebaseio.com",
-            projectId: "cabana-8d55e",
-            storageBucket: "cabana-8d55e.appspot.com",
-            messagingSenderId: "706144237954",
-            appId: "1:706144237954:web:345c10370972486afc779b",
-            measurementId: "G-96Y337GYT8"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-    </script>
-    <style>
-        /* Insira aqui o conteúdo de pagina_de_pagamento.css, caso não esteja usando um arquivo CSS separado */
-    </style>
+    <script src="pagina_de_pagamento.js" defer></script>
 </head>
 <body>
     <nav>
@@ -97,10 +78,10 @@
 
             <div class="summary">
                 <h3>Resumo do Pedido</h3>
-                <p>Subtotal: <span id="subtotal">R$ 0,00</span></p>
+                <p>Subtotal: <span id="subtotal"></span></p>
                 <p>Taxa de Entrega: R$ 3,00</p>
                 <p>Desconto: <span id="desconto">R$ 0,00</span></p>
-                <p>Total: <span id="total">R$ 0,00</span></p>
+                <p>Total: <span id="total"></span></p>
             </div>
 
             <div class="form-group">
@@ -118,7 +99,5 @@
             </div>
         </form>
     </div>
-
-    <script src="pagina_de_pagamento.js"></script>
 </body>
 </html>
