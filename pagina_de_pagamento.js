@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Carregar resumo do pedido
     updateOrderSummary();
 
-    // Função para exibir ou ocultar a seção de troco
+    // Função para exibir ou ocultar a seção de troco e mensagem PIX
     document.querySelectorAll('input[name="payment-method"]').forEach((radio) => {
         radio.addEventListener('change', function() {
             const trocoSection = document.getElementById('troco-section');
