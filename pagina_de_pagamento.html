@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="pagina_de_pagamento.css">
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-    <script src="pagina_de_pagamento.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-messaging.js"></script>
 </head>
 <body>
     <nav>
@@ -80,10 +80,10 @@
 
             <div class="summary">
                 <h3>Resumo do Pedido</h3>
-                <p>Subtotal: <span id="subtotal"></span></p>
+                <p>Subtotal: <span id="subtotal">R$ 0,00</span></p>
                 <p>Taxa de Entrega: R$ 3,00</p>
                 <p>Desconto: <span id="desconto">R$ 0,00</span></p>
-                <p>Total: <span id="total"></span></p>
+                <p>Total: <span id="total">R$ 0,00</span></p>
             </div>
 
             <div class="form-group">
