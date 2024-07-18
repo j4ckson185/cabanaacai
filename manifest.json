@@ -1,0 +1,21 @@
+{
+  "name": "Cabana Açaí",
+  "short_name": "CabanaAçaí",
+  "description": "Aplicativo da Cabana Açaí",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/tHm2PK1/logo-cabana.jpg",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.ibb.co/tHm2PK1/logo-cabana.jpg",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#663399",
+  "theme_color": "#663399"
+}
