@@ -12,6 +12,7 @@
         <a href="promos.html">Promos</a>
         <a href="carrinho.html">Carrinho</a>
     </nav>
+
     <div class="container">
         <h1>Página de Pagamento</h1>
         <form id="formulario-pagamento">
@@ -19,6 +20,7 @@
                 <label for="nome-sobrenome">Nome e Sobrenome:</label>
                 <input type="text" id="nome-sobrenome" name="nome-sobrenome" required>
             </div>
+            
             <div class="form-row">
                 <div class="form-group">
                     <label for="cep">CEP:</label>
@@ -30,6 +32,7 @@
                     <input type="tel" id="telefone" name="telefone" pattern="\d{11}" placeholder="84988731028" required>
                 </div>
             </div>
+            
             <div class="form-row">
                 <div class="form-group">
                     <label for="endereco">Endereço:</label>
@@ -40,6 +43,7 @@
                     <input type="text" id="numero" name="numero" required>
                 </div>
             </div>
+            
             <div class="form-group">
                 <label for="complemento">Complemento:</label>
                 <input type="text" id="complemento" name="complemento">
@@ -56,29 +60,33 @@
                 <label>
                     <input type="radio" name="payment-method" value="pix" required onclick="showPixMessage()"> PIX
                 </label>
-                <p id="pix-info" class="pix-message" style="display:none;">Nosso Pix: 84 9 8873-1028 (Pagseguro). Envie o comprovante para nosso whatsapp após finalizar este pedido.</p>
+                <p id="pix-info" class="pix-message" style="display:none;">Nosso PIX: 84 9 8873-1028 (Pagseguro). Envie o comprovante para nosso whatsapp após finalizar este pedido.</p>
             </div>
+
             <div id="troco-section" class="form-group" style="display:none;">
                 <label for="troco">Precisa de troco para:</label>
                 <input type="text" id="troco" name="troco">
             </div>
+
             <h2>Opções de Entrega</h2>
             <div class="form-group">
                 <label>
                     <input type="checkbox" name="delivery-option" value="motoboy" checked disabled> Motoboy (R$ 3,00)
                 </label>
             </div>
+
             <div class="summary">
                 <h3>Resumo do Pedido</h3>
                 <p>Subtotal: <span id="subtotal"></span></p>
                 <p>Taxa de Entrega: R$ 3,00</p>
-                <p>Desconto: <span id="desconto">R$ 0,00</span></p>
                 <p>Total: <span id="total"></span></p>
             </div>
+
             <div class="form-group">
                 <label for="cupom">Código do Cupom:</label>
                 <input type="text" id="cupom" name="cupom" placeholder="Digite um cupom de desconto aqui caso possua.">
             </div>
+
             <div class="buttons">
                 <button class="button button-whatsapp" id="botao-finalizar-pedido" type="button" onclick="enviarPedidoWhatsApp()">
                     <img src="https://img.icons8.com/ios-filled/24/ffffff/whatsapp.png" alt="WhatsApp" class="button-icon">
@@ -90,166 +98,6 @@
         </form>
     </div>
 
-    <script>
-        // Função para formatar o valor como moeda
-        function formatarMoeda(valor) {
-            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
-
-        // Função para atualizar o resumo do pedido
-        function updateOrderSummary() {
-            const subtotal = document.getElementById('subtotal');
-            const total = document.getElementById('total');
-
-            // Recuperar carrinho do localStorage
-            const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-
-            // Calcular subtotal
-            let subtotalValue = 0;
-            carrinho.forEach(item => {
-                let valorProduto = parseFloat(item.preco) || 0;
-                const extras1 = item.extras1 || [];
-                const extras2 = item.extras2 || [];
-                const allExtras = extras1.concat(extras2);
-                allExtras.forEach(extra => {
-                    valorProduto += parseFloat(extra.match(/\+R\$([0-9,]+)/)[1].replace(',', '.'));
-                });
-                subtotalValue += valorProduto;
-            });
-
-            subtotal.textContent = formatarMoeda(subtotalValue);
-            total.textContent = formatarMoeda(subtotalValue + 3); // Total considerando taxa de entrega fixa de R$ 3,00
-        }
-
-        // Função para mostrar mensagem específica do Pix
-        function showPixMessage() {
-            const pixMessage = document.getElementById('pix-info');
-            pixMessage.style.display = 'block';
-        }
-
-        // Função para enviar o pedido pelo WhatsApp e salvar no Firestore
-        async function enviarPedidoWhatsApp() {
-            const nomeSobrenome = document.getElementById('nome-sobrenome').value;
-            const cep = document.getElementById('cep').value;
-            const endereco = document.getElementById('endereco').value;
-            const numero = document.getElementById('numero').value;
-            const complemento = document.getElementById('complemento').value;
-            const telefone = document.getElementById('telefone').value;
-            const metodoPagamento = document.querySelector('input[name="payment-method"]:checked').value;
-            const troco = document.getElementById('troco').value;
-            const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-
-            let message = `*Pedido Cabana Açaí*\n\n`;
-            message += `*Nome:* ${nomeSobrenome}\n`;
-            message += `*CEP:* ${cep}\n`;
-            message += `*Endereço:* ${endereco}, ${numero}\n`;
-            if (complemento) {
-                message += `*Complemento:* ${complemento}\n`;
-            }
-            message += `*Telefone:* ${telefone}\n\n`;
-
-            message += `*Método de Pagamento:* ${metodoPagamento}\n`;
-            if (metodoPagamento === 'dinheiro' && troco) {
-                message += `*Troco para:* ${troco}\n`;
-            }
-
-            message += `\n*Detalhes do Pedido:*\n`;
-            carrinho.forEach(item => {
-                let itemDetails = `-${item.nome}: ${formatarMoeda(item.preco)}\n`;
-                if (item.sabores1 && item.sabores2) {
-                    itemDetails += `  Sabores (Açaí 1): ${item.sabores1.join(', ')}\n`;
-                    itemDetails += `  Sabores (Açaí 2): ${item.sabores2.join(', ')}\n`;
-                    itemDetails += `  Acompanhamentos (Açaí 1): ${item.acompanhamentos1.join(', ')}\n`;
-                    itemDetails += `  Acompanhamentos (Açaí 2): ${item.acompanhamentos2.join(', ')}\n`;
-                    itemDetails += `  Itens Extras (Açaí 1): ${item.extras1.join(', ')}\n`;
-                    itemDetails += `  Itens Extras (Açaí 2): ${item.extras2.join(', ')}\n`;
-                } else {
-                    itemDetails += `  Sabores: ${item.sabores ? item.sabores.join(', ') : item.sabores1.join(', ')}\n`;
-                    itemDetails += `  Acompanhamentos: ${item.acompanhamentos ? item.acompanhamentos.join(', ') : item.acompanhamentos1.join(', ')}\n`;
-                    itemDetails += `  Itens Extras: ${item.extras ? item.extras.join(', ') : item.extras1.join(', ')}\n`;
-                }
-                message += itemDetails;
-            });
-
-            const totalPedido = parseFloat(document.getElementById('subtotal').textContent.replace('R$', '').replace(',', '.')) + 3; // Total do pedido considerando taxa de entrega
-            message += `\n*Taxa de Entrega:* R$ 3,00\n`;
-            message += `*Total do Pedido:* ${formatarMoeda(totalPedido)}`;
-
-            const whatsappLink = `https://wa.me/5584988731028?text=${encodeURIComponent(message)}`;
-            window.open(whatsappLink, '_blank');
-
-            // Salvar o pedido no Firestore
-            try {
-                await db.collection("orders").add({
-                    nomeSobrenome: nomeSobrenome,
-                    cep: cep,
-                    endereco: endereco,
-                    numero: numero,
-                    complemento: complemento,
-                    telefone: telefone,
-                    metodoPagamento: metodoPagamento,
-                    troco: troco,
-                    itens: carrinho,
-                    total: formatarMoeda(totalPedido),
-                    status: "Pendente",
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                console.log("Pedido salvo com sucesso!");
-            } catch (error) {
-                console.error("Erro ao salvar pedido: ", error);
-            }
-        }
-
-        // Função para consultar o CEP automaticamente ao digitar
-        async function consultarCep() {
-            const cep = document.getElementById('cep').value;
-            const resultadoCep = document.getElementById('resultado-cep');
-            const cepFormatado = cep.replace(/\D/g, '');
-
-            if (cepFormatado.length === 8) {
-                try {
-                    const response = await fetch(`https://viacep.com.br/ws/${cepFormatado}/json/`);
-                    const data = await response.json();
-
-                    if (data.erro) {
-                        resultadoCep.innerText = 'CEP não encontrado. Por favor, verifique o CEP informado.';
-                    } else {
-                        resultadoCep.innerText = `Endereço: ${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`;
-                        document.getElementById('endereco').value = data.logradouro;
-                    }
-                } catch (error) {
-                    console.error('Erro ao consultar CEP:', error);
-                    resultadoCep.innerText = 'Ocorreu um erro ao consultar o CEP. Por favor, tente novamente mais tarde.';
-                }
-            } else {
-                resultadoCep.innerText = '';
-            }
-        }
-
-        // Evento ao carregar a página
-        document.addEventListener('DOMContentLoaded', () => {
-            updateOrderSummary();
-
-            // Eventos de mudança nos métodos de pagamento
-            const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
-            const trocoSection = document.getElementById('troco-section');
-            const pixInfo = document.getElementById('pix-info');
-
-            paymentMethodRadios.forEach(radio => {
-                radio.addEventListener('change', () => {
-                    if (radio.value === 'dinheiro') {
-                        trocoSection.style.display = 'block';
-                        pixInfo.style.display = 'none';
-                    } else if (radio.value === 'pix') {
-                        trocoSection.style.display = 'none';
-                        pixInfo.style.display = 'block';
-                    } else {
-                        trocoSection.style.display = 'none';
-                        pixInfo.style.display = 'none';
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="pagina_de_pagamento.js"></script>
 </body>
 </html>
