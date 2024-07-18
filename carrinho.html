@@ -154,26 +154,26 @@
 
                     if (item.sabores1 && item.sabores2) {
                         detalhes += `
-                            <p>Sabores (Açaí 1):</p>
+                            <p><strong>Sabores (Açaí 1)</strong><:</p>
                             <ul class="sabores">${item.sabores1.map(sabor => `<li>${sabor}</li>`).join('')}</ul>
-                            <p>Acompanhamentos (Açaí 1):</p>
+                            <p><strong>Acompanhamentos (Açaí 1)</strong>:</p>
                             <ul class="acompanhamentos">${item.acompanhamentos1.map(acompanhamento => `<li>${acompanhamento}</li>`).join('')}</ul>
-                            <p>Itens Extras (Açaí 1):</p>
+                            <p><strong>Itens Extras (Açaí 1)</strong>:</p>
                             <ul class="extras">${item.extras1.map(extra => `<li>${extra}</li>`).join('')}</ul>
-                            <p>Sabores (Açaí 2):</p>
+                            <p><strong>Sabores (Açaí 2)</strong>:</p>
                             <ul class="sabores">${item.sabores2.map(sabor => `<li>${sabor}</li>`).join('')}</ul>
-                            <p>Acompanhamentos (Açaí 2):</p>
+                            <p><strong>Acompanhamentos (Açaí 2)</strong>:</p>
                             <ul class="acompanhamentos">${item.acompanhamentos2.map(acompanhamento => `<li>${acompanhamento}</li>`).join('')}</ul>
-                            <p>Itens Extras (Açaí 2):</p>
+                            <p><strong>Itens Extras (Açaí 2)</strong>:</p>
                             <ul class="extras">${item.extras2.map(extra => `<li>${extra}</li>`).join('')}</ul>
                         `;
                     } else {
                         detalhes += `
-                            <p>Sabores:</p>
+                            <p><strong>Sabores</strong>:</p>
                             <ul class="sabores">${item.sabores.map(sabor => `<li>${sabor}</li>`).join('')}</ul>
-                            <p>Acompanhamentos:</p>
+                            <p><strong>Acompanhamentos</strong>:</p>
                             <ul class="acompanhamentos">${item.acompanhamentos.map(acompanhamento => `<li>${acompanhamento}</li>`).join('')}</ul>
-                            <p>Itens Extras:</p>
+                            <p></strong>Itens Extras</strong>:</p>
                             <ul class="extras">${item.extras.map(extra => `<li>${extra}</li>`).join('')}</ul>
                         `;
                     }
