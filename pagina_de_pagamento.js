@@ -1,3 +1,74 @@
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
+    authDomain: "cabana-8d55e.firebaseapp.com",
+    databaseURL: "https://cabana-8d55e-default-rtdb.firebaseio.com",
+    projectId: "cabana-8d55e",
+    storageBucket: "cabana-8d55e.appspot.com",
+    messagingSenderId: "706144237954",
+    appId: "1:706144237954:web:345c10370972486afc779b",
+    measurementId: "G-96Y337GYT8"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateOrderSummary();
+    consultarCep();
+
+    // Função para exibir ou ocultar a seção de troco
+    document.querySelectorAll('input[name="payment-method"]').forEach((radio) => {
+        radio.addEventListener('change', function() {
+            const trocoSection = document.getElementById('troco-section');
+            if (this.value === 'dinheiro') {
+                trocoSection.style.display = 'block';
+                document.getElementById('pix-info').style.display = 'none';
+            } else if (this.value === 'pix') {
+                trocoSection.style.display = 'none';
+                document.getElementById('pix-info').style.display = 'block';
+            } else {
+                trocoSection.style.display = 'none';
+                document.getElementById('pix-info').style.display = 'none';
+            }
+        });
+    });
+
+    // Evento para o botão de envio do pedido
+    document.getElementById('botao-finalizar-pedido').addEventListener('click', enviarPedidoWhatsApp);
+});
+
+// Função para formatar o valor como moeda
+function formatarMoeda(valor) {
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+// Função para atualizar o resumo do pedido
+function updateOrderSummary() {
+    const subtotal = document.getElementById('subtotal');
+    const total = document.getElementById('total');
+
+    // Recuperar carrinho do sessionStorage
+    const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
+
+    // Calcular subtotal
+    let subtotalValue = 0;
+    carrinho.forEach(item => {
+        let valorProduto = parseFloat(item.preco);
+        subtotalValue += valorProduto;
+    });
+
+    subtotal.textContent = formatarMoeda(subtotalValue);
+    total.textContent = formatarMoeda(subtotalValue + 3); // Total considerando taxa de entrega fixa de R$ 3,00
+}
+
+// Função para mostrar mensagem específica do Pix
+function showPixMessage() {
+    const pixMessage = document.getElementById('pix-info');
+    pixMessage.style.display = 'block';
+}
+
 // Função para enviar o pedido pelo WhatsApp
 function enviarPedidoWhatsApp() {
     const nomeSobrenome = document.getElementById('nome-sobrenome').value;
@@ -26,7 +97,7 @@ function enviarPedidoWhatsApp() {
 
     message += `\n*Detalhes do Pedido:*\n`;
     carrinho.forEach(item => {
-        let itemDetails = `-${item.nome}: R$ ${parseFloat(item.preco).toFixed(2)}\n`;
+        let itemDetails = `-${item.nome}: ${formatarMoeda(item.preco)}\n`;
         if (item.sabores1 && item.sabores2) {
             itemDetails += `  Sabores (Açaí 1): ${item.sabores1.join(', ')}\n`;
             itemDetails += `  Sabores (Açaí 2): ${item.sabores2.join(', ')}\n`;
@@ -42,10 +113,13 @@ function enviarPedidoWhatsApp() {
         message += itemDetails;
     });
 
-    const subtotalValue = carrinho.reduce((total, item) => total + parseFloat(item.preco), 0);
+    const subtotalValue = parseFloat(document.getElementById('subtotal').textContent.replace('R$', '').replace(',', '.'));
     const totalPedido = subtotalValue + 3; // Total do pedido considerando taxa de entrega
     message += `\n*Taxa de Entrega:* R$ 3,00\n`;
-    message += `*Total do Pedido:* R$ ${totalPedido.toFixed(2)}`;
+    message += `*Total do Pedido:* ${formatarMoeda(totalPedido)}`;
+
+    const whatsappLink = `https://wa.me/5584986468750?text=${encodeURIComponent(message)}`;
+    window.open(whatsappLink, '_blank');
 
     // Salvar o pedido no Firestore
     db.collection("orders").add({
@@ -57,17 +131,39 @@ function enviarPedidoWhatsApp() {
         telefone: telefone,
         metodoPagamento: metodoPagamento,
         troco: troco,
-        itens: carrinho,
-        subtotal: subtotalValue.toFixed(2),
-        total: totalPedido.toFixed(2),
+        carrinho: carrinho,
+        total: formatarMoeda(totalPedido),
         status: "Pendente",
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then((docRef) => {
         console.log("Pedido salvo com ID: ", docRef.id);
-        // Redirecionar para WhatsApp após salvar o pedido
-        const whatsappLink = `https://wa.me/5584988731028?text=${encodeURIComponent(message)}`;
-        window.open(whatsappLink, '_blank');
     }).catch((error) => {
         console.error("Erro ao salvar pedido: ", error);
     });
+}
+
+// Função para consultar o CEP automaticamente ao digitar
+async function consultarCep() {
+    const cep = document.getElementById('cep').value;
+    const resultadoCep = document.getElementById('resultado-cep');
+    const cepFormatado = cep.replace(/\D/g, '');
+
+    if (cepFormatado.length === 8) {
+        try {
+            const response = await fetch(`https://viacep.com.br/ws/${cepFormatado}/json/`);
+            const data = await response.json();
+
+            if (data.erro) {
+                resultadoCep.innerText = 'CEP não encontrado. Por favor, verifique o CEP informado.';
+            } else {
+                resultadoCep.innerText = `Endereço: ${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`;
+                document.getElementById('endereco').value = data.logradouro;
+            }
+        } catch (error) {
+            console.error('Erro ao consultar CEP:', error);
+            resultadoCep.innerText = 'Ocorreu um erro ao consultar o CEP. Por favor, tente novamente mais tarde.';
+        }
+    } else {
+        resultadoCep.innerText = '';
+    }
 }
