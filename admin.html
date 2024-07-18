@@ -1,47 +1,242 @@
-document.addEventListener('DOMContentLoaded', () => {
-    loadOrders();
-    db.collection("orders").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-        loadOrders();
-    });
-});
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração do Cardápio Digital</title>
+    <link rel="stylesheet" href="admin.css">
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-pF2lRStLTN9Xw9aYQj962qdNFyUXI2E",
+            authDomain: "cabana-8d55e.firebaseapp.com",
+            databaseURL: "https://cabana-8d55e-default-rtdb.firebaseio.com",
+            projectId: "cabana-8d55e",
+            storageBucket: "cabana-8d55e.appspot.com",
+            messagingSenderId: "706144237954",
+            appId: "1:706144237954:web:345c10370972486afc779b",
+            measurementId: "G-96Y337GYT8"
+        };
 
-function loadOrders() {
-    const orderList = document.getElementById('order-list');
-    orderList.innerHTML = '';
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+        const db = firebase.firestore();
 
-    db.collection("orders").orderBy("timestamp", "desc").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            const order = doc.data();
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <strong>Pedido ${doc.id}</strong>
-                <p>Cliente: ${order.nomeSobrenome}</p>
-                <p>Endereço: ${order.endereco}</p>
-                <p>Telefone: ${order.telefone}</p>
-                <p>Email: ${order.email}</p>
-                <p>Método de Pagamento: ${order.metodoPagamento}</p>
-                <p>Total: ${order.total}</p>
-                <p>Status: ${order.status}</p>
-                <p>Data e Hora: ${order.timestamp ? order.timestamp.toDate().toLocaleString() : 'N/A'}</p>
-                <button onclick="updateOrderStatus('${doc.id}', '${order.status}')">Atualizar Status</button>
-            `;
-            orderList.appendChild(li);
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
+            const notificationTitle = payload.notification.title;
+            const notificationOptions = {
+                body: payload.notification.body,
+                icon: payload.notification.icon
+            };
+            new Notification(notificationTitle, notificationOptions);
         });
-    }).catch((error) => {
-        console.error("Erro ao carregar pedidos do Firestore: ", error);
-    });
-}
 
-function updateOrderStatus(orderId, currentStatus) {
-    const newStatus = prompt('Digite o novo status do pedido:', currentStatus);
-    if (newStatus) {
-        db.collection("orders").doc(orderId).update({
-            status: newStatus
-        }).then(() => {
-            console.log('Status do pedido atualizado');
-            loadOrders();
-        }).catch((error) => {
-            console.error('Erro ao atualizar status do pedido:', error);
+        function initFCM() {
+            messaging.requestPermission()
+            .then(() => {
+                console.log('Notification permission granted.');
+                return messaging.getToken();
+            })
+            .then((token) => {
+                console.log('FCM Token:', token);
+            })
+            .catch((err) => {
+                console.log('Unable to get permission to notify.', err);
+            });
+        }
+
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.admin-section');
+            sections.forEach(section => {
+                section.style.display = section.id === sectionId ? 'block' : 'none';
+            });
+        }
+
+        function loadProducts() {
+            db.collection('products').get().then((querySnapshot) => {
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const product = doc.data();
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${product.name}</span>
+                        <button onclick="editProduct('${doc.id}')">Editar</button>
+                        <button onclick="deleteProduct('${doc.id}')">Excluir</button>
+                    `;
+                    productList.appendChild(li);
+                });
+            });
+        }
+
+        function editProduct(productId) {
+            db.collection('products').doc(productId).get().then((doc) => {
+                if (doc.exists) {
+                    const product = doc.data();
+                    document.getElementById('product-id').value = productId;
+                    document.getElementById('product-name').value = product.name;
+                    document.getElementById('product-description').value = product.description;
+                    document.getElementById('product-price').value = product.price;
+                    document.getElementById('product-category').value = product.category;
+                } else {
+                    console.log('No such document!');
+                }
+            }).catch((error) => {
+                console.log('Error getting document:', error);
+            });
+        }
+
+        function deleteProduct(productId) {
+            db.collection('products').doc(productId).delete().then(() => {
+                console.log('Document successfully deleted!');
+                loadProducts();
+            }).catch((error) => {
+                console.error('Error removing document: ', error);
+            });
+        }
+
+        document.getElementById('product-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const productId = document.getElementById('product-id').value;
+            const productName = document.getElementById('product-name').value;
+            const productDescription = document.getElementById('product-description').value;
+            const productPrice = document.getElementById('product-price').value;
+            const productCategory = document.getElementById('product-category').value;
+
+            if (productId) {
+                db.collection('products').doc(productId).update({
+                    name: productName,
+                    description: productDescription,
+                    price: productPrice,
+                    category: productCategory
+                }).then(() => {
+                    console.log('Document successfully updated!');
+                    loadProducts();
+                    document.getElementById('product-form').reset();
+                }).catch((error) => {
+                    console.error('Error updating document: ', error);
+                });
+            } else {
+                db.collection('products').add({
+                    name: productName,
+                    description: productDescription,
+                    price: productPrice,
+                    category: productCategory
+                }).then(() => {
+                    console.log('Document successfully written!');
+                    loadProducts();
+                    document.getElementById('product-form').reset();
+                }).catch((error) => {
+                    console.error('Error writing document: ', error);
+                });
+            }
         });
-    }
-}
+
+        function loadOrders() {
+            console.log('Função loadOrders chamada');
+            const orderList = document.getElementById('order-list');
+            orderList.innerHTML = '';
+
+            db.collection("orders").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+                console.log("Pedidos recebidos do Firestore: ", querySnapshot.size);
+                querySnapshot.forEach((doc) => {
+                    const order = doc.data();
+                    console.log("Pedido:", order);
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <strong>Pedido ${doc.id}</strong>
+                        <p>Cliente: ${order.nomeSobrenome}</p>
+                        <p>Endereço: ${order.endereco}</p>
+                        <p>Telefone: ${order.telefone}</p>
+                        <p>Email: ${order.email}</p>
+                        <p>Método de Pagamento: ${order.metodoPagamento}</p>
+                        <p>Total: ${order.total}</p>
+                        <p>Status: ${order.status}</p>
+                        <p>Data e Hora: ${order.timestamp ? order.timestamp.toDate().toLocaleString() : 'N/A'}</p>
+                        <button onclick="updateOrderStatus('${doc.id}', '${order.status}')">Atualizar Status</button>
+                    `;
+                    orderList.appendChild(li);
+                });
+            }, (error) => {
+                console.error("Erro ao carregar pedidos do Firestore: ", error);
+            });
+        }
+
+        function updateOrderStatus(orderId, currentStatus) {
+            const newStatus = prompt('Digite o novo status do pedido:', currentStatus);
+            if (newStatus) {
+                db.collection("orders").doc(orderId).update({
+                    status: newStatus
+                }).then(() => {
+                    console.log('Status do pedido atualizado');
+                    loadOrders();
+                }).catch((error) => {
+                    console.error('Erro ao atualizar status do pedido:', error);
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+        });
+    </script>
+</head>
+<body onload="initFCM()">
+    <header>
+        <h1>Administração do Cardápio Digital</h1>
+        <nav>
+            <ul>
+                <li><a href="editar.html">Editar Produtos</a></li>
+                <li><a href="horario.html">Horário da Loja</a></li>
+                <li><a href="#" onclick="showSection('view-orders'); loadOrders();">Visualizar Pedidos</a></li>
+                <li><a href="#" onclick="showSection('reports')">Relatórios</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="manage-products" class="admin-section">
+            <h2>Gerenciar Produtos</h2>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <label for="product-name">Nome do Produto</label>
+                <input type="text" id="product-name" required>
+                <label for="product-description">Descrição</label>
+                <textarea id="product-description" required></textarea>
+                <label for="product-price">Preço</label>
+                <input type="number" id="product-price" step="0.01" required>
+                <label for="product-image">Foto do Produto</label>
+                <input type="file" id="product-image" accept="image/*" required>
+                <label for="product-category">Categoria</label>
+                <select id="product-category" required></select>
+                <button type="submit">Salvar Produto</button>
+            </form>
+            <ul id="product-list"></ul>
+        </section>
+        <section id="manage-categories" class="admin-section">
+            <h2>Gerenciar Categorias</h2>
+            <form id="category-form">
+                <input type="hidden" id="category-id">
+                <label for="category-name">Nome da Categoria</label>
+                <input type="text" id="category-name" required>
+                <button type="submit">Salvar Categoria</button>
+            </form>
+            <ul id="category-list"></ul>
+        </section>
+        <section id="view-orders" class="admin-section">
+            <h2>Visualizar Pedidos</h2>
+            <ul id="order-list"></ul>
+        </section>
+        <section id="reports" class="admin-section">
+            <h2>Relatórios</h2>
+            <button onclick="generateReport('daily')">Relatório Diário</button>
+            <button onclick="generateReport('weekly')">Relatório Semanal</button>
+            <button onclick="generateReport('monthly')">Relatório Mensal</button>
+            <div id="report-result"></div>
+        </section>
+    </main>
+    <script src="admin.js"></script>
+</body>
+</html>
