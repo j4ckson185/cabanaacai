@@ -103,13 +103,9 @@
     <div class="container">
         <h1>Combo 2 Açaís ou Cremes 1 Litro</h1>
         <div class="opcoes">
-            <h2>Escolha os Sabores para Açaí 1 (selecione 1 ou 2)</h2>
-            <ul class="sabores" id="sabores1">
-                <li>
-                    <input type="checkbox" id="acai-tradicional1" name="sabor1" value="Açaí tradicional">
-                    <label for="acai-tradicional1">Açaí tradicional</label>
-                    <p class="descricao">Se desejar metade açai e metade creme, será necessário que marque esta opção e o creme que deseja.</p>
-                </li>
+            <h2>Escolha o Sabor para Açaí 1 (selecione 1 ou 2)</h2>
+            <ul class="sabores">
+                <li><input type="checkbox" id="acai-tradicional1" name="sabor1" value="Açaí tradicional"><label for="acai-tradicional1">Açaí tradicional</label></li>
                 <li><input type="checkbox" id="creme-ninho-trufado1" name="sabor1" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado1">Creme de Ninho Trufado</label></li>
                 <li><input type="checkbox" id="creme-cupuacu1" name="sabor1" value="Creme de Cupuaçu"><label for="creme-cupuacu1">Creme de Cupuaçu</label></li>
                 <li><input type="checkbox" id="creme-morango-especial1" name="sabor1" value="Creme de Morango Especial"><label for="creme-morango-especial1">Creme de Morango Especial</label></li>
@@ -132,13 +128,9 @@
                 <li><input type="checkbox" id="calda-de-chocolate1" name="acompanhamento1" value="Calda de Chocolate"><label for="calda-de-chocolate1">Calda de Chocolate</label></li>
                 <li><input type="checkbox" id="gotas-de-chocolate1" name="acompanhamento1" value="Gotas de Chocolate"><label for="gotas-de-chocolate1">Gotas de Chocolate</label></li>
             </ul>
-            <h2>Escolha os Sabores para Açaí 2 (selecione 1 ou 2)</h2>
-            <ul class="sabores" id="sabores2">
-                <li>
-                    <input type="checkbox" id="acai-tradicional2" name="sabor2" value="Açaí tradicional">
-                    <label for="acai-tradicional2">Açaí tradicional</label>
-                    <p class="descricao">Se desejar metade açai e metade creme, será necessário que marque esta opção e o creme que deseja.</p>
-                </li>
+            <h2>Escolha o Sabor para Açaí 2 (selecione 1 ou 2)</h2>
+            <ul class="sabores">
+                <li><input type="checkbox" id="acai-tradicional2" name="sabor2" value="Açaí tradicional"><label for="acai-tradicional2">Açaí tradicional</label></li>
                 <li><input type="checkbox" id="creme-ninho-trufado2" name="sabor2" value="Creme de Ninho Trufado"><label for="creme-ninho-trufado2">Creme de Ninho Trufado</label></li>
                 <li><input type="checkbox" id="creme-cupuacu2" name="sabor2" value="Creme de Cupuaçu"><label for="creme-cupuacu2">Creme de Cupuaçu</label></li>
                 <li><input type="checkbox" id="creme-morango-especial2" name="sabor2" value="Creme de Morango Especial"><label for="creme-morango-especial2">Creme de Morango Especial</label></li>
@@ -173,7 +165,7 @@
                 <li><input type="checkbox" id="m-m-extra" name="extra" value="M&M Extra (+R$2,49)"><label for="m-m-extra">M&M (+R$2,49)</label></li>
                 <li><input type="checkbox" id="leite-em-po-extra" name="extra" value="Leite em pó Extra (+R$2,49)"><label for="leite-em-po-extra">Leite em pó (+R$2,49)</label></li>
             </ul>
-            <button onclick="adicionarAoCarrinho('Combo 2 Açaís ou Cremes 1 Litro', 19.99)">Adicionar ao Carrinho</button>
+            <button onclick="adicionarAoCarrinho('Combo 2 Açaís ou Cremes 1 Litro', 39.99)">Adicionar ao Carrinho</button>
             <button class="ver-carrinho" style="display:none;" onclick="verCarrinho()">Ver Carrinho</button>
         </div>
     </div>
@@ -214,7 +206,7 @@
             });
 
             if (saboresSelecionados1.length < minSabores || saboresSelecionados2.length < minSabores) {
-                alert(`Você deve selecionar pelo menos ${minSabores} sabor para cada pote.`);
+                alert(`Você deve selecionar pelo menos ${minSabores} sabor para cada Açaí.`);
                 return;
             }
 
@@ -244,7 +236,7 @@
                 const selecionados = document.querySelectorAll('input[name="acompanhamento1"]:checked').length;
                 if (selecionados > maxAcompanhamentos) {
                     this.checked = false;
-                    alert(`Você só pode selecionar até ${maxAcompanhamentos} acompanhamentos para o Açaí 1.`);
+                    alert(`Você só pode selecionar até ${maxAcompanhamentos} acompanhamentos para Açaí 1.`);
                 }
             });
         });
@@ -254,7 +246,7 @@
                 const selecionados = document.querySelectorAll('input[name="acompanhamento2"]:checked').length;
                 if (selecionados > maxAcompanhamentos) {
                     this.checked = false;
-                    alert(`Você só pode selecionar até ${maxAcompanhamentos} acompanhamentos para o Açaí 2.`);
+                    alert(`Você só pode selecionar até ${maxAcompanhamentos} acompanhamentos para Açaí 2.`);
                 }
             });
         });
@@ -264,7 +256,7 @@
                 const selecionados = document.querySelectorAll('input[name="sabor1"]:checked').length;
                 if (selecionados > maxSabores) {
                     this.checked = false;
-                    alert(`Você só pode selecionar até ${maxSabores} sabores para o Açaí 1.`);
+                    alert(`Você só pode selecionar até ${maxSabores} sabores para Açaí 1.`);
                 }
             });
         });
@@ -274,7 +266,7 @@
                 const selecionados = document.querySelectorAll('input[name="sabor2"]:checked').length;
                 if (selecionados > maxSabores) {
                     this.checked = false;
-                    alert(`Você só pode selecionar até ${maxSabores} sabores para o Açaí 2.`);
+                    alert(`Você só pode selecionar até ${maxSabores} sabores para Açaí 2.`);
                 }
             });
         });
