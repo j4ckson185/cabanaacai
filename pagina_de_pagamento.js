@@ -43,8 +43,8 @@ function formatarMoeda(valor) {
 
 // Função para atualizar o resumo do pedido
 function updateOrderSummary() {
-    const subtotal = document.getElementById('subtotal');
-    const total = document.getElementById('total');
+    const subtotalElement = document.getElementById('subtotal');
+    const totalElement = document.getElementById('total');
 
     // Recuperar carrinho do sessionStorage
     const carrinho = JSON.parse(sessionStorage.getItem('carrinho')) || [];
@@ -62,8 +62,11 @@ function updateOrderSummary() {
         subtotalValue += valorProduto;
     });
 
-    subtotal.textContent = formatarMoeda(subtotalValue);
-    total.textContent = formatarMoeda(subtotalValue + 3); // Total considerando taxa de entrega fixa de R$ 3,00
+    const taxaEntrega = 3.00; // Taxa de entrega fixa
+    const totalValue = subtotalValue + taxaEntrega;
+
+    subtotalElement.textContent = formatarMoeda(subtotalValue);
+    totalElement.textContent = formatarMoeda(totalValue);
 }
 
 // Função para mostrar mensagem específica do Pix
@@ -116,7 +119,10 @@ function enviarPedidoWhatsApp() {
         message += itemDetails;
     });
 
-    const totalPedido = parseFloat(subtotal.textContent.replace('R$', '').replace(',', '.')) + 3; // Total do pedido considerando taxa de entrega
+    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('R$', '').replace(',', '.'));
+    const taxaEntrega = 3.00; // Taxa de entrega fixa
+    const totalPedido = subtotal + taxaEntrega;
+
     message += `\n*Taxa de Entrega:* R$ 3,00\n`;
     message += `*Total do Pedido:* ${formatarMoeda(totalPedido)}`;
 
