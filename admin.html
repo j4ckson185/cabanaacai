@@ -21,16 +21,56 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        function loadOrders() {
+            db.collection("orders").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+                const orderList = document.getElementById('order-list');
+                orderList.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const order = doc.data();
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <strong>Pedido ${doc.id}</strong>
+                        <p>Cliente: ${order.nomeSobrenome}</p>
+                        <p>Endereço: ${order.endereco}</p>
+                        <p>Telefone: ${order.telefone}</p>
+                        <p>Email: ${order.email}</p>
+                        <p>Método de Pagamento: ${order.metodoPagamento}</p>
+                        <p>Total: ${order.total}</p>
+                        <p>Status: ${order.status}</p>
+                        <button onclick="updateOrderStatus('${doc.id}', '${order.status}')">Atualizar Status</button>
+                    `;
+                    orderList.appendChild(li);
+                });
+            });
+        }
+
+        function updateOrderStatus(orderId, currentStatus) {
+            const newStatus = prompt('Digite o novo status do pedido:', currentStatus);
+            if (newStatus) {
+                db.collection("orders").doc(orderId).update({
+                    status: newStatus
+                }).then(() => {
+                    console.log('Status do pedido atualizado');
+                }).catch((error) => {
+                    console.error('Erro ao atualizar status do pedido:', error);
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOrders();
+        });
     </script>
 </head>
-<body onload="initFCM()">
+<body>
     <header>
         <h1>Administração do Cardápio Digital</h1>
         <nav>
             <ul>
-                <li><a href="#" onclick="showSection('manage-products');">Gerenciar Produtos</a></li>
-                <li><a href="#" onclick="showSection('manage-categories');">Gerenciar Categorias</a></li>
-                <li><a href="#" id="view-orders" onclick="showSection('view-orders');">Visualizar Pedidos</a></li>
+                <li><a href="#" onclick="showSection('manage-products')">Gerenciar Produtos</a></li>
+                <li><a href="#" onclick="showSection('manage-categories')">Gerenciar Categorias</a></li>
+                <li><a href="#" onclick="showSection('view-orders'); loadOrders();">Visualizar Pedidos</a></li>
                 <li><a href="#" onclick="showSection('reports')">Relatórios</a></li>
             </ul>
         </nav>
@@ -46,8 +86,6 @@
                 <textarea id="product-description" required></textarea>
                 <label for="product-price">Preço</label>
                 <input type="number" id="product-price" step="0.01" required>
-                <label for="product-image">Foto do Produto</label>
-                <input type="file" id="product-image" accept="image/*" required>
                 <label for="product-category">Categoria</label>
                 <select id="product-category" required></select>
                 <button type="submit">Salvar Produto</button>
@@ -76,6 +114,5 @@
             <div id="report-result"></div>
         </section>
     </main>
-    <script src="admin.js"></script>
 </body>
 </html>
