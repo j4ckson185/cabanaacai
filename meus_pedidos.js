@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadCustomerOrders(phoneNumber) {
-    const orders = JSON.parse(localStorage.getItem('pedidos')) || [];
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
     const orderList = document.getElementById('order-list');
     orderList.innerHTML = '';
 
