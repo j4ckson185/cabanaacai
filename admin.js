@@ -1,15 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Carregar produtos e categorias ao iniciar
+    loadOrders();
     loadProducts();
     loadCategories();
 
-    // Manipulação de formulários
     document.getElementById('product-form').addEventListener('submit', saveProduct);
     document.getElementById('category-form').addEventListener('submit', saveCategory);
-    document.getElementById('view-orders').addEventListener('click', loadOrders);
 });
 
-// Função para mostrar seções
 function showSection(sectionId) {
     document.querySelectorAll('.admin-section').forEach(section => {
         section.style.display = 'none';
@@ -18,7 +15,6 @@ function showSection(sectionId) {
 }
 
 function loadProducts() {
-    // Carregar produtos do servidor ou local storage
     const products = JSON.parse(localStorage.getItem('products')) || [];
     const productList = document.getElementById('product-list');
     productList.innerHTML = '';
@@ -131,43 +127,37 @@ function deleteCategory(index) {
 }
 
 function loadOrders() {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
     const orderList = document.getElementById('order-list');
     orderList.innerHTML = '';
 
-    db.collection("orders").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            const order = doc.data();
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <strong>Pedido ${doc.id}</strong>
-                <p>Cliente: ${order.nome}</p>
-                <p>Endereço: ${order.endereco}</p>
-                <p>Telefone: ${order.telefone}</p>
-                <p>Método de Pagamento: ${order.metodoPagamento}</p>
-                <p>Total: ${order.total}</p>
-                <p>Status: ${order.status}</p>
-                <button onclick="updateOrderStatus('${doc.id}', '${order.status}')">Atualizar Status</button>
-            `;
-            orderList.appendChild(li);
-        });
+    orders.forEach((order, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <strong>Pedido ${index + 1}</strong>
+            <p>Cliente: ${order.nome}</p>
+            <p>Endereço: ${order.endereco}</p>
+            <p>Telefone: ${order.telefone}</p>
+            <p>Email: ${order.email}</p>
+            <p>Método de Pagamento: ${order.metodoPagamento}</p>
+            <p>Total: ${order.total}</p>
+            <p>Status: ${order.status}</p>
+            <button onclick="updateOrderStatus(${index})">Atualizar Status</button>
+        `;
+        orderList.appendChild(li);
     });
 }
 
-function updateOrderStatus(orderId, currentStatus) {
-    const newStatus = prompt('Digite o novo status do pedido:', currentStatus);
+function updateOrderStatus(index) {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const newStatus = prompt('Digite o novo status do pedido:', orders[index].status);
     if (newStatus) {
-        db.collection("orders").doc(orderId).update({
-            status: newStatus
-        }).then(() => {
-            console.log('Status do pedido atualizado');
-            loadOrders();
-        }).catch((error) => {
-            console.error('Erro ao atualizar status do pedido:', error);
-        });
+        orders[index].status = newStatus;
+        localStorage.setItem('orders', JSON.stringify(orders));
+        loadOrders();
     }
 }
 
 function generateReport(type) {
-    // Função para gerar relatórios
     alert(`Gerando relatório ${type}`);
 }
