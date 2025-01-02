@@ -1,273 +1,543 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Search, X } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cabana Açaí - Painel Administrativo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-const Menu = () => {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([
-    'Todos',
-    'Apenas Cremes',
-    'Açaí com Creme de Ninho',
-    'Açaí com Creme de Ovomaltine',
-    'Açaí com Creme de Amendoim',
-    'Açaí puro',
-    'Monte seu Açaí'
-  ]);
-  const [selectedCategory, setSelectedCategory] = useState('Todos');
-  const [cartItems, setCartItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showCart, setShowCart] = useState(false);
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
 
-  // Mock products data
-  useEffect(() => {
-    setProducts([
-      {
-        id: 1,
-        name: 'Açaí com Ninho',
-        description: 'Açaí na tigela com creme de leite ninho',
-        price: 18.90,
-        category: 'Açaí com Creme de Ninho',
-        image: '/api/placeholder/100/100',
-        toppings: ['Granola', 'Banana', 'Morango', 'Leite em pó'],
-        minToppings: 1,
-        maxToppings: 3
-      },
-      // More products would be added here
-    ]);
-  }, []);
+        .sidebar {
+            width: 250px;
+            background-color: #6b46c1;
+            color: white;
+            height: 100vh;
+            padding: 1rem;
+        }
 
-  const Header = () => (
-    <div className="flex items-center justify-between p-4 bg-purple-700 text-white">
-      <img src="/api/placeholder/40/40" alt="Logo" className="w-10 h-10" />
-      <h1 className="text-2xl font-bold">Cabana Açaí</h1>
-      <div className="relative">
-        <ShoppingCart size={24} />
-        {cartItems.length > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-            {cartItems.length}
-          </span>
-        )}
-      </div>
+        .nav-button {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border: none;
+            background: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .nav-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-button.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .schedule-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .category-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: white;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .product-card {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .product-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #6b46c1;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #e53e3e;
+        }
+
+        input, select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h1 style="margin-bottom: 2rem;">Cabana Açaí Admin</h1>
+        <button class="nav-button active" data-section="schedule">⏰ Horário de Funcionamento</button>
+        <button class="nav-button" data-section="categories">📋 Categorias</button>
+        <button class="nav-button" data-section="products">📦 Produtos</button>
+        <button class="nav-button" data-section="customers">👥 Clientes</button>
+        <button class="nav-button" data-section="loyalty">⭐ Programa de Fidelidade</button>
     </div>
-  );
 
-  const Categories = () => (
-    <div className="overflow-x-auto p-4">
-      <div className="flex space-x-4">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-full whitespace-nowrap ${
-              selectedCategory === category
-                ? 'bg-purple-700 text-white'
-                : 'bg-gray-200'
-            }`}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
-  const SearchBar = () => (
-    <div className="p-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-        <input
-          type="text"
-          placeholder="O que você quer comer hoje?"
-          className="w-full p-2 pl-10 border rounded-lg"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-    </div>
-  );
-
-  const ProductCard = ({ product }) => (
-    <div
-      onClick={() => setSelectedProduct(product)}
-      className="flex p-4 border rounded-lg cursor-pointer hover:shadow-lg"
-    >
-      <div className="flex-1">
-        <h3 className="font-bold">{product.name}</h3>
-        <p className="text-sm text-gray-600">{product.description}</p>
-        <p className="mt-2 font-bold text-purple-700">
-          R$ {product.price.toFixed(2)}
-        </p>
-      </div>
-      <img
-        src={product.image}
-        alt={product.name}
-        className="w-20 h-20 object-cover rounded-lg"
-      />
-    </div>
-  );
-
-  const ProductModal = () => {
-    const [selectedToppings, setSelectedToppings] = useState([]);
-
-    if (!selectedProduct) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg max-w-lg w-full p-6">
-          <div className="flex justify-between items-start">
-            <h2 className="text-xl font-bold">{selectedProduct.name}</h2>
-            <button onClick={() => setSelectedProduct(null)}>
-              <X size={24} />
-            </button>
-          </div>
-          <img
-            src={selectedProduct.image}
-            alt={selectedProduct.name}
-            className="w-full h-48 object-cover rounded-lg my-4"
-          />
-          <p className="text-gray-600 mb-4">{selectedProduct.description}</p>
-          <p className="font-bold text-purple-700 mb-4">
-            R$ {selectedProduct.price.toFixed(2)}
-          </p>
-          
-          <div className="mb-4">
-            <h3 className="font-bold mb-2">
-              Acompanhamentos (min: {selectedProduct.minToppings}, max:{' '}
-              {selectedProduct.maxToppings})
-            </h3>
-            <div className="space-y-2">
-              {selectedProduct.toppings.map((topping) => (
-                <label key={topping} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedToppings.includes(topping)}
-                    onChange={() => {
-                      if (selectedToppings.includes(topping)) {
-                        setSelectedToppings(
-                          selectedToppings.filter((t) => t !== topping)
-                        );
-                      } else if (
-                        selectedToppings.length < selectedProduct.maxToppings
-                      ) {
-                        setSelectedToppings([...selectedToppings, topping]);
-                      }
-                    }}
-                    className="mr-2"
-                  />
-                  {topping}
-                </label>
-              ))}
+    <main class="main-content">
+        <!-- Schedule Section -->
+        <section id="schedule" class="content-section active">
+            <h2>Horário de Funcionamento</h2>
+            <div id="schedule-form">
+                <!-- Will be populated by JavaScript -->
             </div>
-          </div>
+            <button class="btn" onclick="saveSchedule()">Salvar Alterações</button>
+        </section>
 
-          <button
-            onClick={() => {
-              if (
-                selectedToppings.length >= selectedProduct.minToppings &&
-                selectedToppings.length <= selectedProduct.maxToppings
-              ) {
-                setCartItems([
-                  ...cartItems,
-                  { ...selectedProduct, selectedToppings },
-                ]);
-                setShowCart(true);
-                setSelectedProduct(null);
-              }
-            }}
-            disabled={
-              selectedToppings.length < selectedProduct.minToppings ||
-              selectedToppings.length > selectedProduct.maxToppings
-            }
-            className="w-full bg-purple-700 text-white py-2 rounded-lg disabled:bg-gray-400"
-          >
-            Adicionar ao Carrinho
-          </button>
+        <!-- Categories Section -->
+        <section id="categories" class="content-section">
+            <h2>Categorias</h2>
+            <div class="category-input">
+                <input type="text" id="new-category" placeholder="Nova categoria">
+                <button class="btn" onclick="addCategory()">Adicionar</button>
+            </div>
+            <ul class="category-list" id="category-list">
+                <!-- Will be populated by JavaScript -->
+            </ul>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="content-section">
+            <h2>Produtos</h2>
+            <button class="btn" onclick="openProductModal()" style="margin-bottom: 1rem;">
+                Adicionar Novo Produto
+            </button>
+            <div id="products-list">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Customers Section -->
+        <section id="customers" class="content-section">
+            <h2>Clientes</h2>
+            <table style="width: 100%; margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Pontos</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="customers-list">
+                    <!-- Will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Loyalty Program Section -->
+        <section id="loyalty" class="content-section">
+            <h2>Programa de Fidelidade</h2>
+            <div style="margin-top: 1rem;">
+                <h3>Configurações</h3>
+                <div style="margin: 1rem 0;">
+                    <label>Pontos por real gasto:</label>
+                    <input type="number" id="points-per-real" value="1">
+                </div>
+                <div style="margin: 1rem 0;">
+                    <label>Valor do ponto em reais:</label>
+                    <input type="number" id="point-value" value="0.05">
+                </div>
+                <button class="btn" onclick="saveLoyaltyConfig()">Salvar Configurações</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Product Modal -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <h2>Adicionar/Editar Produto</h2>
+            <form id="product-form">
+                <div style="margin-bottom: 1rem;">
+                    <label>Nome:</label>
+                    <input type="text" id="product-name" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Descrição:</label>
+                    <textarea id="product-description" required></textarea>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Preço:</label>
+                    <input type="number" id="product-price" step="0.01" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Categoria:</label>
+                    <select id="product-category" required>
+                        <!-- Will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Imagem URL:</label>
+                    <input type="text" id="product-image" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Acompanhamentos (separados por vírgula):</label>
+                    <input type="text" id="product-toppings">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Mínimo de acompanhamentos:</label>
+                    <input type="number" id="product-min-toppings" min="0">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label>Máximo de acompanhamentos:</label>
+                    <input type="number" id="product-max-toppings" min="0">
+                </div>
+                <button type="submit" class="btn">Salvar</button>
+                <button type="button" class="btn" onclick="closeProductModal()" style="margin-left: 1rem;">Cancelar</button>
+            </form>
         </div>
-      </div>
-    );
-  };
-
-  const CartModal = () => {
-    if (!showCart) return null;
-
-    const total = cartItems.reduce((sum, item) => sum + item.price, 0);
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg max-w-lg w-full p-6">
-          <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-bold">Seu Pedido</h2>
-            <button onClick={() => setShowCart(false)}>
-              <X size={24} />
-            </button>
-          </div>
-
-          <div className="space-y-4 mb-4">
-            {cartItems.map((item, index) => (
-              <div key={index} className="border-b pb-2">
-                <h3 className="font-bold">{item.name}</h3>
-                <p className="text-sm text-gray-600">
-                  Acompanhamentos: {item.selectedToppings.join(', ')}
-                </p>
-                <p className="font-bold text-purple-700">
-                  R$ {item.price.toFixed(2)}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <p className="font-bold text-lg mb-4">
-            Total: R$ {total.toFixed(2)}
-          </p>
-
-          <div className="flex space-x-4">
-            <button
-              onClick={() => setShowCart(false)}
-              className="flex-1 bg-gray-200 py-2 rounded-lg"
-            >
-              Continuar Comprando
-            </button>
-            <button
-              onClick={() => {
-                // Handle order completion
-                setShowCart(false);
-                setCartItems([]);
-              }}
-              className="flex-1 bg-purple-700 text-white py-2 rounded-lg"
-            >
-              Finalizar Pedido
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const filteredProducts = products.filter(
-    (product) =>
-      (selectedCategory === 'Todos' ||
-        product.category === selectedCategory) &&
-      (!searchQuery ||
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <Categories />
-      <SearchBar />
-      
-      <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {filteredProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
-
-      <ProductModal />
-      <CartModal />
     </div>
-  );
-};
 
-export default Menu;
+    <script>
+        // Navigation
+        const navButtons = document.querySelectorAll('.nav-button');
+        const sections = document.querySelectorAll('.content-section');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const sectionId = button.dataset.section;
+                
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                sections.forEach(section => section.classList.remove('active'));
+                
+                button.classList.add('active');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+        // Schedule Management
+        const schedule = {
+            monday: { open: '10:00', close: '22:00', isOpen: true },
+            tuesday: { open: '10:00', close: '22:00', isOpen: true },
+            wednesday: { open: '10:00', close: '22:00', isOpen: true },
+            thursday: { open: '10:00', close: '22:00', isOpen: true },
+            friday: { open: '10:00', close: '23:00', isOpen: true },
+            saturday: { open: '10:00', close: '23:00', isOpen: true },
+            sunday: { open: '12:00', close: '20:00', isOpen: true }
+        };
+
+        function initializeSchedule() {
+            const container = document.getElementById('schedule-form');
+            Object.entries(schedule).forEach(([day, hours]) => {
+                const row = document.createElement('div');
+                row.className = 'schedule-row';
+                row.innerHTML = `
+                    <span style="width: 100px; text-transform: capitalize;">${day}</span>
+                    <input type="checkbox" ${hours.isOpen ? 'checked' : ''} 
+                           onchange="updateSchedule('${day}', 'isOpen', this.checked)">
+                    <input type="time" value="${hours.open}" 
+                           onchange="updateSchedule('${day}', 'open', this.value)"
+                           ${!hours.isOpen ? 'disabled' : ''}>
+                    <span>até</span>
+                    <input type="time" value="${hours.close}" 
+                           onchange="updateSchedule('${day}', 'close', this.value)"
+                           ${!hours.isOpen ? 'disabled' : ''}>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function updateSchedule(day, field, value) {
+            schedule[day][field] = value;
+            if (field === 'isOpen') {
+                const row = document.querySelector(`[onclick*="${day}"]`).parentElement;
+                const timeInputs = row.querySelectorAll('input[type="time"]');
+                timeInputs.forEach(input => input.disabled = !value);
+            }
+        }
+
+        function saveSchedule() {
+            localStorage.setItem('schedule', JSON.stringify(schedule));
+            alert('Horário salvo com sucesso!');
+        }
+
+        // Categories Management
+        let categories = [
+            'Todos',
+            'Apenas Cremes',
+            'Açaí com Creme de Ninho',
+            'Açaí com Creme de Ovomaltine',
+            'Açaí com Creme de Amendoim',
+            'Açaí puro',
+            'Monte seu Açaí'
+        ];
+
+        function initializeCategories() {
+            updateCategoryList();
+            updateProductCategorySelect();
+        }
+
+        function updateCategoryList() {
+            const list = document.getElementById('category-list');
+            list.innerHTML = categories.map(category => `
+                <li class="category-item">
+                    <span>${category}</span>
+                    <button class="btn btn-danger" onclick="removeCategory('${category}')">
+                        Remover
+                    </button>
+                </li>
+            `).join('');
+        }
+
+        function addCategory() {
+            const input = document.getElementById('new-category');
+            const category = input.value.trim();
+            
+            if (category && !categories.includes(category)) {
+                categories.push(category);
+                updateCategoryList();
+                updateProductCategorySelect();
+                input.value = '';
+                localStorage.setItem('categories', JSON.stringify(categories));
+            }
+        }
+
+        function removeCategory(category) {
+            if (category !== 'Todos') {
+                categories = categories.filter(c => c !== category);
+                updateCategoryList();
+                updateProductCategorySelect();
+                localStorage.setItem('categories', JSON.stringify(categories));
+            }
+        }
+
+        // Products Management
+        let products = [];
+
+        function initializeProducts() {
+            const savedProducts = localStorage.getItem('products');
+            if (savedProducts) {
+                products = JSON.parse(savedProducts);
+            }
+            updateProductsList();
+        }
+
+        function updateProductsList() {
+            const container = document.getElementById('products-list');
+            container.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div style="flex: 1;">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <p>R$ ${product.price.toFixed(2)}</p>
+                        <p>Categoria: ${product.category}</p>
+                    </div>
+                    <div>
+                        <button class="btn" onclick="editProduct(${product.id})">Editar</button>
+                        <button class="btn btn-danger" onclick="deleteProduct(${product.id})">
+                            Excluir
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateProductCategorySelect() {
+            const select = document.getElementById('product-category');
+            select.innerHTML = categories
+                .filter(category => category !== 'Todos')
+                .map(category => `
+                    <option value="${category}">${category}</option>
+                `).join('');
+        }
+
+        let editingProductId = null;
+
+        function openProductModal(productId = null) {
+            editingProductId = productId;
+            const modal = document.getElementById('product-modal');
+            const form = document.getElementById('product-form');
+            
+            if (productId) {
+                const product = products.find(p => p.id === productId);
+                form.elements['product-name'].value = product.name;
+                form.elements['product-description'].value = product.description;
+                form.elements['product-price'].value = product.price;
+                form.elements['product-category'].value = product.category;
+                form.elements['product-image'].value = product.image;
+                form.elements['product-toppings'].value = product.toppings.join(', ');
+                form.elements['product-min-toppings'].value = product.minToppings;
+                form.elements['product-max-toppings'].value = product.maxToppings;
+            } else {
+                form.reset();
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').style.display = 'none';
+            editingProductId = null;
+        }
+
+        document.getElementById('product-form').onsubmit = function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const productData = {
+                id: editingProductId || Date.now(),
+                name: formData.get('product-name'),
+                description: formData.get('product-description'),
+                price: parseFloat(formData.get('product-price')),
+                category: formData.get('product-category'),
+                image: formData.get('product-image'),
+                toppings: formData.get('product-toppings')
+                    .split(',')
+                    .map(t => t.trim())
+                    .filter(t => t),
+                minToppings: parseInt(formData.get('product-min-toppings')),
+                maxToppings: parseInt(formData.get('product-max-toppings'))
+            };
+
+            if (editingProductId) {
+                products = products.map(p => 
+                    p.id === editingProductId ? productData : p
+                );
+            } else {
+                products.push(productData);
+            }
+
+            localStorage.setItem('products', JSON.stringify(products));
+            updateProductsList();
+            closeProductModal();
+        };
+
+        function deleteProduct(productId) {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                products = products.filter(p => p.id !== productId);
+                localStorage.setItem('products', JSON.stringify(products));
+                updateProductsList();
+            }
+        }
+
+        // Customers Management
+        let customers = [];
+
+        function initializeCustomers() {
+            const savedCustomers = localStorage.getItem('customers');
+            if (savedCustomers) {
+                customers = JSON.parse(savedCustomers);
+            }
+            updateCustomersList();
+        }
+
+        function updateCustomersList() {
+            const tbody = document.getElementById('customers-list');
+            tbody.innerHTML = customers.map(customer => `
+                <tr>
+                    <td>${customer.name}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
+                    <td>${customer.points}</td>
+                    <td>
+                        <button class="btn" onclick="editCustomer(${customer.id})">
+                            Editar
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteCustomer(${customer.id})">
+                            Excluir
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Loyalty Program Management
+        function saveLoyaltyConfig() {
+            const config = {
+                pointsPerReal: parseFloat(document.getElementById('points-per-real').value),
+                pointValue: parseFloat(document.getElementById('point-value').value)
+            };
+            localStorage.setItem('loyaltyConfig', JSON.stringify(config));
+            alert('Configurações do programa de fidelidade salvas com sucesso!');
+        }
+
+        // Initialize everything
+        window.onload = function() {
+            initializeSchedule();
+            initializeCategories();
+            initializeProducts();
+            initializeCustomers();
+        };
+       
